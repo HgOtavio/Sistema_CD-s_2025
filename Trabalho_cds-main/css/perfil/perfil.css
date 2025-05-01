@@ -1,0 +1,273 @@
+/* Resetando margens e preenchimentos padrão */
+*{
+    padding: 0px;
+    margin: 0px;
+    font-family: Arial, Helvetica, sans-serif; /* Define a fonte padrão */
+}
+
+:root{
+    --cinza-1: #303030;
+    --cinza-2: #5d5d5d;
+    --cinza-3: #6d6d6d;
+    --cinza-4: #7b7a7a;
+    --cinza-5: #888888;
+    --cinza-6: #949494;
+    --cinza-7: #abaaaa;
+    --branco: #ffffff;
+    --roxo: #7445cc;
+}
+
+
+
+/* Configuração geral da seção principal */
+#section_perfil{
+    display: flex;
+    background-color: var(--branco);
+    width: 900px; /* Define a largura da seção */
+    margin: 50px auto; /* Centraliza a seção na tela */
+    box-shadow: 3px 3px 5px rgba(0, 0, 0, 0.5); /* Adiciona sombra ao contêiner */
+    border-radius: 10px; /* Arredonda as bordas */
+    z-index: -1;
+}
+
+/* Configuração da parte esquerda do perfil */
+#esquerda{
+    margin-top: 40px;
+    margin-left: 30px;
+    width: 500px;
+}
+
+/* Configuração do cabeçalho do perfil (foto e nome) */
+#cima{
+    display: flex;
+    justify-content: space-around;
+    margin-bottom: 50px;
+    align-items: center;
+}
+
+/* Nome do usuário */
+#nome_user{
+    color: var(--roxo);
+    margin-left: 10px;
+}
+
+/* Foto do perfil */
+#foto_perfil{
+    width: 80px;
+    height: 80px;
+    border: 1px solid var(--roxo);
+    border-radius: 50px; /* Deixa a imagem circular */
+}
+
+/* Linha vertical separadora */
+#hr_em_pe{
+    margin: 0px 30px;
+    width: 5px;
+    height: 500px;
+    background-color: var(--roxo); /* Define a cor da linha */
+}
+
+/* Configuração dos dados do usuário */
+.dados{
+    margin-top: 30px;
+    color: var(--roxo);
+    border-bottom: 2px solid var(--roxo); /* Linha inferior para separar */
+    font-size: 25px;
+    width: 100%;
+    max-width: 350px;
+}
+
+/* Botão de alteração de dados e botões gerais */
+#button, .butoes{
+    width: 250px;
+    max-width: 350px;
+    height: 40px;
+    border-radius: 10px;
+    border: none;
+    margin: 50px 0px;
+    background-color: var(--cinza-1);
+    font-size: 25px;
+    font-weight: bold;
+}
+
+#button{
+    background-color: var(--cinza-2); /* Cor de fundo */
+}
+
+/* Efeito hover nos botões */
+#button:hover, .butoes:hover{
+    background-color: var(--cinza-7);
+    transition: 0.2s;
+}
+
+
+/* Links dentro dos botões */
+#a_buton_principal, .a_butoes{
+    color: var(--branco);
+    text-decoration: none;
+}
+
+/* Efeito hover nos links dos botões */
+#a_buton_principal:hover, .a_butoes:hover{
+    color: var(--cinza-2);
+    transition: 0.2s;
+}
+
+/* Configuração da parte direita do perfil */
+#direita{
+    display: flex;
+    width: 500px;
+}
+
+/* Área dos botões na seção direita */
+#butoes{
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    height: 450px;
+}
+
+/* Estilização geral dos botões da seção direita */
+.butoes{
+    margin: 15px 0px;
+    height: 50px;
+    font-size: 30px;
+    z-index: 2;
+}
+
+/* Área para exibição da imagem do disco */
+#cortar{
+    margin-left: -15%;
+    width: 350px;
+    height: 500px;
+    overflow: hidden; /* Esconde parte da imagem fora da área */
+    z-index: 1;
+}
+
+/* Imagem do disco lateral */
+#img_cd{
+    width: 240%;
+    height: 101%;
+    object-fit: cover; /* Garante que a imagem cubra a área sem distorção */
+    z-index: 1;
+}
+
+/* == ESTILIZAÇÃO DAS IMAGENS LATERAIS == */
+
+/* Classe para esconder elementos específicos */
+.sumir {
+    display: none; /* Oculta as imagens */
+}
+
+/* Imagens decorativas posicionadas à direita */
+#imgs_direita {
+    display: flex; /* Usa flexbox para organização */
+    align-items: flex-end; /* Alinha as imagens ao fundo */
+    flex-direction: column; /* Organiza as imagens em coluna */
+    position: fixed; /* Posicionamento absoluto sobre o conteúdo */
+    bottom: 0; /* Alinha ao fundo da tela */
+    right: 0; /* Alinha à direita */
+    z-index: -3; /* Coloca as imagens atrás do conteúdo principal */
+    width: 100%;
+    height: 100%;
+}
+
+/* Imagens decorativas posicionadas à esquerda */
+#imgs_esquerda {
+    display: flex;
+    flex-direction: column;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    z-index: -3;
+    width: 100%;
+    height: 100%;
+}
+
+/* Ajuste de tamanho e margem das imagens da direita */
+.img_direita {
+    width: 300px; /* Define a largura das imagens */
+    margin-right: -200px; /* Ajusta a posição da imagem */
+}
+
+/* Ajuste de espaçamento entre imagens da direita, exceto a primeira */
+.img_direita:not(:first-child) {
+    margin-top: -5px;
+}
+
+/* Ajuste das imagens da esquerda (espelhadas horizontalmente) */
+.img_esquerda {
+    width: 300px;
+    margin-left: -200px;
+    transform: scaleX(-1); /* Inverte horizontalmente a imagem */
+}
+
+/* Ajuste de espaçamento entre imagens da esquerda, exceto a primeira */
+.img_esquerda:not(:first-child) {
+    margin-top: -5px;
+}
+
+.img_direita, .img_esquerda {
+    max-width: 300px; /* Mantém as imagens menores em telas pequenas */
+    opacity: 0.5; /* Reduz a opacidade para não sobrecarregar o layout */
+}
+
+
+@media only screen and (max-width: 768px) {
+    #section_perfil{
+        width: 450px;
+        height: auto;
+        flex-direction: column;
+    }
+
+    #esquerda{
+        width: 400px;
+        height: 250px;
+    }
+
+    #hr_em_pe{
+        width: 5px;
+        height: 452px;
+        margin-left: 49.3%;
+        transform: rotate(90deg);
+    }
+
+    #direita{
+        width: 450px;
+        margin-top: -240px;
+        flex-direction: column;
+        margin-left: 70px;
+    }
+
+    #butoes{
+        margin-left: 20px;
+    }
+
+    #cortar{
+        transform: rotate(90deg);
+        margin-left: 5px;
+        width: 305px;
+        height: 500px;
+        margin-top: -240px;
+        margin-bottom: -98px;
+        border-radius: 40px;
+        z-index: 1;
+    }
+
+    /* Exibe imagens ocultas em telas menores */
+    .sumir {
+        display: block;
+    }
+
+    .img_direita {
+        width: 200%;
+        height: 100%;
+        object-fit: cover;
+    }
+
+    .cortar{
+        width: 150px;
+        overflow: hidden; /* Esconde parte da imagem fora da área */
+    }
+
+}

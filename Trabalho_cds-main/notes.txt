@@ -1,0 +1,158 @@
+icones: https://icons8.com.br/icons/set/lupa-de-pesquisa-musica
+
+img slide tamanho: 1800x600 e 1040x600, https://br.freepik.com/fotos-gratis/animada-e-animada-garota-ruiva-em-extase-sorrindo-fascinada-e-divertida-mostrando-grande-e-grande-obj_37025767.htm#fromView=keyword&page=1&position=3&uuid=9853e3a3-4d0b-4d08-ad58-c09494aa2c86&query=1800x600
+
+imagem destaque: 1200x1200
+
+img silde artista: ?? x ?? e 1800x500
+
+Gêneros:
+
+Clássica
+Eletrônica
+Forro
+Hip Hop
+MPB
+Pagode
+Pop
+Reggae
+Rock
+Sertanejo
+
+obsevação: os links dos slides podem ser removidos, contanto que o css que estiver na 'class' do 'a', seja colocada para 'class' da imagem.
+
+Codigos feitos:
+
+cadastro.html > cabeçalho_sem_login.css
+login.html > cabeçalho_sem_login.css
+adm.html > cabeçalho_com_login.css
+alterar_dados.html > cabeçalho_com_login_sem_menu.css
+user.html > cabeçalho_com_login.css
+politica_comercial.html > cabeçalho_com_login.css > rodape.css
+avaliar.html > cabeçalho_com_login_sem_menu.css
+perguntas_frequentes.html > cabeçalho_com_login.css > rodape.css
+todos_os_produtos.html > cabeçalho_com_login.css > rodape.css
+add_artista.html > cabeçalho_com_login_sem_menu.css
+add_cds.html > cabeçalho_com_login_sem_menu.css
+add_user.html > cabeçalho_com_login_sem_menu.css
+add_musica.html > cabeçalho_com_login_sem_menu.css
+editar_artistas.html > cabeçalho_com_login_sem_menu.css
+editar_cds.html > cabeçalho_com_login_sem_menu.css
+editar_user.html > cabeçalho_com_login_sem_menu.css
+editar_musicas.html > cabeçalho_com_login_sem_menu.css
+gerenciar_artistas.html > cabeçalho_com_login_sem_menu.css
+gerenciar_cds.html > cabeçalho_com_login_sem_menu.css
+gerenciar_user.html > cabeçalho_com_login_sem_menu.css
+gerenciar_musicas.html > cabeçalho_com_login_sem_menu.css
+favoritos.html > cabeçalho_com_login.css > rodape.css
+artista.html > cabeçalho_com_login.css > rodape.css
+carrinho.html > cabeçalho_com_login.css
+
+
+Falta terminar:
+
+index_logado.html > cabeçalho_com_login.css > rodape.css (Falta Alterar as imagens dos carrosseis e do destaque)
+index.html > cabeçalho_sem_login.css > rodape.css (Falta Alterar as imagens dos carrosseis e do destaque)
+
+Falta telas:
+
+-gerenciar_atividades
+
+-sugestao
+-historico_compras
+
+-detalhes_cd (produto)
+-comprar
+
+Organização:
+
+php_matriz{
+    >css{...}
+    >html{
+        >login_cadastro{
+            >perfil{
+                >adm{
+                    >add{
+                        -adicionar_artistas
+                        -adicionar_cd
+                        -adicionar_usuarios
+                        -adicionar_musica
+                    }
+                    >edicao{
+                        -editar_artista
+                        -editar_cd
+                        -editar_usuarios
+                        -editar_musica
+                    }
+                    >gerenciamento{
+                        -gerenciar_artista
+                        -gerenciar_cd
+                        -gerenciar_usuarios
+                        -gerenciar_musicas
+                        -gerenciar_atividades
+                    }
+                    >puro{...}
+                }
+                >butoes{
+                    -favoritos
+                    -logout (sair)
+                    -sugestao
+                    -uploud_foto
+                    -carrinho
+                    -historico_compras
+                }
+                >uplouds{...}
+                -editar_cliente (alterar_dados)
+                -index (perfil_user)
+                -perfil_adm
+            }
+            >puro{...}
+            -cadastro
+            -login
+        }
+        >pagina_inicial{
+            -index
+            -index_logado
+        }
+        >produtos{
+            -todos_produtos
+            -artista
+            -detalhes_cd (produto)
+            -comprar
+        }
+        >rodape{
+                -politica_comercial
+                -avaliar_site
+                -perguntas_frequentes
+            }
+    }
+    >imagens{...}
+    >img_code{...}
+    >js{...}
+}
+
+
+
+
+Alterações:
+
+produto info
+título 
+capa 
+disponibilidade
+preço 
+os nomes e os tempos das músicas 
+nomes dos artistas 
+descrição 
+ano de lançamento 
+gênero 
+procedência
+trecho de uma música
+
+
+Pagamento
+forma de pagamento (à vista ou a 
+prazo) 
+tipo de pagamento (boleto bancário ou cartão) 
+as opções de envio (transporte: aéreo ou marítimo) 
+endereço de entrega

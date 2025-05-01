@@ -1,0 +1,385 @@
+/* Reseta as margens e o preenchimento de todos os elementos e define a fonte padrão */
+
+
+* {
+    margin: 0px;
+    padding: 0px;
+    font-family: Arial, Helvetica, sans-serif;
+}
+
+:root{
+    --cinza-1: #303030;
+    --cinza-2: #5d5d5d;
+    --cinza-3: #6d6d6d;
+    --cinza-4: #7b7a7a;
+    --cinza-5: #888888;
+    --cinza-6: #949494;
+    --cinza-7: #abaaaa;
+    --branco: #ffffff;
+    --roxo: #7445cc;
+}
+
+main{
+    display: flex;
+    justify-content: center;
+}
+
+/* Estilo para o container principal de login */
+#login {
+    background-color: var(--roxo); /* Cor de fundo cinza */
+    display: flex; /* Flexbox para organizar o layout dos elementos */
+    margin-top: 70px;
+    width: 700px; /* Largura fixa do box de login */
+    height: 420px; /* Altura fixa do box de login */
+    border-radius: 20px; /* Bordas arredondadas */
+    position: relative; /* Permite que elementos internos se posicionem em relação a esse container */
+    width: 90%; /* Ocupa 90% da tela */
+    max-width: 700px; /* Máximo de 700px */
+}
+
+/* Estilos para a parte esquerda do container de login */
+#lado_esquerdo {
+    margin: 20px;
+    color: var(--branco); /* Cor do texto em branco */
+}
+
+/* Estilo do título principal */
+#titulo {
+    font-size: 60px; /* Tamanho da fonte grande */
+}
+
+/* Estilo para o subtítulo */
+#p_titulo {
+    font-size: 15px; /* Tamanho da fonte menor */
+}
+
+/* Estilo do link de início */
+#link_inicio {
+    color: var(--branco);
+}
+
+/* Efeito hover para o link de início */
+#link_inicio:hover {
+    color: var(--cinza-1); /* Altera a cor para um cinza mais escuro ao passar o mouse */
+    transition: 0.2s;
+}
+
+/* Estilos para os inputs de login */
+#inputs {
+    margin-top: 20px; /* Margem superior para separar os campos */
+}
+
+/* Estilo para os títulos dos campos de input */
+.titulo_input {
+    font-size: 30px; /* Tamanho da fonte maior */
+    margin-bottom: 10px; /* Espaço abaixo do título */
+}
+
+/* Estilo para os campos de input */
+.input {
+    width: 100%;
+    max-width: 330px;
+    height: 30px; /* Altura do campo */
+    border-radius: 10px; /* Bordas arredondadas */
+    border: none; /* Remove a borda padrão */
+    padding-left: 10px; /* Espaço interno à esquerda */
+}
+
+/* Foco nos campos de input (remover borda de foco padrão) */
+.input:focus {
+    outline: none;
+}
+
+/* Estilos para o campo de senha */
+#senha {
+    margin-top: 10px;
+    z-index: 0; /* Organiza a camada do elemento */
+}
+
+/* Estilos para o botão "olho" (mostrar/ocultar senha) */
+#olho {
+    background-color: transparent; /* Fundo transparente */
+    border: none; /* Remove a borda */
+    position: absolute; /* Posicionamento absoluto */
+    z-index: 1; /* Organiza a camada do elemento */
+    margin-left: -40px;
+    margin-top: 2px;
+}
+
+/* Tamanho da imagem do ícone do olho */
+#img_olho {
+    width: 30px;
+    height: 25px;
+}
+
+/* Estilos para os links relacionados à senha */
+#link_senha, #p_link_senha {
+    color: var(--branco); /* Cor do texto branco */
+    font-size: 15px; /* Tamanho da fonte pequeno */
+}
+
+/* Margens para o link de senha */
+#p_link_senha {
+    margin: 5px 0px 0px 5px;
+}
+
+/* Efeito hover no link de senha */
+#link_senha:hover {
+    color: var(--cinza-1); /* Cor ao passar o mouse */
+    transition: 0.2s;
+}
+
+/* Estilos para o botão de acesso */
+#acessar {
+    width: 100%;
+    max-width: 300px;
+    height: 40px;
+    border-radius: 10px;
+    border: none;
+    margin: 25px 15px 0px 15px;
+    background-color: #e2e2e2; /* Cor de fundo */
+    color: var(--cinza-2); /* Cor do texto */
+    font-size: 25px; /* Tamanho da fonte */
+    font-weight: bold; /* Negrito */
+}
+
+/* Efeito hover no botão de acesso */
+#acessar:hover {
+    color: var(--branco); /* Cor do texto ao passar o mouse */
+    background-color: var(--cinza-2); /* Cor de fundo ao passar o mouse */
+    transition: 0.3s;
+}
+
+/* Estilos para o link de criar conta */
+#link_criar, #p_link_criar {
+    color: var(--branco); /* Cor do texto branco */
+}
+
+/* Efeito hover no link de criar conta */
+#link_criar:hover {
+    color: var(--cinza-1); /* Cor ao passar o mouse */
+    transition: 0.2s;
+}
+
+/* Estilos para o parágrafo de criar conta */
+#p_link_criar {
+    margin: 5px 0px 0px 20px;
+    font-size: 15px; /* Tamanho da fonte */
+}
+
+/* == Barras de animação == */
+.visualizer-container {
+    display: flex;
+    justify-content: center;
+    width: 100vw;
+    height: 200px;
+    position: fixed; /* Fixa o visualizador na tela */
+    z-index: -1; /* Coloca atrás dos outros elementos */
+}
+
+/* Estilos para a barra de animação da esquerda */
+#esquerda {
+    left: -43%; /* Posiciona fora da tela */
+    transform: rotate(270deg); /* Rotaciona a barra */
+}
+
+/* Estilos para a barra de animação da direita */
+#direita {
+    right: -43%; /* Posiciona fora da tela */
+    transform: rotate(90deg); /* Rotaciona a barra */
+}
+
+/* Contêiner para as barras animadas */
+.visualizer {
+    display: flex;
+    justify-content: center;
+    gap: 5px; /* Espaço entre as barras */
+    width: 100%;
+    height: 100%;
+}
+
+/* Estilos para cada barra de animação */
+.bar {
+    flex-grow: 1; /* Expande para preencher o espaço */
+    width: 15px; /* Largura da barra */
+    height: 50px; /* Altura inicial */
+    background-color: #000000; /* Cor de fundo preta */
+    animation: barAnimation 1s ease-in-out infinite; /* Animação */
+    position: relative;
+    overflow: hidden; /* Impede o conteúdo de ultrapassar a barra */
+}
+
+/* Estilos para as barras cinzas */
+.bar.gray {
+    background-color: var(--branco); /* Cor de fundo branca */
+}
+
+/* Animação das barras */
+.bar::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-image: linear-gradient(black 5px, transparent 5px); /* Efeito de linha dentro da barra */
+    background-size: 100% 10px;
+}
+
+/* === Barras animadas === */
+
+.bar:nth-child(1) {animation-delay: 0s;}
+
+.bar:nth-child(2) {animation-delay: 0.1s;}
+
+.bar:nth-child(3) {animation-delay: 0.2s;}
+
+.bar:nth-child(4) {animation-delay: 0.3s;}
+
+.bar:nth-child(5) {animation-delay: 0.4s;}
+
+.bar:nth-child(6) {animation-delay: 0.5s;}
+
+.bar:nth-child(7) {animation-delay: 0.6s;}
+
+.bar:nth-child(8) {animation-delay: 0.7s;}
+
+.bar:nth-child(9) {animation-delay: 0.8s;}
+
+.bar:nth-child(10) {animation-delay: 0.9s;}
+
+.bar:nth-child(11) {animation-delay: 1s;}
+
+.bar:nth-child(12) {animation-delay: 1.1s;}
+
+.bar:nth-child(13) {animation-delay: 1.2s;}
+
+.bar:nth-child(14) {animation-delay: 1.3s;}
+
+.bar:nth-child(15) {animation-delay: 1.4s;}
+
+.bar:nth-child(16) {animation-delay: 1.5s;}
+
+.bar:nth-child(17) {animation-delay: 1.6s;}
+
+.bar:nth-child(18) {animation-delay: 1.7s;}
+
+.bar:nth-child(19) {animation-delay: 1.8s;}
+
+.bar:nth-child(20) {animation-delay: 1.9s;}
+
+.bar:nth-child(21) {animation-delay: 2s;}
+
+.bar:nth-child(22) {animation-delay: 2.1s;}
+
+.bar:nth-child(23) {animation-delay: 2.2s;}
+
+.bar:nth-child(24) {animation-delay: 2.3s;}
+
+.bar:nth-child(25) {animation-delay: 2.4s;}
+
+/* Definindo a animação das barras */
+@keyframes barAnimation {
+    0% {height: 50px;} /* Altura inicial */
+    50% {height: 150px;} /* Altura máxima no meio da animação */
+    100% {height: 50px;} /* Altura final */
+}
+
+/* Estilo para a imagem de login */
+#img_login {
+    width: 340px;
+    border-radius: 0px 20px 20px 0px; /* Bordas arredondadas do lado direito */
+    background-position: center;
+}
+
+/* Para telas grandes (a partir de 1200px) */
+@media only screen and (max-width: 1200px) {
+    #login {
+        width: 50%; /* Evita que fique pequeno em telas grandes */
+        max-width: 900px;
+    }
+
+    #titulo {
+        font-size: 50px; /* Ajusta tamanho do título */
+    }
+
+    .input {
+        font-size: 22px;
+        max-width: 100%;
+    }
+
+    #acessar {
+        font-size: 24px;
+        width: 350px;
+    }
+
+    /* Centralizar melhor o layout */
+    .container {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+    }
+
+    /* Aumentar ícone do olho */
+    #olho {
+        width: 30px;
+        height: 30px;
+    }
+}
+
+/* Media query para telas pequenas (como dispositivos móveis) */
+@media only screen and (max-width: 768px) {
+    #login {
+        width: 450px; 
+        height: auto;
+        margin: 68px 50px; /* Ajuste da margem */
+    }
+
+    #img_login {
+        display: none; /* Oculta a imagem de login em telas pequenas */
+    }
+
+    .visualizer-container {
+        display: none; /* Esconde o visualizador de animação */
+    }
+
+    body {
+        background-image: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url(../../img/login/img_login_cel.png);
+        background-repeat: no-repeat; /* Evita que a imagem de fundo se repita */
+        background-size: cover; /* Faz a imagem cobrir toda a tela */
+        background-position: center; /* Centraliza a imagem de fundo */
+    }
+    .input{
+        width: 350px;
+    }
+}
+
+/*  Para telas pequenas, como celulares (até 480px) */
+@media only screen and (max-width: 480px) {
+    #login {
+        width: 95%;
+    }
+
+    #titulo {
+        font-size: 28px; /* Reduz ainda mais para caber melhor */
+    }
+
+    .input {
+        font-size: 16px;
+    }
+
+    #acessar {
+        font-size: 18px;
+        padding: 10px;
+    }
+
+    /* Esconde elementos decorativos para otimizar a tela */
+    .img_direita, .img_esquerda {
+        display: none;
+    }
+    
+}
+
+
+

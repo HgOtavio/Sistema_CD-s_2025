@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Avaliar Site</title>
+    <link rel="shortcut icon" href="../../img/favicon/favicon.ico" type="image/x-icon">
+
+    <!-- Importação dos arquivos CSS -->
+    <link rel="stylesheet" href="../../css/avaliar_site/avaliar_site.css">
+    <link rel="stylesheet" href="../../css/cabeçalhos/cabeçalho_com_login_sem_menu.css">
+
+    <!-- Importação do script JavaScript responsável pela avaliação com estrelas -->
+    <script src="../../js/avaliar/estrelas.js" defer></script>
+
+</head>
+<body>
+
+    <!-- Cabeçalho da página (com usuário logado) -->
+    <header> 
+        <div id="parte_de_cima_cab">
+
+            <!-- Logo da página -->
+            <a href="#" id="logo"><img src="../../../img/cabeçario/logo.png" alt="Logo" id="img_logo"></a> 
+            
+            <!-- Barra de pesquisa -->
+
+            <!-- Ícones de perfil e carrinho de compras -->
+            <div id="login_carrinho">
+                <a href="#"><img src="../../../img/cabeçario/icone_perfil.png" alt="Perfil" id="Perfil"></a>
+                <a href="#"><img src="../../../img/cabeçario/icone_carrinho.png" alt="Carrinho" id="Carrinho"></a>
+            </div>
+        </div>
+    </header>
+    <button class="button_voltar"><a href="#" class="link_voltar">Voltar</a></button>
+    <main>
+        <section id="conteudo">
+            <!-- Título principal da página -->
+            <h1 id="titulo">Avaliar</h1>
+
+            <!-- Seção para avaliação com estrelas -->
+            <div id="avaliar_estrelas">
+                <p id="avaliar_estrelas_titulo">Sua Avaliação</p>
+                <div id="linha_de_estrelas">
+                    <!-- Cada div representa uma estrela interativa -->
+                    <div class="estrela" data-valor="1"></div>
+                    <div class="estrela" data-valor="2"></div>
+                    <div class="estrela" data-valor="3"></div>
+                    <div class="estrela" data-valor="4"></div>
+                    <div class="estrela" data-valor="5"></div>
+                </div>
+            </div>
+
+            <!-- Campo para o usuário escrever um comentário sobre o site -->
+            <div id="text_avalicao">
+                <p id="text_avalicao_titulo">Sua avaliação sobre o site</p>
+                <textarea rows="4" cols="50" placeholder="Digite seu texto aqui..." id="input_text"></textarea>
+            </div>
+
+            <!-- Botão de envio da avaliação -->
+            <button id="enviar">Enviar</button>
+        </section>
+    </main>
+
+    <!-- Seção de imagens decorativas à direita -->
+    <div id="imgs_direita">
+        <div class="cortar"><img src="../../../img/img_cantos/img_cantos.png" alt="notas musicais" class="img_direita"></div>
+        <div class="cortar"><img src="../../../img/img_cantos/img_cantos.png" alt="notas musicais" class="img_direita"></div>
+        <div class="cortar"><img src="../../../img/img_cantos/img_cantos.png" alt="notas musicais" class="img_direita sumir"></div>
+    </div>
+
+    <!-- Seção de imagens decorativas à esquerda -->
+    <div id="imgs_esquerda">
+        <img src="../../../img/img_cantos/img_cantos.png" alt="notas musicais" class="img_esquerda">
+        <img src="../../../img/img_cantos/img_cantos.png" alt="notas musicais" class="img_esquerda">
+        <img src="../../../img/img_cantos/img_cantos.png" alt="notas musicais" class="img_esquerda sumir">
+    </div>
+    
+</body>
+</html>

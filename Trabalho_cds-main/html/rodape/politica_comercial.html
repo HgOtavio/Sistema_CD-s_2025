@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="pt_br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Política comercial</title>
+    <link rel="shortcut icon" href="../../img/favicon/favicon.ico" type="image/x-icon">
+
+    <!-- Link para o arquivo CSS -->
+    <link rel="stylesheet" href="../../css/rodape/politica_comercial.css">
+    <link rel="stylesheet" href="../../css/cabeçalhos/cabeçalho_com_login.css">
+    <link rel="stylesheet" href="../../css/rodape/rodape.css">
+
+    <!-- Link para o arquivo CSS -->
+     <script src="../../../js/cabeçalho/menu.js"></script>
+</head>
+<body>
+    <header> 
+        <div id="parte_de_cima_cab">
+
+            <!-- Logo da página -->
+            <a href="#" id="logo"><img src="../../../img/cabeçario/logo.png" alt="Logo" id="img_logo"></a> 
+
+            <!-- Barra de pesquisa -->
+            <div id="barra_pesquisa">
+                <input type="checkbox" id="check"> <!-- Controle de visibilidade -->
+                <div id="complemento_pesquisa">
+
+                    <!-- Campo de pesquisa -->
+                    <input type="text" id="input_barra_pesquisa" placeholder="Buscar..." >
+
+                    <!-- Botão de pesquisa -->
+                    <label for="check" id="buttom_lupa">
+                        <img src="../../../img/cabeçario/icone_lupa.png" alt="Lupa" id="lupa">
+                    </label>
+                </div>
+            </div>
+
+            <div id="login_carrinho"> <!-- Login e Carrinho -->
+                    <a href="#"><img src="../../../img/cabeçario/icone_perfil.png" alt="Perfil" id="Perfil"></a><!-- Foto de perfil -->
+
+                <a href="#"><img src="../../../img/cabeçario/icone_carrinho.png" alt="Carrinho" id="Carrinho"></a><!-- Ícone de carrinho -->
+            </div>
+        </div>
+
+        <hr style="color: #7b7a7a;"><!-- Linha separadora -->
+
+        <!-- Menu de navegação -->
+        <nav class="menu-underline">
+            <input type="checkbox" id="menu_toggle" class="menu_toggle"><!-- Menu responsivo -->
+            <label for="menu_toggle" class="menu_icon">&#9776;</label> 
+
+            <ul id="menu">
+
+                <li class="p_menu"><a href="#" class="a_menu">Inicio</a></li>
+                <li class="p_menu"><a href="#" class="a_menu">Produtos</a></li>
+                
+                 <!-- Menu suspenso de gêneros musicais -->
+                <li class="p_menu" id="menu_genero">
+
+                    <button onclick="aparecer_g('sumir_g')" class="b_menu">
+                        Gênero
+                    </button>
+
+                    <!-- Submenu de Gêneros -->
+                    <ul class="subclasse_menu" id="sumir_g">
+                        
+                        <ul class="sub_subclasse_menu">
+                            <li><a href="#" class="sub_a">Clássica</a></li>
+                            <li><a href="#" class="sub_a">Eletrônica</a></li>
+                            <li><a href="#" class="sub_a">Forro</a></li>
+                            <li><a href="#" class="sub_a">Hip Hop</a></li>
+                            <li><a href="#" class="sub_a">MPB</a></li>
+                        </ul>
+                        
+                        <ul class="sub_subclasse_menu">
+                            <li><a href="#" class="sub_a">Pagode</a></li>
+                            <li><a href="#" class="sub_a">Pop</a></li>
+                            <li><a href="#" class="sub_a">Reggae</a></li>
+                            <li><a href="#" class="sub_a">Rock</a></li>
+                            <li><a href="#" class="sub_a">Sertanejo</a></li>
+                        </ul>
+                    </ul>
+                </li>
+
+                <!-- Menu suspenso para Artistas -->
+                <li class="p_menu" id="arredondar_b">
+
+                    <button onclick="aparecer_a('sumir_a')" class="b_menu">
+                        Artistas
+                    </button>
+
+                    <!-- Submenu de Artistas -->
+                    <ul class="subclasse_menu_a" id="sumir_a">
+                        
+                        <ul class="sub_subclasse_menu">
+                            <li><a href="#" class="sub_a">Ludwing Beethowen</a></li>
+                            <li><a href="#" class="sub_a">Marshmello</a></li>
+                            <li><a href="#" class="sub_a">Luiz Gonzaga</a></li>
+                            <li><a href="#" class="sub_a">Snoop Dogg</a></li>
+                            <li><a href="#" class="sub_a">Maria Bethânia</a></li>
+                        </ul>
+                        
+                        <ul class="sub_subclasse_menu">
+                            <li><a href="#" class="sub_a">Péricles</a></li>
+                            <li><a href="#" class="sub_a">Michael Jackson</a></li>
+                            <li><a href="#" class="sub_a">Bob Marley</a></li>
+                            <li><a href="#" class="sub_a">Elvis Presley</a></li>
+                            <li><a href="#" class="sub_a">Luan Santana</a></li>
+                        </ul>
+                    </ul>
+                </li>
+            </ul>
+        </nav>
+    </header>
+
+    <main>
+        <!-- Seção principal do conteúdo -->
+        <div id="conteudo">
+            <!-- Titulo principal -->
+            <h1 id="principal">Política comercial</h1>
+
+            <!-- Titulo -->
+            <h2 class="titulo" id="termos_uso"> Termos de uso</h2>
+
+            <!-- Conteudo -->
+            <p>Ao acessar e utilizar este site, você concorda com os presentes Termos de Uso. A loja de CDs online fornece aos usuários uma plataforma para consulta e compra de CDs, exclusivamente pela internet. O uso do site deve ser feito de forma responsável, sendo proibida qualquer tentativa de uso indevido, cópia de conteúdo, imagens ou informações para fins comerciais sem autorização prévia</p> <br>
+
+            <p>Para realizar compras, é necessário cadastrar-se com informações verdadeiras, completas e atualizadas. O cliente é o único responsável pela segurança de sua conta e senha de acesso. A loja não se responsabiliza por danos ou prejuízos decorrentes do uso indevido da conta por terceiros.</p> <br>
+
+            <p>Todos os preços e condições de pagamento estão sujeitos a alterações sem aviso prévio. As compras são processadas por plataformas de pagamento seguras, e os pedidos serão enviados somente após a confirmação de pagamento. Eventuais descontos e promoções são válidos apenas durante o período informado no site.</p> <br>
+
+            <p>O cliente tem até 7 dias corridos após o recebimento do produto para solicitar a troca ou devolução, conforme o Código de Defesa do Consumidor. O item deve ser devolvido em perfeitas condições, sem sinais de uso, e acompanhado de todos os acessórios, embalagens e comprovantes.</p> <br>
+
+            <p>Estes Termos de Uso podem ser modificados a qualquer momento, sem aviso prévio. A versão mais atualizada estará sempre disponível neste espaço. O uso contínuo do site após quaisquer alterações representa a sua concordância com os novos termos.</p>
+
+             <!-- Titulo -->
+            <h2 class="titulo" id="politica_privacidade">Políticas de privacidade</h2>
+
+             <!-- Conteudo -->
+            <p>A sua privacidade é muito importante para nós. Esta Política de Privacidade explica como coletamos, utilizamos e protegemos seus dados pessoais ao utilizar nosso site de CDs.</p> <br>
+
+            <p>Coletamos informações como nome, e-mail, CPF, endereço e dados de pagamento no momento do cadastro e da finalização da compra. Esses dados são utilizados exclusivamente para processar os pedidos, realizar entregas, enviar comunicações e melhorar sua experiência de navegação.</p> <br>
+
+            <p>Seus dados são armazenados de forma segura e nunca serão vendidos, compartilhados ou divulgados a terceiros, exceto quando necessário para a conclusão da compra (como transportadoras ou intermediadores de pagamento), ou quando exigido por lei.</p> <br>
+
+            <p>Utilizamos cookies para melhorar a navegação, lembrar suas preferências e oferecer conteúdos personalizados. Você pode desativar os cookies nas configurações do seu navegador, mas isso pode afetar algumas funcionalidades do site.</p> <br>
+
+            <p>O site possui certificado de segurança (SSL), garantindo que todos os dados inseridos sejam criptografados e protegidos contra acessos não autorizados. Reforçamos que não armazenamos informações completas de cartões de crédito.</p> <br>
+
+            <p>Ao continuar navegando e utilizando nosso site, você declara estar ciente e de acordo com esta Política de Privacidade. Caso tenha dúvidas ou deseje solicitar a exclusão dos seus dados, entre em contato conosco pela página "Fale Conosco".</p>
+
+             <!-- Titulo -->
+            <h2 class="titulo" id="trocas_devolucoes">Trocas e Devoluções</h2>
+
+             <!-- Conteudo -->
+            <p>A satisfação dos nossos clientes é prioridade. Por isso, oferecemos um processo simples e transparente para trocas e devoluções, conforme previsto no Código de Defesa do Consumidor.</p> <br>
+
+            <p>Você pode solicitar a troca ou devolução de um produto em até 7 dias corridos após o recebimento do pedido. Para isso, o item deve estar em perfeitas condições, sem sinais de uso, com embalagem original e todos os acessórios inclusos (se houver).</p> <br>
+
+            <p>Caso o produto tenha chegado com defeito de fábrica ou avarias causadas no transporte, entre em contato imediatamente após o recebimento, enviando fotos do item e da embalagem. Avaliaremos o caso e, se confirmado o problema, faremos a troca sem custo adicional.</p> <br>
+
+            <p>Não realizamos trocas de produtos danificados por mau uso ou manuseio incorreto. Também não aceitamos devoluções de CDs com o lacre violado, salvo em casos de defeito.</p> <br>
+
+            <p>Para solicitar uma troca ou devolução, entre em contato conosco pelo e-mail ou WhatsApp informando o número do pedido, o motivo da solicitação e, se necessário, imagens do produto.</p> <br>
+
+            <p>Assim que o produto for recebido e analisado, entraremos em contato para confirmar a troca, emitir um vale-compras ou realizar o estorno, conforme o caso.</p>
+
+             <!-- Titulo -->
+            <h2 class="titulo" id="direito_arrependimento">Direito de arrependimento</h2>
+
+             <!-- Conteudo -->
+            <p>De acordo com o Artigo 49 do Código de Defesa do Consumidor, você tem o direito de se arrepender da compra realizada em nosso site no prazo de até 7 (sete) dias corridos, contados a partir da data de recebimento do produto.</p> <br>
+
+            <p>Para exercer esse direito, o produto deve estar em perfeitas condições, sem sinais de uso, com a embalagem original intacta e o lacre (se houver) não violado. CDs com o lacre rompido não poderão ser devolvidos, exceto em casos de defeito.</p> <br>
+
+            <p>Se você desejar cancelar a compra por arrependimento, entre em contato conosco dentro do prazo, informando o número do pedido e seus dados. O envio do produto deve ser feito para o endereço informado por nossa equipe, e o custo do frete de devolução será de responsabilidade do cliente, salvo em casos de erro da loja.</p> <br>
+
+            <p>Após o recebimento e verificação do produto, realizaremos o reembolso total do valor pago, incluindo o valor do frete de envio, conforme determina a legislação.</p> <br>
+
+            <p>O direito de arrependimento se aplica apenas a compras feitas online. Em caso de dúvidas, nossa equipe está à disposição para orientar todo o processo.</p>
+        </div>
+    </main>
+
+     <!-- Seção de imagens à direita -->
+     <div id="imgs_direita">
+        <!-- Imagens decorativas à direita -->
+        <div class="cortar"><img src="../../../img/img_cantos/img_cantos.png" alt="notas musicais" class="img_direita"></div>
+        <div class="cortar"><img src="../../../img/img_cantos/img_cantos.png" alt="notas musicais" class="img_direita"></div>
+        <div class="cortar"><img src="../../../img/img_cantos/img_cantos.png" alt="notas musicais" class="img_direita"></div>
+        <div class="cortar"><img src="../../../img/img_cantos/img_cantos.png" alt="notas musicais" class="img_direita"></div>
+        <div class="cortar"><img src="../../../img/img_cantos/img_cantos.png" alt="notas musicais" class="img_direita"></div>
+        <div class="cortar"><img src="../../../img/img_cantos/img_cantos.png" alt="notas musicais" class="img_direita"></div>
+        <div class="cortar"><img src="../../../img/img_cantos/img_cantos.png" alt="notas musicais" class="img_direita"></div>
+        <div class="cortar"><img src="../../../img/img_cantos/img_cantos.png" alt="notas musicais" class="img_direita"></div>
+        <div class="cortar"><img src="../../../img/img_cantos/img_cantos.png" alt="notas musicais" class="img_direita sumir"></div> 
+        <div class="cortar"><img src="../../../img/img_cantos/img_cantos.png" alt="notas musicais" class="img_direita sumir"></div>
+        <div class="cortar"><img src="../../../img/img_cantos/img_cantos.png" alt="notas musicais" class="img_direita sumir"></div>
+        <div class="cortar"><img src="../../../img/img_cantos/img_cantos.png" alt="notas musicais" class="img_direita sumir"></div>
+        <div class="cortar"><img src="../../../img/img_cantos/img_cantos.png" alt="notas musicais" class="img_direita sumir"></div>
+        <div class="cortar"><img src="../../../img/img_cantos/img_cantos.png" alt="notas musicais" class="img_direita sumir"></div>
+        <div class="cortar"><img src="../../../img/img_cantos/img_cantos.png" alt="notas musicais" class="img_direita sumir"></div>
+        
+    </div>
+
+    <!-- Seção de imagens à esquerda -->
+    <div id="imgs_esquerda">
+        <!-- Imagens decorativas à esquerda -->
+        <img src="../../../img/img_cantos/img_cantos.png" alt="notas musicais" class="img_esquerda">
+        <img src="../../../img/img_cantos/img_cantos.png" alt="notas musicais" class="img_esquerda">
+        <img src="../../../img/img_cantos/img_cantos.png" alt="notas musicais" class="img_esquerda">
+        <img src="../../../img/img_cantos/img_cantos.png" alt="notas musicais" class="img_esquerda">
+        <img src="../../../img/img_cantos/img_cantos.png" alt="notas musicais" class="img_esquerda">
+        <img src="../../../img/img_cantos/img_cantos.png" alt="notas musicais" class="img_esquerda">
+        <img src="../../../img/img_cantos/img_cantos.png" alt="notas musicais" class="img_esquerda">
+        <img src="../../../img/img_cantos/img_cantos.png" alt="notas musicais" class="img_esquerda">
+        <img src="../../../img/img_cantos/img_cantos.png" alt="notas musicais" class="img_esquerda sumir">
+        <img src="../../../img/img_cantos/img_cantos.png" alt="notas musicais" class="img_esquerda sumir">
+        <img src="../../../img/img_cantos/img_cantos.png" alt="notas musicais" class="img_esquerda sumir">
+        <img src="../../../img/img_cantos/img_cantos.png" alt="notas musicais" class="img_esquerda sumir">
+        <img src="../../../img/img_cantos/img_cantos.png" alt="notas musicais" class="img_esquerda sumir">
+        <img src="../../../img/img_cantos/img_cantos.png" alt="notas musicais" class="img_esquerda sumir">
+        <img src="../../../img/img_cantos/img_cantos.png" alt="notas musicais" class="img_esquerda sumir">
+    </div>
+
+<footer>
+
+    <!-- Seção com a logo no rodapé, contendo duas linhas laterais -->
+    <section id="logo_rodape">
+        <div class="linha_logo_rodape"></div> <!-- Linha à esquerda -->
+        <!-- Logo central -->
+        <img src="../../img/cabeçario/logo.png" alt="Logo" id="img_rodape_logo">
+        <div class="linha_logo_rodape"></div> <!-- Linha à direita -->
+    </section>
+
+    <!-- Corpo principal do rodapé -->
+    <section id="corpo_rodape">
+        <div id="parte_de_cima_rodape">
+            <h1 class="titulo">Sobre nós</h1>
+            <!-- Texto de descrição sobre a empresa ou site -->
+            <p id="sobre_texto_rodape">
+                Somos uma loja online apaixonada por música, dedicada a quem valoriza a experiência de ouvir um bom CD. Trabalhamos com títulos novos e selecionados, dos clássicos aos lançamentos, sempre com qualidade e cuidado.Nossa missão é manter viva a cultura do CD, oferecendo um atendimento atencioso, envios rápidos e uma experiência de compra segura. Se você ama música de verdade, está no lugar certo. 
+            </p>
+        </div>
+
+        <div id="parte_de_baixo_rodape">
+            <!-- Seção: Política Comercial -->
+            <div class="topicos_rodape">
+                <h1 class="titulo">Política comercial</h1>
+                <ul>
+                    <li class="lista_rodape"><a href="politica_comercial.html#trocas_devolucoes" class="link_rodape">Trocas e Devoluções</a></li>
+                    <li class="lista_rodape"><a href="politica_comercial.html#termos_uso" class="link_rodape">Termos de uso</a></li>
+                    <li class="lista_rodape"><a href="politica_comercial.html#politica_privacidade" class="link_rodape">Políticas de privacidade</a></li>
+                    <li class="lista_rodape"><a href="politica_comercial.html#direito_arrependimento" class="link_rodape">Direito de arrependimento</a></li>
+                </ul>
+            </div>
+
+            <!-- Seção: Suporte -->
+            <div class="topicos_rodape">
+                <h1 class="titulo">Suporte</h1>
+                <ul>
+                    <li class="lista_rodape"><a href="perguntas_frequentes.html" class="link_rodape">Perguntas Frequentes</a></li>
+                    <li class="lista_rodape"><a href="avaliar.html" class="link_rodape">Avaliar</a></li>
+                    <li class="lista_rodape"><a href="#" class="link_rodape">Recomendar Produtos</a></li>
+                </ul>
+            </div>
+
+            <!-- Seção: Atendimento -->
+            <div class="topicos_rodape">
+                <h1 class="titulo">Atendimento</h1>
+                <ul>
+                    <li class="lista_rodape">
+                        <a href="mailto:codedisc@gmail.com" class="link_rodape">
+                            <img src="../../img/rodape/contato/icone_email.png" alt="Ícone email" class="img_rodape_contatos"> Email
+                        </a>
+                    </li>
+                    <li class="lista_rodape">
+                        <a href="tel:+5585900000000" class="link_rodape">
+                            <img src="../../img/rodape/contato/icone_telefone.png" alt="Ícone telefone" class="img_rodape_contatos"> Telefone
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </section>
+
+    <!-- Linha separadora do rodapé -->
+    <hr id="hr_rodape">
+
+    <!-- Seção final do rodapé -->
+    <section id="final_rodape">
+        <div>
+            <h1 class="titulo">Formas de pagamento</h1>
+            <!-- Ícones representando formas de pagamento -->
+            <img src="../../img/rodape/cartoes/icone_cartao1.png" alt="Cartão" class="img_cartao_rodape">
+            <img src="../../img/rodape/cartoes/icone_cartao2.png" alt="Cartão" class="img_cartao_rodape">
+            <img src="../../img/rodape/cartoes/icone_cartao1.png" alt="Cartão" class="img_cartao_rodape">
+            <img src="../../img/rodape/cartoes/icone_cartao2.png" alt="Cartão" class="img_cartao_rodape">
+            <img src="../../img/rodape/cartoes/icone_cartao1.png" alt="Cartão" class="img_cartao_rodape">
+            <img src="../../img/rodape/cartoes/icone_cartao2.png" alt="Cartão" class="img_cartao_rodape">
+        </div>
+
+        <!-- Seção de redes sociais -->
+        <div id="redes_sociais_rodape">
+            <h1 class="titulo">Redes Sociais</h1>
+            <!-- Ícones representando redes sociais -->
+            <a href="https://www.instagram.com/code_disc_oficial"><img src="../../img/rodape/redes_sociais/icone_instagram.png" alt="Instagram" class="img_rodape_social"></a>
+            <a href="https://www.facebook.com/code_disc_oficial"><img src="../../img/rodape/redes_sociais/icone_facebook.png" alt="Facebook" class="img_rodape_social"></a>
+            <a href="https://twitter.com/code_disc_oficial"><img src="../../img/rodape/redes_sociais/icone_x.png" alt="X (Twitter)" class="img_rodape_social"></a>
+            <a href="https://www.tiktok.com/code_disc_oficial"><img src="../../img/rodape/redes_sociais/icone_tiktok.png" alt="TikTok" class="img_rodape_social"></a>
+            <a href="https://open.spotify.com/user/code_disc_oficial"><img src="../../img/rodape/redes_sociais/icone_spotify.png" alt="Spotify" class="img_rodape_social"></a>
+            <a href="https://www.youtube.com/code_disc_oficial"><img src="../../img/rodape/redes_sociais/icone_youtube.png" alt="YouTube" class="img_rodape_social"></a>
+        </div>
+    </section>
+</footer>
+</body>
+</html>

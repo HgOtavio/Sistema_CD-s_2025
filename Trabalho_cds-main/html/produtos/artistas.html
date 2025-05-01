@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Artistas</title>
+    <link rel="shortcut icon" href="../../img/favicon/favicon.ico" type="image/x-icon">
+
+    <link rel="stylesheet" href="../../css/artistas/artista.css">
+    <link rel="stylesheet" href="../../css/cabeçalhos/cabeçalho_com_login.css">
+    <link rel="stylesheet" href="../../css/rodape/rodape.css">
+
+    <script src="../../js/cabeçalho/menu.js" defer></script>
+</head>
+<body>
+    <header> 
+
+        <div id="parte_de_cima_cab">
+
+            <!-- Logo da página -->
+            <a href="#" id="logo"><img src="../../img/cabeçario/logo.png" alt="Logo" id="img_logo"></a>  
+            
+            <!-- Barra de pesquisa -->
+            <div id="barra_pesquisa">
+                <input type="checkbox" id="check"> <!-- Controle de visibilidade -->
+                <div id="complemento_pesquisa">
+
+                    <!-- Campo de pesquisa -->
+                    <input type="text" id="input_barra_pesquisa" placeholder="Buscar..." >
+
+                    <!-- Botão de pesquisa -->
+                    <label for="check" id="buttom_lupa">
+                        <img src="../../img/cabeçario/icone_lupa.png" alt="Lupa" id="lupa">
+                    </label>
+                </div>
+            </div>
+
+            <div id="login_carrinho"> <!-- Login e Carrinho -->
+                <a href="#"><img src="../../img/cabeçario/icone_perfil.png" alt="Perfil" id="Perfil"></a><!-- Foto de perfil -->
+
+                <a href="#"><img src="../../img/cabeçario/icone_carrinho.png" alt="Carrinho" id="Carrinho"></a><!-- Ícone de carrinho -->
+            </div>
+        </div>
+
+        <hr style="color: #7b7a7a;"><!-- Linha separadora -->
+
+        <!-- Menu de navegação -->
+        <nav class="menu-underline">
+            <input type="checkbox" id="menu_toggle" class="menu_toggle"><!-- Menu responsivo -->
+            <label for="menu_toggle" class="menu_icon">&#9776;</label> 
+
+            <ul id="menu">
+
+                <li class="p_menu"><a href="#" class="a_menu">Inicio</a></li>
+                <li class="p_menu"><a href="#" class="a_menu">Produtos</a></li>
+                
+                 <!-- Menu suspenso de gêneros musicais -->
+                <li class="p_menu" id="menu_genero">
+
+                    <button onclick="aparecer_g('sumir_g')" class="b_menu">
+                        Gênero
+                    </button>
+
+                    <!-- Submenu de Gêneros -->
+                    <ul class="subclasse_menu" id="sumir_g">
+                        
+                        <ul class="sub_subclasse_menu">
+                            <li><a href="#" class="sub_a">Clássica</a></li>
+                            <li><a href="#" class="sub_a">Eletrônica</a></li>
+                            <li><a href="#" class="sub_a">Forro</a></li>
+                            <li><a href="#" class="sub_a">Hip Hop</a></li>
+                            <li><a href="#" class="sub_a">MPB</a></li>
+                        </ul>
+                        
+                        <ul class="sub_subclasse_menu">
+                            <li><a href="#" class="sub_a">Pagode</a></li>
+                            <li><a href="#" class="sub_a">Pop</a></li>
+                            <li><a href="#" class="sub_a">Reggae</a></li>
+                            <li><a href="#" class="sub_a">Rock</a></li>
+                            <li><a href="#" class="sub_a">Sertanejo</a></li>
+                        </ul>
+                    </ul>
+                </li>
+
+                <!-- Menu suspenso para Artistas -->
+                <li class="p_menu" id="arredondar_b">
+
+                    <button onclick="aparecer_a('sumir_a')" class="b_menu">
+                        Artistas
+                    </button>
+
+                    <!-- Submenu de Artistas -->
+                    <ul class="subclasse_menu_a" id="sumir_a">
+                        
+                        <ul class="sub_subclasse_menu">
+                            <li><a href="#" class="sub_a">Ludwing Beethowen</a></li>
+                            <li><a href="#" class="sub_a">Marshmello</a></li>
+                            <li><a href="#" class="sub_a">Luiz Gonzaga</a></li>
+                            <li><a href="#" class="sub_a">Snoop Dogg</a></li>
+                            <li><a href="#" class="sub_a">Maria Bethânia</a></li>
+                        </ul>
+                        
+                        <ul class="sub_subclasse_menu">
+                            <li><a href="#" class="sub_a">Péricles</a></li>
+                            <li><a href="#" class="sub_a">Michael Jackson</a></li>
+                            <li><a href="#" class="sub_a">Bob Marley</a></li>
+                            <li><a href="#" class="sub_a">Elvis Presley</a></li>
+                            <li><a href="#" class="sub_a">Luan Santana</a></li>
+                        </ul>
+                    </ul>
+                </li>
+            </ul>
+        </nav>
+    </header>
+
+    <section>
+        <div id="caminho">
+            <a href="#" id="home" class="link_caminho">
+                <img src="../../img/todos_produtos/icone_home.png" alt="Home" id="img_home">
+                <p>Home</p>
+            </a>
+            <div class="proxima_part">
+                <img src="../../img/todos_produtos/icone_seta_direita.png" alt="Seta" class="seta">
+                <a href="#" class="link_caminho">Produtos</a>
+            </div>
+            <div class="proxima_part">
+                <img src="../../img/todos_produtos/icone_seta_direita.png" alt="Seta" class="seta">
+                <a href="#" class="link_caminho">Cd</a>
+            </div>
+        </div>
+    </section>
+
+
+<section id="section">
+    
+        <img src="../../img/destaque/capa_de_album_destaque_1.jpg" alt="Imagem do artista" id="img">
+    
+        <div id="corpo">
+            <h1 id="nome">Nome do Artista</h1>
+            <p id="data_nasc">1990-05-50</p>
+            <p id="cds">Cds associados
+                <ul id="lista">
+                    <li><a href="#">Cd_1</a></li>
+                    <li><a href="#">Cd_2</a></li>
+                    <li><a href="#">Cd_3</a></li>
+                    <li><a href="#">Cd_4</a></li>
+                    <li><a href="#">Cd_5</a></li>
+                </ul>
+            </p>
+            <h2 id="descricao">Descrição</h2>
+            <p id="texto">Lorem, ipsum dolor sit amet consectetur adipisicing elit. Nulla voluptatem necessitatibus voluptatum. Cumque vitae aspernatur qui inventore minus perferendis in magni hic nesciunt aliquid, odit ipsa iste sed, impedit odio! Lorem ipsum dolor sit amet consectetur adipisicing elit. Consequuntur, quis cupiditate quam expedita dolorem, nobis veniam in qui eos, quibusdam pariatur ut saepe quia. Quidem tempora dolore error. Voluptatem, id?</p>
+        </div>
+</section>
+
+<footer>
+
+    <!-- Seção com a logo no rodapé, contendo duas linhas laterais -->
+    <section id="logo_rodape">
+        <div class="linha_logo_rodape"></div> <!-- Linha à esquerda -->
+        <!-- Logo central -->
+        <img src="../../img/cabeçario/logo.png" alt="Logo" id="img_rodape_logo">
+        <div class="linha_logo_rodape"></div> <!-- Linha à direita -->
+    </section>
+
+    <!-- Corpo principal do rodapé -->
+    <section id="corpo_rodape">
+        <div id="parte_de_cima_rodape">
+            <h1 class="titulo">Sobre nós</h1>
+            <!-- Texto de descrição sobre a empresa ou site -->
+            <p id="sobre_texto_rodape">
+                Somos uma loja online apaixonada por música, dedicada a quem valoriza a experiência de ouvir um bom CD. Trabalhamos com títulos novos e selecionados, dos clássicos aos lançamentos, sempre com qualidade e cuidado.Nossa missão é manter viva a cultura do CD, oferecendo um atendimento atencioso, envios rápidos e uma experiência de compra segura. Se você ama música de verdade, está no lugar certo. 
+            </p>
+        </div>
+
+        <div id="parte_de_baixo_rodape">
+            <!-- Seção: Política Comercial -->
+            <div class="topicos_rodape">
+                <h1 class="titulo">Política comercial</h1>
+                <ul>
+                    <li class="lista_rodape"><a href="../rodape/politica_comercial.html#trocas_devolucoes" class="link_rodape">Trocas e Devoluções</a></li>
+                    <li class="lista_rodape"><a href="../rodape/politica_comercial.html#termos_uso" class="link_rodape">Termos de uso</a></li>
+                    <li class="lista_rodape"><a href="../rodape/politica_comercial.html#politica_privacidade" class="link_rodape">Políticas de privacidade</a></li>
+                    <li class="lista_rodape"><a href="../rodape/politica_comercial.html#direito_arrependimento" class="link_rodape">Direito de arrependimento</a></li>
+                </ul>
+            </div>
+
+            <!-- Seção: Suporte -->
+            <div class="topicos_rodape">
+                <h1 class="titulo">Suporte</h1>
+                <ul>
+                    <li class="lista_rodape"><a href="../rodape/perguntas_frequentes.html" class="link_rodape">Perguntas Frequentes</a></li>
+                    <li class="lista_rodape"><a href="../rodape/avaliar.html" class="link_rodape">Avaliar</a></li>
+                    <li class="lista_rodape"><a href="#" class="link_rodape">Recomendar Produtos</a></li>
+                </ul>
+            </div>
+
+            <!-- Seção: Atendimento -->
+            <div class="topicos_rodape">
+                <h1 class="titulo">Atendimento</h1>
+                <ul>
+                    <li class="lista_rodape">
+                        <a href="mailto:codedisc@gmail.com" class="link_rodape">
+                            <img src="../../img/rodape/contato/icone_email.png" alt="Ícone email" class="img_rodape_contatos"> Email
+                        </a>
+                    </li>
+                    <li class="lista_rodape">
+                        <a href="tel:+5585900000000" class="link_rodape">
+                            <img src="../../img/rodape/contato/icone_telefone.png" alt="Ícone telefone" class="img_rodape_contatos"> Telefone
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </section>
+
+    <!-- Linha separadora do rodapé -->
+    <hr id="hr_rodape">
+
+    <!-- Seção final do rodapé -->
+    <section id="final_rodape">
+        <div>
+            <h1 class="titulo">Formas de pagamento</h1>
+            <!-- Ícones representando formas de pagamento -->
+            <img src="../../img/rodape/cartoes/icone_cartao1.png" alt="Cartão" class="img_cartao_rodape">
+            <img src="../../img/rodape/cartoes/icone_cartao2.png" alt="Cartão" class="img_cartao_rodape">
+            <img src="../../img/rodape/cartoes/icone_cartao1.png" alt="Cartão" class="img_cartao_rodape">
+            <img src="../../img/rodape/cartoes/icone_cartao2.png" alt="Cartão" class="img_cartao_rodape">
+            <img src="../../img/rodape/cartoes/icone_cartao1.png" alt="Cartão" class="img_cartao_rodape">
+            <img src="../../img/rodape/cartoes/icone_cartao2.png" alt="Cartão" class="img_cartao_rodape">
+        </div>
+
+        <!-- Seção de redes sociais -->
+        <div id="redes_sociais_rodape">
+            <h1 class="titulo">Redes Sociais</h1>
+           <!-- Ícones representando redes sociais -->
+           <a href="https://www.instagram.com/code_disc_oficial"><img src="../../img/rodape/redes_sociais/icone_instagram.png" alt="Instagram" class="img_rodape_social"></a>
+           <a href="https://www.facebook.com/code_disc_oficial"><img src="../../img/rodape/redes_sociais/icone_facebook.png" alt="Facebook" class="img_rodape_social"></a>
+           <a href="https://twitter.com/code_disc_oficial"><img src="../../img/rodape/redes_sociais/icone_x.png" alt="X (Twitter)" class="img_rodape_social"></a>
+           <a href="https://www.tiktok.com/code_disc_oficial"><img src="../../img/rodape/redes_sociais/icone_tiktok.png" alt="TikTok" class="img_rodape_social"></a>
+           <a href="https://open.spotify.com/user/code_disc_oficial"><img src="../../img/rodape/redes_sociais/icone_spotify.png" alt="Spotify" class="img_rodape_social"></a>
+           <a href="https://www.youtube.com/code_disc_oficial"><img src="../../img/rodape/redes_sociais/icone_youtube.png" alt="YouTube" class="img_rodape_social"></a>
+        </div>
+    </section>
+</footer>
+</body>
+</html>

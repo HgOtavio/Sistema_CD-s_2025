@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8">
+  <title>Checkbox Sim e Não</title>
+</head>
+
+<style>
+/* Chrome, Safari, Edge, Opera */
+input[type=number]::-webkit-inner-spin-button,
+input[type=number]::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+/* Firefox */
+input[type=number] {
+  -moz-appearance: textfield;
+}
+
+
+.input-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+  }
+
+  .input-wrapper input {
+    width: 60px;
+    text-align: center;
+    padding: 8px;
+  }
+
+  .input-wrapper button {
+    background-color: #53759a;
+    color: white;
+    border: none;
+    padding: 8px 12px;
+    border-radius: 4px;
+    cursor: pointer;
+  }
+
+  .input-wrapper button:hover {
+    background-color: #0056b3;
+  }
+
+
+</style>
+<body>
+  <div class="input-wrapper">
+    <button onclick="decrementar()">-</button>
+    <input type="number" id="quantidade" value="1" min="0" />
+    <button onclick="incrementar()">+</button>
+  </div>
+
+  <script>
+    function incrementar() {
+      const input = document.getElementById('quantidade');
+      input.value = parseInt(input.value) + 1;
+    }
+  
+    function decrementar() {
+      const input = document.getElementById('quantidade');
+      if (parseInt(input.value) > parseInt(input.min)) {
+        input.value = parseInt(input.value) - 1;
+      }
+    }
+  </script>
+</body>
+</html>

@@ -1,0 +1,171 @@
+/* === Reset de Estilos Globais === */
+
+/* Remove margens e paddings padrão e define box-sizing para facilitar o layout */
+* {
+    padding: 0px;
+    margin: 0px;
+    box-sizing: border-box;
+    font-family: Arial, Helvetica, sans-serif; /* Define a fonte padrão */
+}
+
+:root{
+    --cinza-1: #303030;
+    --cinza-2: #5d5d5d;
+    --cinza-3: #6d6d6d;
+    --cinza-4: #7b7a7a;
+    --cinza-5: #888888;
+    --cinza-6: #949494;
+    --cinza-7: #abaaaa;
+    --branco: #ffffff;
+  }
+
+/* Oculta a barra de rolagem no Chrome, Safari e navegadores baseados em WebKit */
+body::-webkit-scrollbar {
+    display: none;
+}
+
+/* === Estilização do Cabeçalho === */
+
+/* Define um fundo escuro para o cabeçalho */
+header {
+    background-color: var(--cinza-1);
+}
+
+/* Organiza os elementos na parte superior do cabeçalho */
+#parte_de_cima_cab {
+    display: flex;
+    justify-content: space-around; /* Distribui os itens igualmente */
+}
+
+/* Adiciona espaçamento nos elementos do cabeçalho */
+#logo, #barra_pesquisa, #login_carrinho {
+    margin-top: 15px;
+    margin-bottom: 10px;
+}
+
+#logo{
+    margin-top: 0px;
+}
+
+#img_logo{
+    width: 150px;
+
+}
+
+/* === Estilização da Barra de Pesquisa === */
+
+#complemento_pesquisa {
+    background-color: var(--branco);
+    border-radius: 10px; /* Arredonda as bordas */
+    width: 350px;
+    height: 37px;
+}
+
+#input_barra_pesquisa {
+    float: left;
+    background-color: transparent;
+    padding-left: 5px;
+    font-style: italic;
+    font-size: 18px;
+    height: 32px;
+    width: 300px;
+    margin-top: 2px;
+    margin-left: 4px;
+    outline: none;
+    border: none; /* Remove a borda do campo de entrada */
+}
+
+/* Estilização do botão de pesquisa e ícone de lupa */
+#lupa, #buttom_lupa {
+    margin-top: 5px;
+    margin-left: 5px;
+    background-color: var(--branco);
+    border-radius: 10px;
+}
+
+/* Esconde o checkbox que controla a barra de pesquisa */
+#check {
+    display: none;
+}
+
+/* === Estilização da Seção de Login e Carrinho === */
+
+#login_carrinho {
+    display: flex;
+    justify-content: space-between;
+    width: 200px;
+    height: 40px;
+}
+
+/* Define a altura dos ícones de carrinho e perfil */
+#Carrinho, #Perfil {
+    height: 40px;
+}
+
+#Perfil{
+    border-radius: 50px;
+}
+
+/* === Responsividade === */
+@media only screen and (max-width: 650px) {
+
+    /* Ajusta a margem do cabeçalho para melhor espaçamento */
+    #parte_de_cima_cab {
+        margin: 0px 20px;
+    }
+
+    #img_logo{
+        width: 100px;
+    }
+
+    /* === Ajustes na Barra de Pesquisa === */
+
+    /* Define um tamanho máximo para a barra de pesquisa no mobile */
+    #barra_pesquisa {
+        max-width: 400px;
+        width: 100%;
+    }
+
+    /* Ajusta o tamanho da barra de pesquisa */
+    #complemento_pesquisa {
+        width: 250px;
+    }
+
+    /* Estilização da barra de pesquisa expansível */
+    #barra_pesquisa #complemento_pesquisa {
+        position: relative;
+        height: 30px;
+        max-width: 30px; /* Inicia compacta */
+        margin: auto;
+        box-shadow: 0 5px 10px rgba(0, 0, 0, 0.25);
+        border-radius: 10px;
+        transition: all 0.3s ease;
+    }
+
+    /* Expande a barra de pesquisa quando o checkbox é ativado */
+    #check:checked ~ #complemento_pesquisa {
+        max-width: 380px;
+    }
+
+    /* Faz o campo de pesquisa preencher toda a largura disponível */
+    #input_barra_pesquisa {
+        position: absolute;
+        height: 100%;
+        width: 100%;
+    }
+
+    /* Ajusta o botão da lupa */
+    #lupa, #buttom_lupa {
+        position: absolute;
+        right: -2px;
+        width: 30px;
+        height: 100%;
+        margin: 0px;
+    }
+
+    /* Ajusta a lupa quando a barra de pesquisa está expandida */
+    #check:checked ~ #lupa, #buttom_lupa {
+        width: 30px;
+    }
+
+}

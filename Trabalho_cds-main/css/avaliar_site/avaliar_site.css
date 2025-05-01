@@ -1,0 +1,282 @@
+/* == RESET GLOBAL == */
+
+/* Reset básico para remover margens e paddings padrão dos elementos */
+* {
+    padding: 0px;
+    margin: 0px;
+    font-family: Arial, Helvetica, sans-serif; /* Define a fonte padrão para o documento */
+}
+
+:root{
+    --cinza-e1: #aaaaaa;
+    --cinza-e2: #595959;
+    --cinza-1: #303030;
+    --cinza-2: #5d5d5d;
+    --cinza-3: #6d6d6d;
+    --cinza-4: #7b7a7a;
+    --cinza-5: #888888;
+    --cinza-6: #949494;
+    --cinza-7: #abaaaa;
+    --branco: #ffffff;
+    --roxo: #7445cc;
+}
+
+/* Evita o scroll horizontal desnecessário */
+body {
+    overflow-x: hidden;
+}
+
+/* == ESTILIZAÇÃO DO CONTEÚDO PRINCIPAL == */
+
+/* Centraliza o conteúdo principal */
+main {
+    display: flex;
+    justify-content: center;
+}
+
+.button_voltar{
+    border-radius: 5px;
+    border: none;
+    background-color: var(--roxo); /* Cor de fundo */
+    padding: 5px;
+    font-weight: bold;
+    margin: 10px;
+    margin-left: 100px;
+}
+.link_voltar{
+    color: var(--branco); /* Cor do texto */
+    text-decoration: none;
+}
+
+.link_voltar:hover{
+    color: var(--cinza-1); /* Cor do texto ao passar o mouse */
+}
+
+.button_voltar:hover{
+    background-color: var(--cinza-7); /* Cor de fundo ao passar o mouse */
+    transition: 0.3s;
+}
+
+/* Estilização da área de conteúdo principal */
+#conteudo {
+    border: 1px solid var(--cinza-e1); /* Borda cinza clara */
+    box-shadow: 5px 5px 10px rgba(0, 0, 0, 0.3); /* Adiciona sombra para efeito de profundidade */
+    background-color: rgb(247, 247, 247); /* Define a cor de fundo */
+    width: 1000px; /* Define a largura do conteúdo */
+    height: auto; /* Altura ajustável conforme o conteúdo */
+    padding: 10px;
+    color: var(--roxo); /* Define a cor do texto */
+    font-weight: bold;
+    border-radius: 10px; /* Bordas arredondadas */
+    margin-top: 50px; /* Adiciona espaçamento superior */
+    max-width: 90%;
+    min-width: 320px; /* Garante que não fique pequeno demais */
+}
+
+/* Título principal */
+#titulo {
+    font-size: 5vw; /* Define o tamanho da fonte */
+    margin-bottom: 20px; /* Espaçamento inferior */
+}
+
+/* == AVALIAÇÃO COM ESTRELAS == */
+
+#avaliar_estrelas {
+    margin-bottom: 20px;
+    cursor: pointer; /* Cursor interativo */
+}
+
+/* Linha contendo as estrelas */
+#linha_de_estrelas {
+    display: flex;
+    gap: 10px; /* Espaçamento entre as estrelas */
+}
+
+/* Estilos para os títulos das seções de avaliação */
+#avaliar_estrelas_titulo, 
+#text_avalicao_titulo {
+    margin-bottom: 5px;
+}
+
+/* Estilização das estrelas */
+.estrela {
+    width: 20px;
+    height: 20px; 
+    background: url('../../img/avaliar/estrela_escura.png'); /* Define a estrela padrão */
+    background-size: cover;
+    transition: transform 0.2s; /* Suaviza a animação ao passar o mouse */
+}
+
+/* Efeito ao passar o mouse sobre a estrela */
+.estrela:hover {
+    transform: scale(1.2); /* Aumenta ligeiramente a estrela */
+}
+
+/* Classe que define a estrela como selecionada */
+.selecionada {
+    background: url('../../img/avaliar/estrela_amarela.png'); /* Altera a imagem para a estrela amarela */
+    background-size: cover;
+}
+
+/* == CAMPO DE TEXTO DA AVALIAÇÃO == */
+
+#input_text {
+    width: 975px; /* Define a largura do campo */
+    height: 100px; /* Altura do campo de texto */
+    font-size: 18px;
+    padding: 5px;
+    resize: none; /* Impede redimensionamento */
+    border: 1px solid black;
+    border-radius: 5px; /* Bordas arredondadas */
+    margin-top: 5px;
+}
+
+
+/* == BOTÃO DE ENVIO == */
+
+#enviar {
+    margin-top: 30px;
+    width: 200px; /* Largura do botão */
+    height: 40px; /* Altura do botão */
+    border-radius: 10px; /* Bordas arredondadas */
+    border: none; /* Sem borda */
+    color: var(--cinza-2); /* Cor do texto */
+    background-color: var(--cinza-7); /* Cor de fundo */
+    font-size: 20px; /* Tamanho da fonte */
+    font-weight: bold; /* Texto em negrito */
+}
+
+/* Efeito hover no botão */
+#enviar:hover {
+    background-color: var(--cinza-1); /* Cor do fundo ao passar o mouse */
+    color: var(--branco); /* Cor do texto ao passar o mouse */
+    transition: 0.2s; /* Transição suave */
+}
+
+/* == ESTILIZAÇÃO DAS IMAGENS LATERAIS == */
+
+/* Classe para esconder elementos específicos */
+.sumir {
+    display: none; /* Oculta as imagens */
+}
+
+/* Imagens decorativas posicionadas à direita */
+#imgs_direita {
+    display: flex; /* Usa flexbox para organização */
+    align-items: flex-end; /* Alinha as imagens ao fundo */
+    flex-direction: column; /* Organiza as imagens em coluna */
+    position: fixed; /* Posicionamento absoluto sobre o conteúdo */
+    bottom: 0; /* Alinha ao fundo da tela */
+    right: 0; /* Alinha à direita */
+    z-index: -1; /* Coloca as imagens atrás do conteúdo principal */
+    width: 100%;
+    height: 100%;
+}
+
+/* Imagens decorativas posicionadas à esquerda */
+#imgs_esquerda {
+    display: flex;
+    flex-direction: column;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    z-index: -1;
+    width: 100%;
+    height: 100%;
+}
+
+/* Ajuste de tamanho e margem das imagens da direita */
+.img_direita {
+    width: 300px; /* Define a largura das imagens */
+    margin-right: -200px; /* Ajusta a posição da imagem */
+}
+
+/* Ajuste de espaçamento entre imagens da direita, exceto a primeira */
+.img_direita:not(:first-child) {
+    margin-top: -5px;
+}
+
+/* Ajuste das imagens da esquerda (espelhadas horizontalmente) */
+.img_esquerda {
+    width: 300px;
+    margin-left: -200px;
+    transform: scaleX(-1); /* Inverte horizontalmente a imagem */
+}
+
+/* Ajuste de espaçamento entre imagens da esquerda, exceto a primeira */
+.img_esquerda:not(:first-child) {
+    margin-top: -5px;
+}
+
+.img_direita, .img_esquerda {
+    max-width: 300px; /* Mantém as imagens menores em telas pequenas */
+    opacity: 0.5; /* Reduz a opacidade para não sobrecarregar o layout */
+}
+
+/* == RESPONSIVIDADE == */
+
+@media only screen and (min-width: 1200px) {
+    #conteudo {
+        width: 80%;
+    }
+    .sumir {
+        display: block;
+    }
+}
+
+
+
+@media only screen and (max-width: 850px) {
+    /* Ajusta o tamanho do conteúdo principal */
+    #conteudo {
+        width: 450px;
+    }
+
+    /* Reduz a largura do campo de texto */
+    #input_text {
+        width: 420px;
+    }
+
+    /* Exibe imagens ocultas em telas menores */
+    .sumir {
+        display: block;
+    }
+
+    .img_direita {
+        width: 200%;
+        height: 100%;
+        object-fit: cover;
+    }
+
+    .cortar{
+        width: 150px;
+        overflow: hidden; /* Esconde parte da imagem fora da área */
+    }
+
+    .button_voltar{
+        margin-left: 10px;
+    }
+
+}
+
+@media only screen and (max-width: 480px) {
+    #conteudo {
+        padding: 5px;
+    }
+
+    #titulo {
+        font-size: 6vw; /* Mantém o título legível */
+    }
+
+    #input_text {
+        width: 100%;
+    }
+
+    #enviar {
+        width: 100%;
+    }
+    .sumir {
+        display: block;
+    }
+}
+

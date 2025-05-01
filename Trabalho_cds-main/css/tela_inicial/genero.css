@@ -1,0 +1,151 @@
+/* Esconde a barra de rolagem horizontal da página inteira */
+body {
+    overflow-x: hidden; 
+}
+
+:root{
+    --cinza-1: #303030;
+    --cinza-2: #5d5d5d;
+    --cinza-3: #6d6d6d;
+    --cinza-4: #7b7a7a;
+    --cinza-5: #888888;
+    --cinza-6: #949494;
+    --cinza-7: #abaaaa;
+    --branco: #ffffff;
+    --roxo: #7445cc;
+}
+
+/* Define a margem superior da seção "Gênero" */
+#genero {
+    position: relative; /* Define a seção como referência para posicionamento absoluto */
+    margin-top: 50px;
+}
+
+/* Bolas de fundo */
+#bolinhas {
+    position: absolute;
+    top: -10%; /* Ajuste para alinhar corretamente abaixo do título */
+    width: 100vw;
+    height: 170px;
+    background-color: var(--branco);
+    background-image: radial-gradient(circle, black 10%, transparent 20%);
+    background-size: 40px 40px;
+    background-repeat: repeat;
+
+    /* Aplica o efeito de degradê de cima para baixo */
+    mask-image: linear-gradient(to bottom, rgba(0, 0, 0, 1), rgba(0, 0, 0, 0));
+    -webkit-mask-image: linear-gradient(to bottom, rgba(0, 0, 0, 1), rgba(0, 0, 0, 0));
+    
+    z-index: -1; /* Joga a camada para trás do conteúdo */
+}
+
+/* Estiliza o título "Gênero" */
+#texto_genero {
+    font-size: 70px; /* Define o tamanho da fonte */
+    margin-left: 30px; /* Define um espaçamento à esquerda */
+    margin-bottom: 50px; /* Define um espaçamento abaixo do título */
+    background-color: var(--branco);
+}
+
+/* Posição do título "Gênero" */
+#div_h1_genero{
+    display: flex;
+}
+
+/* Define a organização dos elementos dentro da seção "Gênero" */
+#conteudo_genero {
+    display: flex; /* Usa o modelo flexbox para organizar os elementos */
+    position: relative; /* Define a posição relativa para alinhar elementos filhos */
+}
+
+/* Define o comportamento da div que contém as imagens dos gêneros */
+#imagens_genero {
+    display: flex; /* Organiza as imagens lado a lado */
+    justify-content: space-around; /* Distribui as imagens uniformemente */
+    z-index: 0; /* Mantém as imagens atrás de outros elementos */
+    overflow: auto; /* Adiciona rolagem caso o conteúdo ultrapasse o tamanho */
+}
+
+/* Estiliza a barra de rolagem dentro de #imagens_genero no Chrome, Edge e Safari */
+#imagens_genero::-webkit-scrollbar {
+    background: var(--cinza-5); /* Degradê do preto ao cinza */
+    
+}
+
+#imagens_genero::-webkit-scrollbar-thumb{
+    background-color: #000;
+}
+
+/* Estiliza cada item de gênero musical */
+.img_genero {
+    display: flex; /* Define um layout flexível */
+    position: relative; /* Permite posicionamento absoluto dos botões dentro */
+    margin-right: 120px; /* Adiciona espaço entre os itens */
+    margin-bottom: 50px; /* Adiciona espaço abaixo dos itens */
+}
+
+/* Ajusta o último item para ficar mais distante da direita */
+#ultimo {
+    margin-right: 270px;
+}
+
+/* Ajusta o primeiro item para ficar mais afastado da esquerda */
+#primeiro {
+    margin-left: 40px;
+}
+
+/* Estiliza as imagens dentro de cada item de gênero */
+.img_genero img {
+    width: 300px; /* Define um tamanho fixo para as imagens */
+    border: 15px solid var(--roxo); /* Adiciona uma borda cinza ao redor da imagem */
+}
+
+/* Estiliza o botão que sobrepõe as imagens */
+.button_genero {
+    position: absolute; /* Fixa o botão dentro do elemento pai */
+    background-color: rgba(0, 0, 0, 0.5); /* Define um fundo semitransparente */
+    border: none; /* Remove a borda do botão */
+    padding: 99.5px 14.5px; /* Ajusta o tamanho do botão */
+    font-size: 62px; /* Define um tamanho grande para o texto */
+    cursor: pointer; /* Define o cursor como ponteiro ao passar por cima */
+    width: 300px;
+    height: 300px;
+    z-index: 1; /* Mantém o botão acima da imagem */
+}
+
+/* Estiliza o link dentro do botão */
+.button_genero a {
+    color: var(--branco); /* Define a cor do texto como branco */
+    text-decoration: none; /* Remove o sublinhado do link */
+}
+
+/* Estiliza a imagem do disco ao lado da seção */
+#disco_genero {
+    z-index: 2; /* Mantém a imagem do disco acima dos demais elementos */
+    position: absolute; /* Permite o posicionamento exato na tela */
+    height: 830px; /* Define a altura da imagem */
+    top: -70%; /* Move a imagem para cima */
+    left: 71%; /* Posiciona a imagem à direita */
+    background-attachment: fixed; /* Mantém a imagem fixa ao rolar a página */
+}
+
+/* === Responsivide === */
+
+@media screen and (max-width: 650px) {
+    /* Bolas de fundo */
+    #bolinhas{
+        top: -13%; /* Ajuste para alinhar corretamente abaixo do título */
+    }
+
+    /* Ajusta o último item para ficar mais distante da direita */
+    #ultimo{
+        margin-right: 160px;
+    }
+
+    /* Estiliza a imagem do disco ao lado da seção */
+    #disco_genero{
+        height: 700px; /* Define a altura da imagem */
+        top: -52%; /* Move a imagem para cima */
+        left: 45%; /* Posiciona a imagem à direita */
+    }
+}

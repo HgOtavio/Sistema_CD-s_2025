@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login</title>
+    <link rel="shortcut icon" href="../../img/favicon/favicon.ico" type="image/x-icon">
+
+    <!-- Link para o arquivo CSS -->
+    <link rel="stylesheet" href="../../css/login/login.css">
+    <link rel="stylesheet" href="../../css/cabeçalhos/cabeçalho_sem_login.css">
+
+    <!-- Link para o arquivo JS -->
+    <script src="../../js/login/login.js"></script>
+</head>
+<body>
+    <!-- Cabeçalho da página (sem o usuário estar logado) -->
+    <header> 
+        <div id="parte_de_cima_cab">
+
+            <!-- Logo da página -->
+            <a href="#" id="logo"><img src="../../img/cabeçario/logo.png" alt="Logo" id="img_logo"></a> 
+                <div id="login_cadastro"> <!-- Login e cadastro -->
+                    <a href="#"><img src="../../img/cabeçario/icone_perfil.png" alt="Perfil" id="Perfil"></a><!-- Ícone de perfil -->
+                    <p id="p_cadastro_login">
+                        <a href="#" class="a_cadastro_login">Cadastro</a> ou <br>
+                        <a href="#" class="a_cadastro_login">Login</a>
+                    </p>
+                </div>
+        </div>
+    </header>
+    <!-- Barras animadas no lado esquerdo -->
+    <div class="visualizer-container" id="esquerda">
+        <div class="visualizer">
+            <!-- Barras animadas -->
+            <div class="bar gray"></div>
+            <div class="bar gray"></div>
+            <div class="bar gray"></div>
+            <div class="bar gray"></div>
+            <div class="bar gray"></div>
+            <div class="bar gray"></div>
+            <div class="bar gray"></div>
+            <div class="bar gray"></div>
+            <div class="bar gray"></div>
+            <div class="bar gray"></div>
+            <div class="bar gray"></div>
+            <div class="bar gray"></div>
+            <div class="bar gray"></div>
+            <div class="bar gray"></div> 
+            <div class="bar gray"></div> 
+            <div class="bar gray"></div> 
+            <div class="bar gray"></div> 
+            <div class="bar gray"></div> 
+            <div class="bar gray"></div> 
+            <div class="bar gray"></div> 
+            <div class="bar gray"></div> 
+            <div class="bar gray"></div> 
+            <div class="bar gray"></div> 
+            <div class="bar gray"></div> 
+            <div class="bar gray"></div>  
+        </div>
+    </div>
+    <!-- Barras animadas no lado Direito -->
+    <div class="visualizer-container" id="direita">
+        <div class="visualizer">
+            <!-- Barras animadas -->
+            <div class="bar gray"></div>
+            <div class="bar gray"></div>
+            <div class="bar gray"></div>
+            <div class="bar gray"></div>
+            <div class="bar gray"></div>
+            <div class="bar gray"></div>
+            <div class="bar gray"></div>
+            <div class="bar gray"></div>
+            <div class="bar gray"></div>
+            <div class="bar gray"></div>
+            <div class="bar gray"></div>
+            <div class="bar gray"></div>
+            <div class="bar gray"></div>
+            <div class="bar gray"></div> 
+            <div class="bar gray"></div> 
+            <div class="bar gray"></div> 
+            <div class="bar gray"></div> 
+            <div class="bar gray"></div> 
+            <div class="bar gray"></div> 
+            <div class="bar gray"></div> 
+            <div class="bar gray"></div> 
+            <div class="bar gray"></div> 
+            <div class="bar gray"></div> 
+            <div class="bar gray"></div> 
+            <div class="bar gray"></div>  
+        </div>
+    </div>
+     <!-- Seção principal do login -->
+     <main>
+        <form method="post" action="verificar_login.php">
+            <section id="login">
+                <!-- Lado esquerdo com o formulário de login -->
+                <div id="lado_esquerdo">
+                    <h1 id="titulo">Login</h1>
+                    <p id="p_titulo">Preencha os campos com seus dados de acesso ou voltar para
+                        <a href="#" id="link_inicio">tela inicial.</a>
+                    </p>
+                    <!-- Inputs de usuário e senha -->
+                    <div id="inputs">
+                        <h2 class="titulo_input">Usuário</h2>
+                        <input type="text" class="input" placeholder="Digite seu nome de usuário"  name="login" required>
+                        <div id="senha">
+                            <h2 class="titulo_input">Senha</h2>
+                            <input type="password" id="password" class="input" placeholder="Digite sua senha" name="senha" required>
+                            <!-- Botão para alternar a visibilidade da senha -->
+                            <button id="olho">
+                                <img src="../../img/login/icone_olho_fechado.png" alt="olho" id="img_olho" onclick="togglePassword()">
+                            </button>
+                        </div>
+                    </div>
+                    <!-- Botão de acesso -->
+                    <button id="acessar" type="submit">Acessar</button>
+                    <p id="p_link_criar">Você é novo aqui? <a href="cadastro.php" id="link_criar">Crie uma conta</a></p>
+                </div>
+                <!-- Imagem decorativa no lado direito -->
+                <img src="../../img/login/img_login.png" alt="lado direito" id="img_login">
+            </section>
+        </form>
+     </main>
+</body>
+</html>

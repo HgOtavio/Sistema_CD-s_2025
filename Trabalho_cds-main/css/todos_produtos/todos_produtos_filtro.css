@@ -1,0 +1,229 @@
+/* === Reset de estilos globais === */
+*{
+    padding: 0px;
+    margin: 0px;
+    font-family: Arial, Helvetica, sans-serif;
+}
+
+/* === Definição de variáveis de cores === */
+:root{
+    --cinza-1: #303030;
+    --cinza-2: #5d5d5d;
+    --cinza-3: #6d6d6d;
+    --cinza-4: #7b7a7a;
+    --cinza-5: #888888;
+    --cinza-6: #949494;
+    --cinza-7: #abaaaa;
+    --branco: #ffffff;
+    --roxo: #7445cc;
+}
+
+/* === Estilização do caminho de navegação === */
+#caminho{
+    display: flex;
+    align-items: center;
+    margin: 20px 0px 20px 20px;
+}
+
+#cabeca{
+    display: flex;
+    justify-content: space-between;
+}
+
+#butao_filtro{
+    background-color: var(--roxo);
+    color: var(--branco);
+    padding: 5px;
+    border-radius: 5px;
+    width: 110px;
+    font-size: 20px;
+    text-align: center;
+    height: 40px;
+    margin-top: 5px;
+    border: none;
+}
+
+#butao_filtro:hover{
+    background-color: var(--cinza-1);
+    color: var(--branco);
+    transition: 0.2s;
+}
+
+#home{
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 70px;
+}
+
+#img_home{
+    width: 25px;
+}
+
+.seta{
+    width: 20px;
+}
+
+.proxima_part{
+    display: flex;
+    align-items: center;
+}
+
+.link_caminho{
+    color: var(--cinza-1);
+    text-decoration: none;
+}
+
+.link_caminho:hover{
+    color: var(--cinza-4);
+}
+
+/* === Layout geral do conteúdo === */
+#meio{
+    display: flex;
+}
+
+/* === Estilização do filtro lateral === */
+#filtro{
+    border: 2px solid var(--roxo);
+    padding: 15px;
+    margin-left: 10px;
+    background-color: var(--branco);
+    height: min-content;
+}
+
+#titulo_filtro{
+    font-size: 50px;
+    color: var(--roxo);
+}
+
+#linha{
+    height: 3px;
+    background-color: var(--roxo);
+    margin: 0px;
+}
+
+.contener{
+    display: none;
+}
+
+.part_cima{
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 15px;
+}
+
+.titulo{
+    font-size: 30px;
+    color: var(--cinza-3);
+}
+
+.setas_filtro{
+    width: 30px;
+}
+
+.itens{
+    color: var(--cinza-2);
+    font-weight: bold;
+    display: flex;
+    align-items: center;
+    font-size: 20px;
+}
+
+.itens:hover{
+    color: var(--roxo);
+}
+
+/* === Estilização dos checkboxes === */
+.input[type="checkbox"] {
+    display: none;
+}
+
+.input[type="checkbox"] + label {
+    display: inline-block;
+    width: 20px;
+    height: 20px;
+    background-color: var(--branco);
+    border: 2px solid var(--cinza-2);
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease, border-color 0.3s ease;
+    margin-right: 5px;
+    position: relative;
+}
+
+.input[type="checkbox"]:checked + label {
+    background-color: var(--branco);
+    border-color: var(--branco);
+}
+
+.input[type="checkbox"]:checked + label::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 20px;
+    height: 20px;
+    border: 3px solid #1f1f1f;
+    border-radius: 50%;
+    background-color: var(--branco);
+    background-image: radial-gradient(circle, var(--roxo) 30%, var(--cinza-1) 40%);
+    background-size: 100%;
+    box-shadow: 0 0 5px rgba(0, 0, 0, 0.3);
+}
+
+/* === Estilização do input range para controle de preço === */
+#preço{
+    display: flex;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+#valor{
+    margin-top: 5px;
+    font-size: 20px;
+}
+
+#valor_input{
+    margin: 0px 5px;
+}
+
+#valor_ponta{
+    color: var(--roxo);
+    display: block;
+    width: 300px;
+}
+
+/* === Estilização geral do input range === */
+.input[type="range"] {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 200px;
+    height: 8px;
+    background: #ddd;
+    border-radius: 5px;
+    outline: none;
+    transition: 0.3s ease-in-out;
+}
+
+/* === Estilizando o controle deslizante (thumb) === */
+.input[type="range"]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 20px;
+    height: 20px;
+    margin-top: -5px;
+    border-radius: 50%;
+    border: 3px solid #1f1f1f;
+    background-image: radial-gradient(circle, var(--cinza-2) 30%, var(--cinza-1) 40%);
+    box-shadow: 0 0 5px rgba(0, 0, 0, 0.3);
+    cursor: pointer;
+    transition: 0.3s ease-in-out;
+}
+
+/* === Efeito de hover no controle deslizante === */
+.input[type="range"]:hover::-webkit-slider-thumb {
+    background-image: radial-gradient(circle, var(--roxo) 30%, var(--cinza-1) 40%);
+}

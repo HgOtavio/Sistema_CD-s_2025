@@ -1,0 +1,506 @@
+<?php
+session_start();
+if (!isset($_SESSION["id_usuario"]) || $_SESSION["tipo"] != "cliente") {
+    header("Location: ../php/login.php");
+    exit();
+}
+include "../login_cadastro/conexao.php";
+$id_usuario = $_SESSION["id_usuario"];
+
+
+
+// Inicializa os filtros
+$preco_min = isset($_GET['preco_min']) ? $_GET['preco_min'] : 0;
+$preco_max = isset($_GET['preco_max']) ? $_GET['preco_max'] : 1000;
+$desconto = isset($_GET['desconto']) ? $_GET['desconto'] : 'todos'; // Alterado para "todos", "com" e "sem"
+$disponibilidade = isset($_GET['disponibilidade']) ? $_GET['disponibilidade'] : 0;
+$artista_nome = isset($_GET['artista_nome']) ? $_GET['artista_nome'] : ''; // Filtro por nome do artista
+$titulo_cd = isset($_GET['titulo_cd']) ? $_GET['titulo_cd'] : ''; // Filtro por título do CD
+$genero = isset($_GET['genero']) ? $_GET['genero'] : 'todos'; // Filtro por gênero
+$musica_nome = isset($_GET['musica_nome']) ? $_GET['musica_nome'] : ''; // Filtro por nome da música
+$ordem_alfabetica = isset($_GET['ordem_alfabetica']) ? $_GET['ordem_alfabetica'] : 'desc'; // Filtro de ordem alfabética
+$busca_geral = isset($_GET['busca_geral']) ? $_GET['busca_geral'] : '';
+$mais_vendidos = isset($_GET['mais_vendidos']) ? $_GET['mais_vendidos'] : 'nao';
+
+
+
+
+// Consulta para obter todos os CDs com filtros, incluindo o filtro por artista, gênero e música
+$sql = "
+    SELECT 
+        CD.id_cd, 
+        CD.titulo, 
+        CD.capa, 
+        CD.preco, 
+        CD.descricao, 
+        CD.disponibilidade, 
+        COALESCE(P.desconto, 0) AS desconto,
+        CD.genero
+    FROM CD
+    LEFT JOIN CD_Artista ON CD.id_cd = CD_Artista.id_cd
+    LEFT JOIN Artista ON CD_Artista.id_artista = Artista.id_artista
+    LEFT JOIN Promocao P ON CD.id_cd = P.id_cd
+    LEFT JOIN CD_Musica ON CD.id_cd = CD_Musica.id_cd
+    LEFT JOIN Musica ON CD_Musica.id_musica = Musica.id_musica
+    WHERE CD.preco BETWEEN $preco_min AND $preco_max
+    AND (P.desconto >= 0 OR P.desconto IS NULL)
+    AND (CD.disponibilidade >= $disponibilidade)
+";
+
+if (!empty($busca_geral)) {
+    $sql .= " AND (
+        Artista.nomeArtista LIKE '%$busca_geral%' OR 
+        CD.titulo LIKE '%$busca_geral%' OR 
+        Musica.nomeMusica LIKE '%$busca_geral%'
+    )";
+}
+
+
+// Filtro por gênero
+if ($genero != 'todos') {
+    $sql .= " AND CD.genero = '$genero'";
+}
+
+// Filtro de desconto (Com ou Sem)
+if ($desconto == 'com') {
+    $sql .= " AND P.desconto > 0";
+} elseif ($desconto == 'sem') {
+    $sql .= " AND (P.desconto = 0 OR P.desconto IS NULL)";
+}
+
+
+if ($mais_vendidos == 'sim') {
+    $ordem_sql = " ORDER BY CD.numero_vendas DESC";
+} else {
+    if ($ordem_alfabetica == 'asc') {
+        $ordem_sql = " ORDER BY CD.titulo ASC";
+    } else {
+        $ordem_sql = " ORDER BY CD.titulo DESC";
+    }
+}
+
+
+
+$sql .= $ordem_sql;
+
+
+$result = $conn->query($sql);
+
+// Exibe a mensagem de sucesso, caso exista
+if (isset($_SESSION['msg'])) {
+    echo "<div style='text-align: center; color: green; font-size: 18px; margin: 20px 0;'>" . $_SESSION['msg'] . "</div>";
+    unset($_SESSION['msg']); // Limpa a mensagem da sessão após exibição
+}
+
+// Processa a ação de favoritar (POST)
+if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['favoritar'])) {
+    $cd_id = $_POST['cd_id'];
+    // Aqui você deve adicionar a lógica para favoritar o CD (ex: adicionar ao banco de dados de favoritos do usuário)
+    // Exemplo:
+    // $user_id = $_SESSION['user_id']; // Se estiver usando sessões para gerenciar usuários
+    // $conn->query("INSERT INTO Favoritos (user_id, cd_id) VALUES ($user_id, $cd_id)");
+    $_SESSION['msg'] = "CD adicionado aos favoritos!";
+    header("Location: " . $_SERVER['PHP_SELF']);
+    exit();
+}
+
+// Processa a ação de adicionar ao carrinho (POST)
+if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['adicionar_carrinho'])) {
+    $cd_id = $_POST['cd_id'];
+    $quantidade = 1; // A quantidade pode ser ajustada conforme necessário
+
+    // Verifica se o carrinho já foi inicializado na sessão
+    if (!isset($_SESSION['carrinho'])) {
+        $_SESSION['carrinho'] = [];
+    }
+
+    // Adiciona o CD ao carrinho
+    if (isset($_SESSION['carrinho'][$cd_id])) {
+        $_SESSION['carrinho'][$cd_id] += $quantidade; // Se o CD já está no carrinho, aumenta a quantidade
+    } else {
+        $_SESSION['carrinho'][$cd_id] = $quantidade; // Adiciona o CD com a quantidade inicial
+    }
+
+    $_SESSION['msg'] = "CD adicionado ao carrinho!";
+    header("Location: " . $_SERVER['PHP_SELF']);
+    exit();
+}
+?>
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Produtos</title>
+    <link rel="shortcut icon" href="../../img/favicon/favicon.ico" type="image/x-icon">
+
+    <link rel="stylesheet" href="../../css/todos_produtos/todos_produtos_filtro.css">
+    <link rel="stylesheet" href="../../css/todos_produtos/todos_produtos_orderna.css">
+    <link rel="stylesheet" href="../../css/todos_produtos/todos_produtos_produto.css">
+    <link rel="stylesheet" href="../../css/todos_produtos/todos_produtos_responsividade.css">
+    <link rel="stylesheet" href="../../css/cabeçalhos/cabeçalho_com_login.css">
+    <link rel="stylesheet" href="../../css/rodape/rodape.css">
+    
+
+    <script src="../../js/todos_produtos/filtro_part1.js" defer></script>
+    <script src="../../js/todos_produtos/filtro_part2.js" defer></script>
+    <script src="../../js/todos_produtos/ordernar.js" defer></script>
+    <script src="../../js/todos_produtos/favoritos.js" defer></script>
+    <script src="../../js/cabeçalho/menu.js" defer></script> <!-- Script do menu interativo -->
+</head>
+<body>
+
+    <!-- Cabeçalho da página (logado) -->
+    <header> 
+
+        <div id="parte_de_cima_cab">
+
+            <!-- Logo da página -->
+            <a href="#" id="logo"><img src="../../img/cabeçario/logo.png" alt="Logo" id="img_logo"></a>  
+            
+            <!-- Barra de pesquisa -->
+            <div id="barra_pesquisa">
+                <input type="checkbox" id="check"> <!-- Controle de visibilidade -->
+                <div id="complemento_pesquisa">
+
+                    <!-- Campo de pesquisa -->
+                    <input type="text" id="input_barra_pesquisa" placeholder="Buscar..." >
+
+                    <!-- Botão de pesquisa -->
+                    <label for="check" id="buttom_lupa">
+                        <img src="../../img/cabeçario/icone_lupa.png" alt="Lupa" id="lupa">
+                    </label>
+                </div>
+            </div>
+
+            <div id="login_carrinho"> <!-- Login e Carrinho -->
+                <a href=""><img src="../../img/cabeçario/icone_perfil.png" alt="Perfil" id="Perfil"></a><!-- Foto de perfil -->
+
+                <a href="../login_cadastro/perfil/butoes/carrinho.php"><img src="../../img/cabeçario/icone_carrinho.png" alt="Carrinho" id="Carrinho"></a><!-- Ícone de carrinho -->
+            </div>
+        </div>
+
+        <hr style="color: #7b7a7a;"><!-- Linha separadora -->
+
+        <!-- Menu de navegação -->
+        <nav class="menu-underline">
+            <input type="checkbox" id="menu_toggle" class="menu_toggle"><!-- Menu responsivo -->
+            <label for="menu_toggle" class="menu_icon">&#9776;</label> 
+
+            <ul id="menu">
+
+                <li class="p_menu"><a href="#" class="a_menu">Inicio</a></li>
+                <li class="p_menu"><a href="#" class="a_menu">Produtos</a></li>
+                
+                 <!-- Menu suspenso de gêneros musicais -->
+                <li class="p_menu" id="menu_genero">
+
+                    <button onclick="aparecer_g('sumir_g')" class="b_menu">
+                        Gênero
+                    </button>
+
+                    <!-- Submenu de Gêneros -->
+                    <ul class="subclasse_menu" id="sumir_g">
+                        
+                        <ul class="sub_subclasse_menu">
+                            <li><a href="#" class="sub_a">Clássica</a></li>
+                            <li><a href="#" class="sub_a">Eletrônica</a></li>
+                            <li><a href="#" class="sub_a">Forro</a></li>
+                            <li><a href="#" class="sub_a">Hip Hop</a></li>
+                            <li><a href="#" class="sub_a">MPB</a></li>
+                        </ul>
+                        
+                        <ul class="sub_subclasse_menu">
+                            <li><a href="#" class="sub_a">Pagode</a></li>
+                            <li><a href="#" class="sub_a">Pop</a></li>
+                            <li><a href="#" class="sub_a">Reggae</a></li>
+                            <li><a href="#" class="sub_a">Rock</a></li>
+                            <li><a href="#" class="sub_a">Sertanejo</a></li>
+                        </ul>
+                    </ul>
+                </li>
+
+                <!-- Menu suspenso para Artistas -->
+                <li class="p_menu" id="arredondar_b">
+
+                    <button onclick="aparecer_a('sumir_a')" class="b_menu">
+                        Artistas
+                    </button>
+
+                    <!-- Submenu de Artistas -->
+                    <ul class="subclasse_menu_a" id="sumir_a">
+                        
+                        <ul class="sub_subclasse_menu">
+                            <li><a href="#" class="sub_a">Ludwing Beethowen</a></li>
+                            <li><a href="#" class="sub_a">Marshmello</a></li>
+                            <li><a href="#" class="sub_a">Luiz Gonzaga</a></li>
+                            <li><a href="#" class="sub_a">Snoop Dogg</a></li>
+                            <li><a href="#" class="sub_a">Maria Bethânia</a></li>
+                        </ul>
+                        
+                        <ul class="sub_subclasse_menu">
+                            <li><a href="#" class="sub_a">Péricles</a></li>
+                            <li><a href="#" class="sub_a">Michael Jackson</a></li>
+                            <li><a href="#" class="sub_a">Bob Marley</a></li>
+                            <li><a href="#" class="sub_a">Elvis Presley</a></li>
+                            <li><a href="#" class="sub_a">Luan Santana</a></li>
+                        </ul>
+                    </ul>
+                </li>
+            </ul>
+        </nav>
+    </header>
+    <section>
+        <div id="caminho">
+            <a href="#" id="home" class="link_caminho">
+                <img src="../../img/todos_produtos/icone_home.png" alt="Home" id="img_home">
+                <p>Home</p>
+            </a>
+        </div>
+    </section>
+
+    <section id="meio">
+        <div id="filtro">
+            <div id="cabeca">
+                <h1 id="titulo_filtro">Filtro</h1>
+                <button id="butao_filtro">Filtrar</button>
+            </div>
+            <hr id="linha">
+
+            <div>
+                <div class="part_cima">
+                    <h1 class="titulo">Gênero</h1>
+                    <img src="../../img/todos_produtos/icone_seta_direita.png" alt="Seta para abrir seleção" id="button_filtro_generos" class="setas_filtro">
+                </div>
+                <div id="generos" class="contener">
+                    <label class="itens"><input type="checkbox" id="checkbox1" class="input"> <label for="checkbox1"></label> Gênero 1</label><br>
+                    <label class="itens"><input type="checkbox" id="checkbox2" class="input"> <label for="checkbox2"></label> Gênero 2</label><br>
+                    <label class="itens"><input type="checkbox" id="checkbox3" class="input"> <label for="checkbox3"></label> Gênero 3</label><br>
+                    <label class="itens"><input type="checkbox" id="checkbox4" class="input"> <label for="checkbox4"></label> Gênero 4</label><br>
+                    <label class="itens"><input type="checkbox" id="checkbox5" class="input"> <label for="checkbox5"></label> Gênero 5</label><br>
+                    <label class="itens"><input type="checkbox" id="checkbox6" class="input"> <label for="checkbox6"></label> Gênero 6</label><br>
+                    <label class="itens"><input type="checkbox" id="checkbox7" class="input"> <label for="checkbox7"></label> Gênero 7</label><br>
+                    <label class="itens"><input type="checkbox" id="checkbox8" class="input"> <label for="checkbox8"></label> Gênero 8</label><br>
+                    <label class="itens"><input type="checkbox" id="checkbox9" class="input"> <label for="checkbox9"></label> Gênero 9</label><br>
+                    <label class="itens"><input type="checkbox" id="checkbox10" class="input"> <label for="checkbox10"></label> Gênero 10</label><br>
+                </div>
+            </div>
+            
+            <div>
+                <div class="part_cima">
+                    <h1 class="titulo">Artistas</h1>
+                    <img src="../../img/todos_produtos/icone_seta_direita.png" alt="Seta para abrir seleção" id="button_filtro_artistas" class="setas_filtro">
+                </div>
+                <div id="artistas" class="contener">
+                    <label class="itens"><input type="checkbox" id="checkbox11" class="input"> <label for="checkbox11"></label> Artista 1</label><br>
+                    <label class="itens"><input type="checkbox" id="checkbox12" class="input"> <label for="checkbox12"></label> Artista 2</label><br>
+                    <label class="itens"><input type="checkbox" id="checkbox13" class="input"> <label for="checkbox13"></label> Artista 3</label><br>
+                    <label class="itens"><input type="checkbox" id="checkbox14" class="input"> <label for="checkbox14"></label> Artista 4</label><br>
+                    <label class="itens"><input type="checkbox" id="checkbox15" class="input"> <label for="checkbox15"></label> Artista 5</label><br>
+                    <label class="itens"><input type="checkbox" id="checkbox16" class="input"> <label for="checkbox16"></label> Artista 6</label><br>
+                    <label class="itens"><input type="checkbox" id="checkbox17" class="input"> <label for="checkbox17"></label> Artista 7</label><br>
+                    <label class="itens"><input type="checkbox" id="checkbox18" class="input"> <label for="checkbox18"></label> Artista 8</label><br>
+                    <label class="itens"><input type="checkbox" id="checkbox19" class="input"> <label for="checkbox19"></label> Artista 9</label><br>
+                    <label class="itens"><input type="checkbox" id="checkbox20" class="input"> <label for="checkbox20"></label> Artista 10</label><br>
+                </div>
+            </div>
+            
+            <div>
+                <div class="part_cima">
+                    <h1 class="titulo">Musicas</h1>
+                    <img src="../../img/todos_produtos/icone_seta_direita.png" alt="Seta para abrir seleção" id="button_filtro_musicas" class="setas_filtro">
+                </div>
+                <div id="musicas" class="contener">
+                    <label class="itens"><input type="checkbox" id="checkbox21" class="input"> <label for="checkbox21"></label> Música 1</label><br>
+                    <label class="itens"><input type="checkbox" id="checkbox22" class="input"> <label for="checkbox22"></label> Música 2</label><br>
+                    <label class="itens"><input type="checkbox" id="checkbox23" class="input"> <label for="checkbox23"></label> Música 3</label><br>
+                    <label class="itens"><input type="checkbox" id="checkbox24" class="input"> <label for="checkbox24"></label> Música 4</label><br>
+                    <label class="itens"><input type="checkbox" id="checkbox25" class="input"> <label for="checkbox25"></label> Música 5</label><br>
+                    <label class="itens"><input type="checkbox" id="checkbox26" class="input"> <label for="checkbox26"></label> Música 6</label><br>
+                    <label class="itens"><input type="checkbox" id="checkbox27" class="input"> <label for="checkbox27"></label> Música 7</label><br>
+                    <label class="itens"><input type="checkbox" id="checkbox28" class="input"> <label for="checkbox28"></label> Música 8</label><br>
+                    <label class="itens"><input type="checkbox" id="checkbox29" class="input"> <label for="checkbox29"></label> Música 9</label><br>
+                    <label class="itens"><input type="checkbox" id="checkbox30" class="input"> <label for="checkbox30"></label> Música 10</label><br>
+                </div>
+            </div>
+            <div>
+                <div class="part_cima">
+                    <h1 class="titulo">Destaques Do Ano</h1>
+                    <img src="../../img/todos_produtos/icone_seta_direita.png" alt="Seta para abrir seleção" id="button_filtro_destaque" class="setas_filtro">
+                </div>
+                <div id="destaque" class="contener">
+                    <label class="itens"><input type="checkbox" id="checkbox31" class="input"> <label for="checkbox31"></label>  1901</label><br>
+                    <label class="itens"><input type="checkbox" id="checkbox32" class="input"> <label for="checkbox32"></label>  1902</label><br>
+                    <label class="itens"><input type="checkbox" id="checkbox33" class="input"> <label for="checkbox33"></label>  1903</label><br>
+                    <label class="itens"><input type="checkbox" id="checkbox34" class="input"> <label for="checkbox34"></label>  1904</label><br>
+                    <label class="itens"><input type="checkbox" id="checkbox35" class="input"> <label for="checkbox35"></label>  1905</label><br>
+                    <label class="itens"><input type="checkbox" id="checkbox36" class="input"> <label for="checkbox36"></label>  1906</label><br>
+                    <label class="itens"><input type="checkbox" id="checkbox37" class="input"> <label for="checkbox37"></label>  1907</label><br>
+                    <label class="itens"><input type="checkbox" id="checkbox38" class="input"> <label for="checkbox38"></label>  1908</label><br>
+                    <label class="itens"><input type="checkbox" id="checkbox39" class="input"> <label for="checkbox39"></label>  1909</label><br>
+                    <label class="itens"><input type="checkbox" id="checkbox40" class="input"> <label for="checkbox40"></label>  1910</label><br>
+                </div>
+            </div>
+    
+            <div>
+                <h1 class="titulo" id="preço">Preço: <p id="valor">R$<span id="valor_range">500</span></p></h1> 
+                <lable id="valor_ponta">R$5<input type="range" min="5" max="1000" value="500" step="5" id="valor_input" class="input">R$1000</lable>
+            </div>
+        </div>
+
+        <div id="main">
+            <div id="part_cima_produtos">
+                <p id="quantidade">0000 Produtos</p>
+                <div>
+                    <div id="ordenar_produtos">
+                        <p id="ordenar">Ordenar Por</p>
+                        <img src="../../img/todos_produtos/icone_seta_direita.png" alt="Seta" id="seta_ordenar">
+                    </div>
+
+                    <div id="formas_de_ordenar">
+                        <div id="forma_ordenar">
+                            <button id="button_ordenar">Todos</button>
+                            <button id="button_ordenar">Preço: Baixo</button>
+                            <button id="button_ordenar">Preço: Alto</button>
+                            <button id="button_ordenar">Data de Adição: Recente</button>
+                            <button id="button_ordenar">Data de Adição: Antigo</button>
+                            <button id="button_ordenar">Maior Descontos</button>
+                            <button id="button_ordenar">Mais Vendido</button>
+                            <button id="button_ordenar">Relevancia</button>
+                            <button id="button_ordenar">Avaliação</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="fileira_produtos">
+
+            <?php while ($cd = $result->fetch_assoc()) { ?>
+
+                <div>
+                    <div class="produto">
+                           <img src="../<?php echo $cd['capa']; ?>" alt="<?php echo $cd['titulo']; ?>" class="img_capa_cd">
+                           <div>
+                               <div>
+                                   <h1 class="nome_cd"><?php echo $cd['titulo']; ?></h1>
+                                   <p class="descricao"><a href="#" class="artista"><?php echo substr($cd['descricao'], 0, 60); ?></a></p>
+                               </div>
+                               <form  method="POST"  action="">
+                <input type="hidden" name="cd_id" value="<?php echo $cd['id_cd']; ?>">
+                <button type="submit" name="adicionar_carrinho" class="carrinho">Adicionar ao Carrinho</button>
+            </form>                             
+              <div class="baixo_part">
+                                   <div>
+                                       <h1 class="valor">R$<?php echo number_format($cd['preco'], 2, ',', '.'); ?></h1>
+                                       <?php if ($cd['desconto'] > 0) { ?>
+                <p class="promo">R$ <?php echo number_format($cd['preco'] * (1 - $cd['desconto'] / 100), 2, ',', '.'); ?></p>
+            <?php } ?>
+                                   </div>
+                                   <img src="../../img/todos_produtos/icone_favoritos.png" alt="Favoritos" class="img_favorito">
+                               </div>
+                           </div>
+                    </div>
+                    <a href="#" class="link_produto2"> <div class="butao">Ver Mais</div></a>
+                </div>
+            <?php } ?>
+
+
+
+             
+            </div>
+        
+        </div>
+    </section>
+
+<footer>
+
+    <!-- Seção com a logo no rodapé, contendo duas linhas laterais -->
+    <section id="logo_rodape">
+        <div class="linha_logo_rodape"></div> <!-- Linha à esquerda -->
+        <!-- Logo central -->
+        <img src="../../img/cabeçario/logo.png" alt="Logo" id="img_rodape_logo">
+        <div class="linha_logo_rodape"></div> <!-- Linha à direita -->
+    </section>
+
+    <!-- Corpo principal do rodapé -->
+    <section id="corpo_rodape">
+        <div id="parte_de_cima_rodape">
+            <h1 class="titulo">Sobre nós</h1>
+            <!-- Texto de descrição sobre a empresa ou site -->
+            <p id="sobre_texto_rodape">
+                Somos uma loja online apaixonada por música, dedicada a quem valoriza a experiência de ouvir um bom CD. Trabalhamos com títulos novos e selecionados, dos clássicos aos lançamentos, sempre com qualidade e cuidado.Nossa missão é manter viva a cultura do CD, oferecendo um atendimento atencioso, envios rápidos e uma experiência de compra segura. Se você ama música de verdade, está no lugar certo. 
+            </p>
+        </div>
+
+        <div id="parte_de_baixo_rodape">
+            <!-- Seção: Política Comercial -->
+            <div class="topicos_rodape">
+                <h1 class="titulo">Política comercial</h1>
+                <ul>
+                    <li class="lista_rodape"><a href="../rodape/politica_comercial.html#trocas_devolucoes" class="link_rodape">Trocas e Devoluções</a></li>
+                    <li class="lista_rodape"><a href="../rodape/politica_comercial.html#termos_uso" class="link_rodape">Termos de uso</a></li>
+                    <li class="lista_rodape"><a href="../rodape/politica_comercial.html#politica_privacidade" class="link_rodape">Políticas de privacidade</a></li>
+                    <li class="lista_rodape"><a href="../rodape/politica_comercial.html#direito_arrependimento" class="link_rodape">Direito de arrependimento</a></li>
+                </ul>
+            </div>
+
+            <!-- Seção: Suporte -->
+            <div class="topicos_rodape">
+                <h1 class="titulo">Suporte</h1>
+                <ul>
+                    <li class="lista_rodape"><a href="../rodape/perguntas_frequentes.html" class="link_rodape">Perguntas Frequentes</a></li>
+                    <li class="lista_rodape"><a href="../rodape/avaliar.html" class="link_rodape">Avaliar</a></li>
+                    <li class="lista_rodape"><a href="#" class="link_rodape">Recomendar Produtos</a></li>
+                </ul>
+            </div>
+
+            <!-- Seção: Atendimento -->
+            <div class="topicos_rodape">
+                <h1 class="titulo">Atendimento</h1>
+                <ul>
+                    <li class="lista_rodape">
+                        <a href="mailto:codedisc@gmail.com" class="link_rodape">
+                            <img src="../../img/rodape/contato/icone_email.png" alt="Ícone email" class="img_rodape_contatos"> Email
+                        </a>
+                    </li>
+                    <li class="lista_rodape">
+                        <a href="tel:+5585900000000" class="link_rodape">
+                            <img src="../../img/rodape/contato/icone_telefone.png" alt="Ícone telefone" class="img_rodape_contatos"> Telefone
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </section>
+
+    <!-- Linha separadora do rodapé -->
+    <hr id="hr_rodape">
+
+    <!-- Seção final do rodapé -->
+    <section id="final_rodape">
+        <div>
+            <h1 class="titulo">Formas de pagamento</h1>
+            <!-- Ícones representando formas de pagamento -->
+            <img src="../../img/rodape/cartoes/icone_cartao1.png" alt="Cartão" class="img_cartao_rodape">
+            <img src="../../img/rodape/cartoes/icone_cartao2.png" alt="Cartão" class="img_cartao_rodape">
+            <img src="../../img/rodape/cartoes/icone_cartao1.png" alt="Cartão" class="img_cartao_rodape">
+            <img src="../../img/rodape/cartoes/icone_cartao2.png" alt="Cartão" class="img_cartao_rodape">
+            <img src="../../img/rodape/cartoes/icone_cartao1.png" alt="Cartão" class="img_cartao_rodape">
+            <img src="../../img/rodape/cartoes/icone_cartao2.png" alt="Cartão" class="img_cartao_rodape">
+        </div>
+
+        <!-- Seção de redes sociais -->
+        <div id="redes_sociais_rodape">
+            <h1 class="titulo">Redes Sociais</h1>
+           <!-- Ícones representando redes sociais -->
+           <a href="https://www.instagram.com/code_disc_oficial"><img src="../../img/rodape/redes_sociais/icone_instagram.png" alt="Instagram" class="img_rodape_social"></a>
+           <a href="https://www.facebook.com/code_disc_oficial"><img src="../../img/rodape/redes_sociais/icone_facebook.png" alt="Facebook" class="img_rodape_social"></a>
+           <a href="https://twitter.com/code_disc_oficial"><img src="../../img/rodape/redes_sociais/icone_x.png" alt="X (Twitter)" class="img_rodape_social"></a>
+           <a href="https://www.tiktok.com/code_disc_oficial"><img src="../../img/rodape/redes_sociais/icone_tiktok.png" alt="TikTok" class="img_rodape_social"></a>
+           <a href="https://open.spotify.com/user/code_disc_oficial"><img src="../../img/rodape/redes_sociais/icone_spotify.png" alt="Spotify" class="img_rodape_social"></a>
+           <a href="https://www.youtube.com/code_disc_oficial"><img src="../../img/rodape/redes_sociais/icone_youtube.png" alt="YouTube" class="img_rodape_social"></a>
+        </div>
+    </section>
+</footer>
+</body>
+</html>

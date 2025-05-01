@@ -1,0 +1,148 @@
+/* === VARIÁVEIS DE CORES GLOBAIS === */
+:root {
+    --cinza-1: #303030;
+    --cinza-2: #5d5d5d;
+    --cinza-3: #6d6d6d;
+    --cinza-4: #7b7a7a;
+    --cinza-5: #888888;
+    --cinza-6: #949494;
+    --cinza-7: #abaaaa;
+    --branco: #ffffff;
+    --roxo: #7445cc;
+}
+
+/* === CONTAINER QUE AGRUPA OS PRODUTOS EM FILEIRAS === */
+.fileira_produtos {
+    display: flex;                 /* Exibe os produtos em linha */
+    width: 1000px;
+    height: auto;
+    margin-top: 35px;
+    flex-wrap: wrap;              /* Quebra linha caso não caibam na mesma */
+    margin-bottom: 30px;
+    gap: 30px;
+    justify-content: center;
+}
+
+/* === LINK SOBRE O PRODUTO COM BOTÃO SOBREPOSTO === */
+.link_produto2 {
+    width: 140px;
+    height: 80px;
+    z-index: 1;
+    position: relative;
+    display: flex;
+    align-items: center;
+    margin-top: -80px;           /* Posicionamento relativo ao produto */
+    margin-left: 5px;
+}
+
+/* === BOTÃO SOBRE O PRODUTO (APARECE AO PASSAR O MOUSE) === */
+.butao {
+    display: none;               /* Escondido por padrão */
+    position: absolute;
+    background-color: var(--roxo);
+    color: var(--branco);
+    padding: 5px;
+    border-radius: 5px;
+    width: 140px;
+    font-size: 30px;
+    text-align: center;
+    height: 50px;
+    margin-top: 5px;
+    margin-left: 5px;
+    line-height: 40px;
+}
+
+/* === EXIBE O BOTÃO AO PASSAR O MOUSE SOBRE O LINK DO PRODUTO === */
+.link_produto2:hover .butao {
+    display: block;
+    transition: 1s;             /* Transição suave na aparição */
+}
+
+/* === CARD DO PRODUTO === */
+.produto {
+    border: 2px solid var(--roxo); /* Borda com a cor roxa padrão */
+    width: 220px;
+    height: 380px;
+    justify-content: space-between;
+    display: flex;
+    flex-direction: column;
+    padding: 15px;
+    border-radius: 10px;
+    background-color: var(--branco);
+    z-index: 0;
+    box-shadow: 10px 10px 20px rgba(0, 0, 0, 0.3); /* Sombra suave */
+    margin-top: 15px;
+}
+
+/* === IMAGEM DO PRODUTO (CAPA DO CD) === */
+.img_capa_cd {
+    height: 180px;
+}
+
+/* === NOME DO CD E VALOR === */
+.nome_cd, .valor {
+    font-size: 25px;
+    color: var(--roxo);
+}
+
+/* === DESCRIÇÃO E INFORMAÇÃO DE PROMOÇÃO === */
+.descricao, .promo {
+    color: var(--cinza-3);
+    font-size: 15px;
+}
+
+/* === AJUSTE ESPECÍFICO DA DESCRIÇÃO === */
+.descricao {
+    z-index: 3;
+}
+
+/* === NOME DO ARTISTA === */
+.artista {
+    color: var(--cinza-3);
+    z-index: 3;
+    position: relative;
+}
+
+/* === EFEITO AO PASSAR O MOUSE NO NOME DO ARTISTA === */
+.artista:hover {
+    color: var(--roxo);
+}
+
+.carrinho{
+    background-color: var(--roxo);
+    color: var(--branco);
+    padding: 5px;
+    border-radius: 5px;
+    width: 110px;
+    font-size: 15px;
+    text-align: center;
+    height: 40px;
+    margin-top: 5px;
+    line-height: 15px;
+    border: none;
+}
+
+.carrinho:hover{
+    background-color: var(--cinza-1);
+    color: var(--branco);
+    transition: 0.2s;
+}
+
+/* === CONTAINER INFERIOR DO CARD: CONTÉM ÍCONE DE FAVORITO E OUTROS === */
+.baixo_part {
+    margin-top: 15px;
+    display: flex;
+    justify-content: space-between;
+}
+
+/* === ÍCONE DE FAVORITO === */
+.img_favorito {
+    width: 50px;
+    cursor: pointer; /* Mostra que o ícone é clicável */
+    transition: transform 0.2s ease-in-out; /* Suaviza o efeito de clique */
+}
+
+/* === EFEITO DE CLIQUE NO ÍCONE DE FAVORITO === */
+.img_favorito:active {
+    transform: scale(0.95); /* Reduz o tamanho ligeiramente ao clicar */
+}
