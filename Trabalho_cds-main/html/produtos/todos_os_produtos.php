@@ -1,31 +1,44 @@
 <?php
 session_start();
-if (!isset($_SESSION["id_usuario"]) || $_SESSION["tipo"] != "cliente") {
-    header("Location: ../php/login.php");
-    exit();
-}
+// Função para garantir que o parâmetro seja tratado como array
+
 include "../login_cadastro/conexao.php";
-$id_usuario = $_SESSION["id_usuario"];
 
-
+function garantirArray($param) {
+    if (is_array($param)) {
+        return $param;
+    } elseif (!empty($param)) {
+        return [$param];
+    }
+    return [];
+}
 
 // Inicializa os filtros
 $preco_min = isset($_GET['preco_min']) ? $_GET['preco_min'] : 0;
 $preco_max = isset($_GET['preco_max']) ? $_GET['preco_max'] : 1000;
-$desconto = isset($_GET['desconto']) ? $_GET['desconto'] : 'todos'; // Alterado para "todos", "com" e "sem"
+$desconto = isset($_GET['desconto']) ? $_GET['desconto'] : 'todos';
 $disponibilidade = isset($_GET['disponibilidade']) ? $_GET['disponibilidade'] : 0;
-$artista_nome = isset($_GET['artista_nome']) ? $_GET['artista_nome'] : ''; // Filtro por nome do artista
-$titulo_cd = isset($_GET['titulo_cd']) ? $_GET['titulo_cd'] : ''; // Filtro por título do CD
-$genero = isset($_GET['genero']) ? $_GET['genero'] : 'todos'; // Filtro por gênero
-$musica_nome = isset($_GET['musica_nome']) ? $_GET['musica_nome'] : ''; // Filtro por nome da música
-$ordem_alfabetica = isset($_GET['ordem_alfabetica']) ? $_GET['ordem_alfabetica'] : 'desc'; // Filtro de ordem alfabética
+$artista_nome = isset($_GET['artista_nome']) ? garantirArray($_GET['artista_nome']) : [];
+$titulo_cd = isset($_GET['titulo_cd']) ? $_GET['titulo_cd'] : '';
+$genero = isset($_GET['genero']) ? garantirArray($_GET['genero']) : [];
+$musica_nome = isset($_GET['musica_nome']) ? garantirArray($_GET['musica_nome']) : [];
+$ordem_alfabetica = isset($_GET['ordem_alfabetica']) ? $_GET['ordem_alfabetica'] : 'desc';
 $busca_geral = isset($_GET['busca_geral']) ? $_GET['busca_geral'] : '';
 $mais_vendidos = isset($_GET['mais_vendidos']) ? $_GET['mais_vendidos'] : 'nao';
+$ordem_personalizada = isset($_GET['ordem_personalizada']) ? $_GET['ordem_personalizada'] : '';
+$anosSelecionados = isset($_GET['anos']) ? $_GET['anos'] : [];
+$mostrarDestaques = isset($_GET['destaque']) ? in_array('Destaque', $_GET['destaque']) : false;
+$mostrarNaoDestaques = isset($_GET['destaque']) ? in_array('Não Destaque', $_GET['destaque']) : false;
 
+// Consulta para checkboxes
+$artistas_result = $conn->query("SELECT * FROM Artista");
+$musicas_result = $conn->query("SELECT * FROM Musica");
+$generos_result = $conn->query("SELECT DISTINCT genero FROM CD");
 
+// Buscar anos com destaque
+$anosResult = $conn->query("SELECT DISTINCT anoLancamento FROM CD WHERE destaque = 'Destaque' ORDER BY anoLancamento DESC");
 
-
-// Consulta para obter todos os CDs com filtros, incluindo o filtro por artista, gênero e música
+// Consulta principal
 $sql = "
     SELECT 
         CD.id_cd, 
@@ -47,6 +60,7 @@ $sql = "
     AND (CD.disponibilidade >= $disponibilidade)
 ";
 
+// Filtros adicionais
 if (!empty($busca_geral)) {
     $sql .= " AND (
         Artista.nomeArtista LIKE '%$busca_geral%' OR 
@@ -55,36 +69,73 @@ if (!empty($busca_geral)) {
     )";
 }
 
-
-// Filtro por gênero
-if ($genero != 'todos') {
-    $sql .= " AND CD.genero = '$genero'";
+if (!empty($anosSelecionados)) {
+    $anosFiltrados = array_map('intval', $anosSelecionados);
+    $anosString = implode(",", $anosFiltrados);
+    $sql .= " AND CD.anoLancamento IN ($anosString)";
 }
 
-// Filtro de desconto (Com ou Sem)
+if ($mostrarDestaques && !$mostrarNaoDestaques) {
+    $sql .= " AND CD.destaque = 'Sim'";
+} elseif (!$mostrarDestaques && $mostrarNaoDestaques) {
+    $sql .= " AND (CD.destaque IS NULL OR CD.destaque != 'Sim')";
+}
+
+// Filtros com múltiplos valores
+if (!empty($genero)) {
+    $generoFiltrado = array_map([$conn, 'real_escape_string'], $genero);
+    $sql .= " AND CD.genero IN ('" . implode("','", $generoFiltrado) . "')";
+}
+
+if (!empty($artista_nome)) {
+    $artistaFiltrado = array_map([$conn, 'real_escape_string'], $artista_nome);
+    $sql .= " AND Artista.nomeArtista IN ('" . implode("','", $artistaFiltrado) . "')";
+}
+
+if (!empty($musica_nome)) {
+    $musicaFiltrado = array_map([$conn, 'real_escape_string'], $musica_nome);
+    $sql .= " AND Musica.nomeMusica IN ('" . implode("','", $musicaFiltrado) . "')";
+}
+
 if ($desconto == 'com') {
     $sql .= " AND P.desconto > 0";
 } elseif ($desconto == 'sem') {
     $sql .= " AND (P.desconto = 0 OR P.desconto IS NULL)";
 }
 
-
-if ($mais_vendidos == 'sim') {
-    $ordem_sql = " ORDER BY CD.numero_vendas DESC";
-} else {
-    if ($ordem_alfabetica == 'asc') {
-        $ordem_sql = " ORDER BY CD.titulo ASC";
-    } else {
-        $ordem_sql = " ORDER BY CD.titulo DESC";
-    }
+// Ordenação
+$ordem_sql = '';
+switch ($ordem_personalizada) {
+    case 'avaliacao':
+        $ordem_sql .= "CD.avaliacao_media DESC";
+        break;
+    case 'recente':
+        $ordem_sql .= "CD.anoLancamento DESC";
+        break;
+    case 'antigo':
+        $ordem_sql .= "CD.anoLancamento ASC";
+        break;
+    case 'preco_min':
+        $ordem_sql .= "CD.preco ASC";
+        break;
+    case 'preco_max':
+        $ordem_sql .= "CD.preco DESC";
+        break;
+    case 'mais_vendidos':
+    case 'relevancia':
+        $ordem_sql .= "CD.disponibilidade DESC";
+        break;
 }
 
+if (!empty($ordem_sql)) {
+    $sql .= " ORDER BY $ordem_sql";
+}
 
+// Executa
+$stmt = $conn->prepare($sql);
+$stmt->execute();
+$result = $stmt->get_result();
 
-$sql .= $ordem_sql;
-
-
-$result = $conn->query($sql);
 
 // Exibe a mensagem de sucesso, caso exista
 if (isset($_SESSION['msg'])) {
@@ -92,12 +143,15 @@ if (isset($_SESSION['msg'])) {
     unset($_SESSION['msg']); // Limpa a mensagem da sessão após exibição
 }
 
+
 // Processa a ação de favoritar (POST)
 if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['favoritar'])) {
     $cd_id = $_POST['cd_id'];
-    // Aqui você deve adicionar a lógica para favoritar o CD (ex: adicionar ao banco de dados de favoritos do usuário)
-    // Exemplo:
-    // $user_id = $_SESSION['user_id']; // Se estiver usando sessões para gerenciar usuários
+    $ja_favoritado = false; // valor padrão
+
+   
+
+
     // $conn->query("INSERT INTO Favoritos (user_id, cd_id) VALUES ($user_id, $cd_id)");
     $_SESSION['msg'] = "CD adicionado aos favoritos!";
     header("Location: " . $_SERVER['PHP_SELF']);
@@ -163,13 +217,18 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['adicionar_carrinho']))
                 <input type="checkbox" id="check"> <!-- Controle de visibilidade -->
                 <div id="complemento_pesquisa">
 
+
+                <form method="GET" action="">
+
                     <!-- Campo de pesquisa -->
-                    <input type="text" id="input_barra_pesquisa" placeholder="Buscar..." >
+                    <input  name="busca_geral" type="text" id="input_barra_pesquisa" placeholder="Buscar..." value="<?php echo isset($_GET['busca_geral']) ? htmlspecialchars($_GET['busca_geral']) : ''; ?>" autocomplete="off">
 
                     <!-- Botão de pesquisa -->
                     <label for="check" id="buttom_lupa">
                         <img src="../../img/cabeçario/icone_lupa.png" alt="Lupa" id="lupa">
                     </label>
+                </form>
+
                 </div>
             </div>
 
@@ -252,126 +311,118 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['adicionar_carrinho']))
     </header>
     <section>
         <div id="caminho">
-            <a href="#" id="home" class="link_caminho">
+            <a href="../pagina_inicial/index_logado.php" id="home" class="link_caminho">
                 <img src="../../img/todos_produtos/icone_home.png" alt="Home" id="img_home">
                 <p>Home</p>
             </a>
         </div>
     </section>
-
+    <form method="get" action="">
     <section id="meio">
-        <div id="filtro">
-            <div id="cabeca">
-                <h1 id="titulo_filtro">Filtro</h1>
-                <button id="butao_filtro">Filtrar</button>
-            </div>
-            <hr id="linha">
-
-            <div>
-                <div class="part_cima">
-                    <h1 class="titulo">Gênero</h1>
-                    <img src="../../img/todos_produtos/icone_seta_direita.png" alt="Seta para abrir seleção" id="button_filtro_generos" class="setas_filtro">
-                </div>
-                <div id="generos" class="contener">
-                    <label class="itens"><input type="checkbox" id="checkbox1" class="input"> <label for="checkbox1"></label> Gênero 1</label><br>
-                    <label class="itens"><input type="checkbox" id="checkbox2" class="input"> <label for="checkbox2"></label> Gênero 2</label><br>
-                    <label class="itens"><input type="checkbox" id="checkbox3" class="input"> <label for="checkbox3"></label> Gênero 3</label><br>
-                    <label class="itens"><input type="checkbox" id="checkbox4" class="input"> <label for="checkbox4"></label> Gênero 4</label><br>
-                    <label class="itens"><input type="checkbox" id="checkbox5" class="input"> <label for="checkbox5"></label> Gênero 5</label><br>
-                    <label class="itens"><input type="checkbox" id="checkbox6" class="input"> <label for="checkbox6"></label> Gênero 6</label><br>
-                    <label class="itens"><input type="checkbox" id="checkbox7" class="input"> <label for="checkbox7"></label> Gênero 7</label><br>
-                    <label class="itens"><input type="checkbox" id="checkbox8" class="input"> <label for="checkbox8"></label> Gênero 8</label><br>
-                    <label class="itens"><input type="checkbox" id="checkbox9" class="input"> <label for="checkbox9"></label> Gênero 9</label><br>
-                    <label class="itens"><input type="checkbox" id="checkbox10" class="input"> <label for="checkbox10"></label> Gênero 10</label><br>
-                </div>
-            </div>
             
-            <div>
-                <div class="part_cima">
-                    <h1 class="titulo">Artistas</h1>
-                    <img src="../../img/todos_produtos/icone_seta_direita.png" alt="Seta para abrir seleção" id="button_filtro_artistas" class="setas_filtro">
-                </div>
-                <div id="artistas" class="contener">
-                    <label class="itens"><input type="checkbox" id="checkbox11" class="input"> <label for="checkbox11"></label> Artista 1</label><br>
-                    <label class="itens"><input type="checkbox" id="checkbox12" class="input"> <label for="checkbox12"></label> Artista 2</label><br>
-                    <label class="itens"><input type="checkbox" id="checkbox13" class="input"> <label for="checkbox13"></label> Artista 3</label><br>
-                    <label class="itens"><input type="checkbox" id="checkbox14" class="input"> <label for="checkbox14"></label> Artista 4</label><br>
-                    <label class="itens"><input type="checkbox" id="checkbox15" class="input"> <label for="checkbox15"></label> Artista 5</label><br>
-                    <label class="itens"><input type="checkbox" id="checkbox16" class="input"> <label for="checkbox16"></label> Artista 6</label><br>
-                    <label class="itens"><input type="checkbox" id="checkbox17" class="input"> <label for="checkbox17"></label> Artista 7</label><br>
-                    <label class="itens"><input type="checkbox" id="checkbox18" class="input"> <label for="checkbox18"></label> Artista 8</label><br>
-                    <label class="itens"><input type="checkbox" id="checkbox19" class="input"> <label for="checkbox19"></label> Artista 9</label><br>
-                    <label class="itens"><input type="checkbox" id="checkbox20" class="input"> <label for="checkbox20"></label> Artista 10</label><br>
-                </div>
-            </div>
-            
-            <div>
-                <div class="part_cima">
-                    <h1 class="titulo">Musicas</h1>
-                    <img src="../../img/todos_produtos/icone_seta_direita.png" alt="Seta para abrir seleção" id="button_filtro_musicas" class="setas_filtro">
-                </div>
-                <div id="musicas" class="contener">
-                    <label class="itens"><input type="checkbox" id="checkbox21" class="input"> <label for="checkbox21"></label> Música 1</label><br>
-                    <label class="itens"><input type="checkbox" id="checkbox22" class="input"> <label for="checkbox22"></label> Música 2</label><br>
-                    <label class="itens"><input type="checkbox" id="checkbox23" class="input"> <label for="checkbox23"></label> Música 3</label><br>
-                    <label class="itens"><input type="checkbox" id="checkbox24" class="input"> <label for="checkbox24"></label> Música 4</label><br>
-                    <label class="itens"><input type="checkbox" id="checkbox25" class="input"> <label for="checkbox25"></label> Música 5</label><br>
-                    <label class="itens"><input type="checkbox" id="checkbox26" class="input"> <label for="checkbox26"></label> Música 6</label><br>
-                    <label class="itens"><input type="checkbox" id="checkbox27" class="input"> <label for="checkbox27"></label> Música 7</label><br>
-                    <label class="itens"><input type="checkbox" id="checkbox28" class="input"> <label for="checkbox28"></label> Música 8</label><br>
-                    <label class="itens"><input type="checkbox" id="checkbox29" class="input"> <label for="checkbox29"></label> Música 9</label><br>
-                    <label class="itens"><input type="checkbox" id="checkbox30" class="input"> <label for="checkbox30"></label> Música 10</label><br>
-                </div>
-            </div>
-            <div>
-                <div class="part_cima">
-                    <h1 class="titulo">Destaques Do Ano</h1>
-                    <img src="../../img/todos_produtos/icone_seta_direita.png" alt="Seta para abrir seleção" id="button_filtro_destaque" class="setas_filtro">
-                </div>
-                <div id="destaque" class="contener">
-                    <label class="itens"><input type="checkbox" id="checkbox31" class="input"> <label for="checkbox31"></label>  1901</label><br>
-                    <label class="itens"><input type="checkbox" id="checkbox32" class="input"> <label for="checkbox32"></label>  1902</label><br>
-                    <label class="itens"><input type="checkbox" id="checkbox33" class="input"> <label for="checkbox33"></label>  1903</label><br>
-                    <label class="itens"><input type="checkbox" id="checkbox34" class="input"> <label for="checkbox34"></label>  1904</label><br>
-                    <label class="itens"><input type="checkbox" id="checkbox35" class="input"> <label for="checkbox35"></label>  1905</label><br>
-                    <label class="itens"><input type="checkbox" id="checkbox36" class="input"> <label for="checkbox36"></label>  1906</label><br>
-                    <label class="itens"><input type="checkbox" id="checkbox37" class="input"> <label for="checkbox37"></label>  1907</label><br>
-                    <label class="itens"><input type="checkbox" id="checkbox38" class="input"> <label for="checkbox38"></label>  1908</label><br>
-                    <label class="itens"><input type="checkbox" id="checkbox39" class="input"> <label for="checkbox39"></label>  1909</label><br>
-                    <label class="itens"><input type="checkbox" id="checkbox40" class="input"> <label for="checkbox40"></label>  1910</label><br>
-                </div>
-            </div>
-    
-            <div>
-                <h1 class="titulo" id="preço">Preço: <p id="valor">R$<span id="valor_range">500</span></p></h1> 
-                <lable id="valor_ponta">R$5<input type="range" min="5" max="1000" value="500" step="5" id="valor_input" class="input">R$1000</lable>
-            </div>
-        </div>
-
-        <div id="main">
-            <div id="part_cima_produtos">
-                <p id="quantidade">0000 Produtos</p>
-                <div>
-                    <div id="ordenar_produtos">
-                        <p id="ordenar">Ordenar Por</p>
-                        <img src="../../img/todos_produtos/icone_seta_direita.png" alt="Seta" id="seta_ordenar">
+ 
+                <div id="filtro">
+                    <div id="cabeca">
+                        <h1 id="titulo_filtro">Filtro</h1>
+                        <button id="butao_filtro">Filtrar</button>
                     </div>
+                    <hr id="linha">
 
-                    <div id="formas_de_ordenar">
-                        <div id="forma_ordenar">
-                            <button id="button_ordenar">Todos</button>
-                            <button id="button_ordenar">Preço: Baixo</button>
-                            <button id="button_ordenar">Preço: Alto</button>
-                            <button id="button_ordenar">Data de Adição: Recente</button>
-                            <button id="button_ordenar">Data de Adição: Antigo</button>
-                            <button id="button_ordenar">Maior Descontos</button>
-                            <button id="button_ordenar">Mais Vendido</button>
-                            <button id="button_ordenar">Relevancia</button>
-                            <button id="button_ordenar">Avaliação</button>
+                    <div>
+                        <div class="part_cima">
+                            <h1 class="titulo">Gênero</h1>
+                            <img src="../../img/todos_produtos/icone_seta_direita.png" alt="Seta para abrir seleção" id="button_filtro_generos" class="setas_filtro">
+                        </div>
+                        <div id="generos" class="contener">
+                        <?php while ($genero_item = $generos_result->fetch_assoc()) { ?>
+                        <label class="itens">
+                            <input  class="input" type="checkbox" name="genero[]" value="<?php echo $genero_item['genero']; ?>" <?php echo (in_array($genero_item['genero'], $genero)) ? 'checked' : ''; ?>>
+                            <?php echo ucfirst($genero_item['genero']); ?>
+                        </label><br>
+                    <?php } ?>
                         </div>
                     </div>
+                    
+                    <div>
+                        <div class="part_cima">
+                            <h1 class="titulo">Artistas</h1>
+                            <img src="../../img/todos_produtos/icone_seta_direita.png" alt="Seta para abrir seleção" id="button_filtro_artistas" class="setas_filtro">
+                        </div>
+                        <div id="artistas" class="contener">
+                        <?php while ($artista = $artistas_result->fetch_assoc()) { ?>
+                        <label class="itens">
+                            <input class="input" type="checkbox" name="artista_nome[]" value="<?php echo $artista['nomeArtista']; ?>" <?php echo (in_array($artista['nomeArtista'], $artista_nome)) ? 'checked' : ''; ?>>
+                            <?php echo $artista['nomeArtista']; ?>
+                                </label><br>
+                            <?php } ?>
+                        </div>
+                    </div>
+                    
+                    <div>
+                        <div class="part_cima">
+                            <h1 class="titulo">Musicas</h1>
+                            <img src="../../img/todos_produtos/icone_seta_direita.png" alt="Seta para abrir seleção" id="button_filtro_musicas" class="setas_filtro">
+                        </div>
+                        <div id="musicas" class="contener">
+                        <?php while ($musica = $musicas_result->fetch_assoc()) { ?>
+                                <label class="itens">
+                                    <input class="input" type="checkbox" name="musica_nome[]" value="<?php echo $musica['nomeMusica']; ?>" <?php echo (in_array($musica['nomeMusica'], $musica_nome)) ? 'checked' : ''; ?>>
+                                    <?php echo $musica['nomeMusica']; ?>
+                                </label><br>
+                                <?php } ?>
+                        </div>
+                    </div>
+                    <div>
+                        <div class="part_cima">
+                            <h1 class="titulo">Destaques Do Ano</h1>
+                            <img src="../../img/todos_produtos/icone_seta_direita.png" alt="Seta para abrir seleção" id="button_filtro_destaque" class="setas_filtro">
+                        </div>
+                        <div id="destaque" class="contener">
+                        <?php while ($ano = $anosResult->fetch_assoc()): ?>
+                            <label class="itens" >
+                                <input  class="itens" id="checkbox31" class="input"  type="checkbox" name="anos[]" value="<?php echo $ano['anoLancamento']; ?>"
+                                    <?php if (in_array($ano['anoLancamento'], $anosSelecionados)) echo 'checked'; ?>>
+                                <?php echo $ano['anoLancamento']; ?>
+                            </label>
+                        <?php endwhile; ?>
+                        </div>
+                    </div>
+            
+                    <div>
+                        <h1 class="titulo" id="preço">Preço: <p id="valor">R$<span id="valor_preco"><?php echo $preco_max; ?></span></p></h1> 
+                        <lable id="valor_ponta">R$5<input  class="input" type="range" name="preco_max" min="0" max="1000" step="5"
+                                            value="<?php echo $preco_max; ?>"
+                                            oninput="document.getElementById('valor_preco').textContent = this.value;">
+                            <input type="hidden" name="preco_min" class="input" value="0" >R$1000</lable>
+                    </div>
                 </div>
+
+                <div id="main">
+                    <div id="part_cima_produtos">
+                        <p id="quantidade"><?php echo $result->num_rows; ?> Produtos</p>
+                        <div>
+                            <div id="ordenar_produtos">
+                                <p id="ordenar">Ordenar Por</p>
+                                <img src="../../img/todos_produtos/icone_seta_direita.png" alt="Seta" id="seta_ordenar">
+                            </div>
+
+                            <div id="formas_de_ordenar">
+                                <div id="forma_ordenar">
+
+                                <button type="submit" id="button_ordenar" name="ordem_personalizada" value="avaliacao" <?php if ($ordem_personalizada == 'avaliacao')  ?>>Mais bem avaliados</button>
+                        <button type="submit" id="button_ordenar"href="todos_os_produtos.php">  TODOS</button>
+                                            <button type="submit" id="button_ordenar" name="ordem_personalizada" value="recente" <?php if ($ordem_personalizada == 'recente')  ?>>Mais recentes</button>
+                                            <button type="submit" id="button_ordenar" name="ordem_personalizada" value="antigo" <?php if ($ordem_personalizada == 'antigo')  ?>>Mais antigos</button>
+                                            <button type="submit" id="button_ordenar" name="ordem_personalizada" value="preco_baixo" <?php if ($ordem_personalizada == 'preco_baixo'); ?>>Preço: menor para maior</button>
+                                            <button type="submit" id="button_ordenar" name="ordem_personalizada" value="preco_alto" <?php if ($ordem_personalizada == 'preco_alto'); ?>>Preço: maior para menor</button>
+                                            <button type="submit" id="button_ordenar" name="ordem_personalizada" value="mais_vendidos" <?php if ($ordem_personalizada == 'mais_vendidos') ; ?>>Mais vendidos</button>
+                                            <button type="submit" id="button_ordenar" name="ordem_personalizada" value="relevancia" <?php if ($ordem_personalizada == 'relevancia') ; ?>>Mais relevantes</button>
+                                </div>
+                            </div>
+                        </div>
             </div>
+            </form>
+
 
             <div class="fileira_produtos">
 
@@ -379,7 +430,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['adicionar_carrinho']))
 
                 <div>
                     <div class="produto">
-                           <img src="../<?php echo $cd['capa']; ?>" alt="<?php echo $cd['titulo']; ?>" class="img_capa_cd">
+                           <img src="../../img/<?php echo $cd['capa']; ?>" alt="<?php echo $cd['titulo']; ?>" class="img_capa_cd">
                            <div>
                                <div>
                                    <h1 class="nome_cd"><?php echo $cd['titulo']; ?></h1>
@@ -396,8 +447,32 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['adicionar_carrinho']))
                 <p class="promo">R$ <?php echo number_format($cd['preco'] * (1 - $cd['desconto'] / 100), 2, ',', '.'); ?></p>
             <?php } ?>
                                    </div>
-                                   <img src="../../img/todos_produtos/icone_favoritos.png" alt="Favoritos" class="img_favorito">
-                               </div>
+                                   <form method="post" action="favoritar.php">
+                            <input type="hidden" name="id_cd" value="<?= $cd['id_cd'] ?>">
+                            <?php
+                            // Verificar se o CD já está favoritado
+    $sql_verificar = "SELECT 1 FROM Favoritos WHERE id_usuario = ? AND id_cd = ?";
+    $stmt = $conn->prepare($sql_verificar);
+    $stmt->bind_param("ii", $id_usuario, $cd['id_cd']);
+    $stmt->execute();
+    $stmt->store_result();
+
+    if ($stmt->num_rows > 0) {
+        // CD já favoritado, mostrar imagem de favorito ativo
+        $img_favorito = '../../img/todos_produtos/icone_favoritos_selecionado.png'; 
+    } else {
+        // CD não favoritado, mostrar imagem de favorito inativo
+        $img_favorito = '../../img/todos_produtos/icone_favoritos.png'; 
+    }
+
+    $stmt->close();
+    ?>
+
+                            <button type="submit" class="btn-favorito">
+                                <img src="../../img/todos_produtos/<?= $img_favorito ?>" alt="Favoritar" class="img_favorito">
+                            </button>
+                        </form>                
+                     </div>
                            </div>
                     </div>
                     <a href="#" class="link_produto2"> <div class="butao">Ver Mais</div></a>
@@ -502,5 +577,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['adicionar_carrinho']))
         </div>
     </section>
 </footer>
+
+<script src="../../js/todos_produtos/produto/nome_cd.js" defer></script>
 </body>
 </html>

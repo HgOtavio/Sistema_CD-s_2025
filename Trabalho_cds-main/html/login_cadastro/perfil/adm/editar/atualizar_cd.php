@@ -1,58 +1,72 @@
 <?php
-// Conexão com o banco de dados
-$conn = new mysqli("localhost", "root", "", "LojaCDs");
-if ($conn->connect_error) {
-    die("Erro de conexão: " . $conn->connect_error);
+include "../../../../login_cadastro/conexao.php";
+session_start();
+
+if (!isset($_POST['id_cd'])) {
+    die("CD inválido.");
 }
 
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    // Obtendo os dados enviados pelo formulário
-    $id_cd = $_POST['id_cd'];
-    $titulo = $_POST['titulo'];
-    $disponibilidade = $_POST['disponibilidade'];
-    $preco = $_POST['preco'];
-    $destaque = $_POST['destaque'];
-    $anoLancamento = $_POST['anoLancamento'];
-    $genero = $_POST['genero'];
-    $descricao = $_POST['descricao'];
-    $artistasSelecionados = $_POST['artistasSelecionados']; // Array com os artistas selecionados
-    $musicasSelecionadas = $_POST['musicasSelecionadas']; // Array com as músicas selecionadas
+$id_cd = $_POST['id_cd'];
+$titulo = $_POST['titulo'];
+$disponibilidade = $_POST['disponibilidade'];
+$preco = $_POST['preco'];
+$destaque = $_POST['destaque'];
+$anoLancamento = $_POST['anoLancamento'];
+$genero = $_POST['genero'];
+$descricao = $_POST['descricao'];
 
-    // Atualizando os dados do CD
-    $sql_atualizar_cd = "UPDATE CD SET titulo = ?, disponibilidade = ?, preco = ?, destaque = ?, anoLancamento = ?, genero = ?, descricao = ? WHERE id_cd = ?";
-    $stmt_atualizar_cd = $conn->prepare($sql_atualizar_cd);
-    $stmt_atualizar_cd->bind_param("ssdsdssi", $titulo, $disponibilidade, $preco, $destaque, $anoLancamento, $genero, $descricao, $id_cd);
-    $stmt_atualizar_cd->execute();
+$caminhoBanco = null;
 
-    // Atualizando os artistas associados
-    $sql_deletar_artistas = "DELETE FROM CD_Artista WHERE id_cd = ?";
-    $stmt_deletar_artistas = $conn->prepare($sql_deletar_artistas);
-    $stmt_deletar_artistas->bind_param("i", $id_cd);
-    $stmt_deletar_artistas->execute();
+// Se uma nova capa foi enviada
+if (isset($_FILES['nova_capa']) && $_FILES['nova_capa']['error'] === UPLOAD_ERR_OK) {
+    $tmp = $_FILES['nova_capa']['tmp_name'];
+    $extensao = pathinfo($_FILES['nova_capa']['name'], PATHINFO_EXTENSION);
+    $nomeArquivo = strtolower(preg_replace("/[^a-zA-Z0-9]/", "", $genero)) . "_$id_cd." . $extensao;
 
-    foreach ($artistasSelecionados as $id_artista) {
-        $sql_associar_artista = "INSERT INTO CD_Artista (id_cd, id_artista) VALUES (?, ?)";
-        $stmt_associar_artista = $conn->prepare($sql_associar_artista);
-        $stmt_associar_artista->bind_param("ii", $id_cd, $id_artista);
-        $stmt_associar_artista->execute();
+    $caminhoFinal = "../../../../../img/imagens/" . $nomeArquivo;
+    $caminhoBanco = "imagens/" . $nomeArquivo;
+
+    if (!is_dir('img/imagens')) {
+        mkdir('img/imagens', 0777, true);
     }
 
-    // Atualizando as músicas associadas
-    $sql_deletar_musicas = "DELETE FROM CD_Musica WHERE id_cd = ?";
-    $stmt_deletar_musicas = $conn->prepare($sql_deletar_musicas);
-    $stmt_deletar_musicas->bind_param("i", $id_cd);
-    $stmt_deletar_musicas->execute();
-
-    foreach ($musicasSelecionadas as $id_musica) {
-        $sql_associar_musica = "INSERT INTO CD_Musica (id_cd, id_musica) VALUES (?, ?)";
-        $stmt_associar_musica = $conn->prepare($sql_associar_musica);
-        $stmt_associar_musica->bind_param("ii", $id_cd, $id_musica);
-        $stmt_associar_musica->execute();
+    if (!move_uploaded_file($tmp, $caminhoFinal)) {
+        die("Erro ao salvar nova imagem.");
     }
-
-    // Redirecionar após o sucesso
-    header("Location:../editar/editar_cds.php?id_cd=" . $id_cd);
-    exit();
 }
+
+// Atualizar dados do CD
+if ($caminhoBanco) {
+    $sql = "UPDATE CD SET titulo=?, capa=?, disponibilidade=?, preco=?, destaque=?, anoLancamento=?, genero=?, descricao=? WHERE id_cd=?";
+    $stmt = $conn->prepare($sql);
+    $stmt->bind_param("sssdsissi", $titulo, $caminhoBanco, $disponibilidade, $preco, $destaque, $anoLancamento, $genero, $descricao, $id_cd);
+} else {
+    $sql = "UPDATE CD SET titulo=?, disponibilidade=?, preco=?, destaque=?, anoLancamento=?, genero=?, descricao=? WHERE id_cd=?";
+    $stmt = $conn->prepare($sql);
+    $stmt->bind_param("ssdsissi", $titulo, $disponibilidade, $preco, $destaque, $anoLancamento, $genero, $descricao, $id_cd);
+}
+
+if ($stmt->execute()) {
+    // Atualizar artistas
+    if (isset($_POST['artistas']) && is_array($_POST['artistas'])) {
+        $conn->query("DELETE FROM CD_Artista WHERE id_cd = $id_cd");
+        foreach ($_POST['artistas'] as $id_artista) {
+            $conn->query("INSERT INTO CD_Artista (id_cd, id_artista) VALUES ($id_cd, $id_artista)");
+        }
+    }
+
+    // Atualizar músicas
+    if (isset($_POST['musicas']) && is_array($_POST['musicas'])) {
+        $conn->query("DELETE FROM CD_Musica WHERE id_cd = $id_cd");
+        foreach ($_POST['musicas'] as $id_musica) {
+            $conn->query("INSERT INTO CD_Musica (id_cd, id_musica) VALUES ($id_cd, $id_musica)");
+        }
+    }
+
+    echo "<script>alert('CD atualizado com sucesso!'); window.location.href='lista_cds.php';</script>";
+} else {
+    echo "Erro ao atualizar CD: " . $stmt->error;
+}
+
+$conn->close();
 ?>
-

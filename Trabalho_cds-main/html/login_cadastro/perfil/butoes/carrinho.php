@@ -183,7 +183,7 @@ if (!empty($_SESSION['carrinho'])) {
             <div id="produtos">
                 <div class="produto">
                     <div class="esquerda">
-                    <img src="<?= $item['capa'] ?>" alt="Imagem do cd" class="img">
+                    <img src="../../../../img/<?= $item['capa'] ?>" alt="Imagem do cd" class="img">
                         <div class="lado">
                             <h1 class="nome"><?= htmlspecialchars($item['titulo']) ?></h1>
                                         <p class="sub_titulo">Preço: <span class="info_sub">R$<?= number_format($item['preco'], 2, ',', '.') ?></span></p>

@@ -78,8 +78,8 @@ $result_musicas = $conn->query($sql_musicas);
                             <div id="destaque">
                                 <h1 id="titulo_destaque">Destaque</h1>
                                 <select name="destaque" required>
-                                    <option value="Sim">Sim</option>
-                                    <option value="Não">Não</option>
+                                    <option value="Destaque">Sim</option>
+                                    <option value="Não Destaque">Não</option>
                                 </select>
                             </div>
                         </div>

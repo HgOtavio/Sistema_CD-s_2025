@@ -27,17 +27,29 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $id_artista = $stmt->insert_id;
     }
 
-    // Upload da imagem
+    // Upload da imagem para a pasta img/Artista
     if ($fotoPerfil['error'] == 0) {
         $ext = strtolower(pathinfo($fotoPerfil['name'], PATHINFO_EXTENSION));
         if (in_array($ext, ['jpg', 'jpeg', 'png', 'gif'])) {
             $nomeFoto = uniqid('artista_') . "." . $ext;
-            $destino = "../Artista/" . $nomeFoto;
-            move_uploaded_file($fotoPerfil['tmp_name'], $destino);
 
-            $stmt = $conn->prepare("UPDATE Artista SET fotoPerfil = ? WHERE id_artista = ?");
-            $stmt->bind_param("si", $nomeFoto, $id_artista);
-            $stmt->execute();
+            $diretorio_upload = '../../../../../img/Artista';
+            if (!is_dir($diretorio_upload)) {
+                mkdir($diretorio_upload, 0777, true);
+            }
+
+            $caminho_final = $diretorio_upload . '/' . $nomeFoto;
+            if (move_uploaded_file($fotoPerfil['tmp_name'], $caminho_final)) {
+                // 🔽 Aqui salvamos apenas 'Artista/nomeFoto' no banco
+                $caminho_para_banco = 'Artista/' . $nomeFoto;
+                $stmt = $conn->prepare("UPDATE Artista SET fotoPerfil = ? WHERE id_artista = ?");
+                $stmt->bind_param("si", $caminho_para_banco, $id_artista);
+                $stmt->execute();
+            } else {
+                echo "Erro ao mover a imagem.";
+            }
+        } else {
+            echo "Formato de imagem inválido.";
         }
     }
 
@@ -52,7 +64,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         }
     }
 
-    echo "<script>alert('Artista cadastrado com sucesso!'); window.location.href='add_artista.php.php';</script>";
+    echo "<script>alert('Artista cadastrado com sucesso!'); window.location.href='add_artista.php';</script>";
 }
 
 $conn->close();

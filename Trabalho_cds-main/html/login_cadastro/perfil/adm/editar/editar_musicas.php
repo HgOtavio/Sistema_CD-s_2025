@@ -45,6 +45,11 @@ $cds_disponiveis = [];
 while ($cd = $result_cds->fetch_assoc()) {
     $cds_disponiveis[] = $cd;
 }
+ // Áudio
+ $audio_path = "../../../../../audio/" . $musica['id_musica'] . ".mp3";
+ $audio_player = file_exists($audio_path) ? 
+     "<audio controls><source src='$audio_path' type='audio/mp3'>Seu navegador não suporta o áudio.</audio>" : 
+     "Sem áudio";
 ?>
 <!DOCTYPE html>
 <html lang="pt-br">
@@ -96,14 +101,9 @@ while ($cd = $result_cds->fetch_assoc()) {
                         <!-- Div para os dados do artista -->
                         <div class="separacao" id="direita">
                             <div>
-                                <?php if (!empty($musica['audio'])): ?>
-                                    <audio controls>
-                                        <source src="uploads/<?= htmlspecialchars($musica['audio']); ?>" class="input" type="audio/mp3">
-                                        Seu navegador não suporta áudio.
-                                    </audio><br><br>
-                                <?php else: ?>
-                                    Nenhum áudio cadastrado.<br><br>
-                                <?php endif; ?>
+                            <div>
+    <?= $audio_player ?><br><br>
+</div>
                                 <label for="upload" id="audio">Alterar áudio da Música</label>
                                 <input type="file" class="input add_perfil_img" id="upload" hidden class="input">
                             </div> 

@@ -14,7 +14,12 @@ if (
     // Pega os dados
     $titulo = $conn->real_escape_string($_POST['titulo']);
     $disponibilidade = $conn->real_escape_string($_POST['disponibilidade']);
-    $preco = floatval($_POST['preco']);
+    
+    // Ajusta o preço
+    $preco_br = $_POST['preco']; // Preço enviado pelo formulário
+    // Remove 'R$' e substitui vírgula por ponto
+    $preco = floatval(str_replace(',', '.', str_replace('R$', '', $preco_br)));
+
     $destaque = $conn->real_escape_string($_POST['destaque']);
     $anoLancamento = intval($_POST['anoLancamento']);
     $genero = $conn->real_escape_string($_POST['genero']);
@@ -28,11 +33,11 @@ if (
         $capa_nome = $_FILES['capa']['name'];
         $capa_tmp = $_FILES['capa']['tmp_name'];
 
-        $diretorio_upload = 'uploads/capas/';
+        $diretorio_upload = '../../../../../img/imagens'; // Pasta para armazenar as imagens
         if (!is_dir($diretorio_upload)) {
             mkdir($diretorio_upload, 0777, true); // Cria a pasta se não existir
         }
-        $caminho_final = $diretorio_upload . basename($capa_nome);
+        $caminho_final = $diretorio_upload . '/' . basename($capa_nome);
 
         if (!move_uploaded_file($capa_tmp, $caminho_final)) {
             echo "Aviso: Não foi possível salvar a capa. Continuando sem imagem...<br>";
@@ -41,7 +46,7 @@ if (
     }
 
     // Prepara o campo de capa para o banco
-    $capa_valor = $capa_nome ? "'$capa_nome'" : "NULL";
+    $capa_valor = $capa_nome ? "'imagens/" . $capa_nome . "'" : "NULL";
 
     // Insere o CD
     $sql_cd = "INSERT INTO CD (titulo, capa, disponibilidade, preco, destaque, anoLancamento, genero, descricao) 

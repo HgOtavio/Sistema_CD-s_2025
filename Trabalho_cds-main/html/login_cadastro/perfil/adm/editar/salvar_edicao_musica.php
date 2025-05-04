@@ -1,66 +1,43 @@
 <?php
-// Conexão com o banco de dados
-$conn = new mysqli("localhost", "root", "", "LojaCDs");
-if ($conn->connect_error) {
-    die("Erro de conexão: " . $conn->connect_error);
-}
+include_once("../../../../../conexao.php");
 
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $id_musica = intval($_POST['id_musica']);
-    $nomeMusica = $_POST['nomeMusica'];
-    $tempo = $_POST['tempo'];
-    $cdsSelecionados = isset($_POST['cdsSelecionados']) ? $_POST['cdsSelecionados'] : [];
+// 1. Receber dados do formulário
+$id_musica = isset($_POST['id_musica']) ? intval($_POST['id_musica']) : 0;
+$nomeMusica = $_POST['nomeMusica'] ?? '';
+$tempo = $_POST['tempo'] ?? '';
+$cdsSelecionados = $_POST['cdsSelecionados'] ?? [];
 
-    // Atualizar dados da música
-    $sql_update = "UPDATE Musica SET nomeMusica = ?, tempo = ? WHERE id_musica = ?";
-    $stmt = $conn->prepare($sql_update);
-    $stmt->bind_param("ssi", $nomeMusica, $tempo, $id_musica);
-    $stmt->execute();
+// 2. Atualizar dados da música
+$sql_update = "UPDATE Musica SET nomeMusica = ?, tempo = ? WHERE id_musica = ?";
+$stmt = $conn->prepare($sql_update);
+$stmt->bind_param("ssi", $nomeMusica, $tempo, $id_musica);
+$stmt->execute();
 
-    // Upload de novo áudio (se enviado)
-    if (isset($_FILES['audio']) && $_FILES['audio']['error'] == 0) {
-        $arquivo = $_FILES['audio'];
-        $extensao = pathinfo($arquivo['name'], PATHINFO_EXTENSION);
-        $nomeArquivo = uniqid() . "." . $extensao;
-        $caminho = "uploads/" . $nomeArquivo;
+// 3. Atualizar CDs associados à música
+// Remove todos os registros antigos
+$conn->query("DELETE FROM CD_Musica WHERE id_musica = $id_musica");
 
-        // Validar tipos permitidos
-        $tipos_permitidos = ['mp3', 'wav'];
-        if (in_array(strtolower($extensao), $tipos_permitidos)) {
-            move_uploaded_file($arquivo['tmp_name'], $caminho);
-
-            // Atualizar campo de áudio
-            $sql_audio = "UPDATE Musica SET audio = ? WHERE id_musica = ?";
-            $stmt = $conn->prepare($sql_audio);
-            $stmt->bind_param("si", $nomeArquivo, $id_musica);
-            $stmt->execute();
-        } else {
-            echo "Tipo de arquivo inválido! Permitido: MP3 ou WAV.";
-            exit;
-        }
-    }
-
-    // Atualizar CDs associados:
-    // Remove associações antigas
-    $sql_delete_cds = "DELETE FROM CD_Musica WHERE id_musica = ?";
-    $stmt = $conn->prepare($sql_delete_cds);
-    $stmt->bind_param("i", $id_musica);
-    $stmt->execute();
-
-    // Inserir novas associações
+// Adiciona os novos CDs selecionados
+if (!empty($cdsSelecionados)) {
+    $stmt_cd = $conn->prepare("INSERT INTO CD_Musica (id_cd, id_musica) VALUES (?, ?)");
     foreach ($cdsSelecionados as $id_cd) {
-        $sql_insert_cd = "INSERT INTO CD_Musica (id_musica, id_cd) VALUES (?, ?)";
-        $stmt = $conn->prepare($sql_insert_cd);
-        $stmt->bind_param("ii", $id_musica, $id_cd);
-        $stmt->execute();
+        $id_cd = intval($id_cd);
+        $stmt_cd->bind_param("ii", $id_cd, $id_musica);
+        $stmt_cd->execute();
     }
-
-    // Redirecionar após atualização
-    header("Location: editar_musicas.php?atualizado=1");
-    exit();
-} else {
-    echo "Requisição inválida.";
 }
 
-$conn->close();
+// 4. Verifica se foi enviado um novo arquivo de áudio
+if (isset($_FILES['audio']) && $_FILES['audio']['error'] === 0) {
+    $pasta_destino = "../../../../../audio/";
+    $nome_arquivo = $id_musica . ".mp3";
+    $caminho_completo = $pasta_destino . $nome_arquivo;
+
+    // Move o novo arquivo para a pasta
+    move_uploaded_file($_FILES['audio']['tmp_name'], $caminho_completo);
+}
+
+// 5. Redireciona ou exibe mensagem
+header("Location: ../musicas.php?sucesso=1");
+exit;
 ?>

@@ -98,11 +98,12 @@ $result_musica = $conn->query($sql_musica);
             </div>
         </section>
     </form>
-    <button class="button_voltar"><a href="#" class="link_voltar">Adicionar Músicas</a></button>
-    <button id="button_excluir">Excluir</button>
+    <button class="button_voltar"><a href="../adicionar/add_musica.php" class="link_voltar">Adicionar Músicas</a></button>
+    
 
     <section id="tabelao">
      <form method="POST" action="deletar_varias_musicas.php">
+     <button id="button_excluir" type="submit">Excluir</button>
             <table id="tabela">
                 <thead>
                     <tr id="itens_cabeca">
@@ -137,7 +138,7 @@ $result_musica = $conn->query($sql_musica);
                             $cds_list = !empty($cds) ? implode(", ", $cds) : "Nenhum CD associado";
 
                             // Áudio
-                            $audio_path = "../audio/" . $musica['id_musica'] . ".mp3";
+                            $audio_path = "../../../../../audio/" . $musica['id_musica'] . ".mp3";
                             $audio_player = file_exists($audio_path) ? 
                                 "<audio controls><source src='$audio_path' type='audio/mp3'>Seu navegador não suporta o áudio.</audio>" : 
                                 "Sem áudio";
@@ -152,7 +153,11 @@ $result_musica = $conn->query($sql_musica);
                                     <th class='info'>
                                         <a href='../editar/editar_musicas.php?id_musica={$musica['id_musica']}' class='link_acao'>Editar</a><br>
 
-                                        <input type='checkbox'id='checkbox1' name='musicas_selecionadas[]' class='input' /><label for='checkbox1'></label>
+                                        <input type='checkbox' name='musicas_selecionadas[]' value='{$musica['id_musica']}' class='input' id='musica_{$musica['id_musica']}' />
+                                        <label for='musica_{$musica['id_musica']}'></label>
+
+                                        
+                                
                                     </td>
                                 </tr>";
 

@@ -128,7 +128,7 @@ $result_cd = $conn->query($sql_cd);
                                 <input type="text" id="cpf" placeholder="CPF" maxlength="14" class="input"  name="cpf" required>
                                 <div>
                                     <label for="upload" class="input add_perfil_img">Escolher foto de perfil</label>
-                                    <input type="file" id="upload" hidden>
+                                    <input type="file" id="upload"  name="foto_perfil" hidden>
                                 </div>
                                     <!-- Div para os dados de endereço -->
                                 </div>

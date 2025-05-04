@@ -1,65 +1,64 @@
 <?php
-session_start();
 include "../../../../login_cadastro/conexao.php";
+session_start();
 
-// Verifica se o usuário está logado e é do tipo administrador
-if (!isset($_SESSION["id_usuario"]) || $_SESSION["tipo"] != "admin") {
-    header("Location: ../php/login.php");
-    exit();
+if (!isset($_POST['id_artista'])) {
+    die("ID do artista não fornecido.");
 }
 
-// Verificar se foi passado um ID
-if (!isset($_POST['id_artista']) || !is_numeric($_POST['id_artista'])) {
-    die("ID do artista não informado ou inválido.");
-}
+$id_artista = $_POST['id_artista'];
+$nomeArtista = trim($_POST['nomeArtista']);
+$dataNascimento = date('Y-m-d', strtotime($_POST['dataNascimento']));
+$descricao = $_POST['descricao'];
+$caminhoImagem = null;
 
-$id_artista = intval($_POST['id_artista']);
+// Upload da nova foto (se enviada)
+if (isset($_FILES['fotoPerfil']) && $_FILES['fotoPerfil']['error'] === UPLOAD_ERR_OK) {
+    $tmp = $_FILES['fotoPerfil']['tmp_name'];
+    $extensao = strtolower(pathinfo($_FILES['fotoPerfil']['name'], PATHINFO_EXTENSION));
 
-// Se enviou o formulário (alteração)
-if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-    $nomeArtista = $_POST['nomeArtista'];
-    $dataNascimento = DateTime::createFromFormat('m/d/Y', $_POST['dataNascimento'])->format('Y-m-d');
-    $descricao = $_POST['descricao'];
-    $cdsSelecionados = isset($_POST['cds']) ? $_POST['cds'] : [];
+    // Formata o nome do artista (sem espaços ou acentos)
+    $nomeFormatado = preg_replace('/[^a-zA-Z0-9]/', '', iconv('UTF-8', 'ASCII//TRANSLIT', $nomeArtista));
 
-    // Atualizar dados do artista
-    $sql_update = "UPDATE Artista SET nomeArtista = ?, dataNascimento = ?, descricao = ? WHERE id_artista = ?";
-    $stmt_update = $conn->prepare($sql_update);
-    $stmt_update->bind_param("sssi", $nomeArtista, $dataNascimento, $descricao, $id_artista);
+    // Caminho a ser salvo no banco
+    $caminhoImagem = 'Artista/' . $nomeFormatado . '.' . $extensao;
 
-    if ($stmt_update->execute()) {
-        // Se houver foto, processar o upload
-        if (isset($_FILES['fotoPerfil']) && $_FILES['fotoPerfil']['error'] == 0) {
-            $fotoNome = $_FILES['fotoPerfil']['name'];
-            $fotoTemp = $_FILES['fotoPerfil']['tmp_name'];
-            $fotoCaminho = "../Artista/" . $fotoNome;
+    // Caminho real para salvar o arquivo
+    $caminhoPasta = '../../../../../img/Artista/';
+    if (!is_dir($caminhoPasta)) {
+        mkdir($caminhoPasta, 0777, true);
+    }
 
-            // Move a foto para o diretório
-            if (move_uploaded_file($fotoTemp, $fotoCaminho)) {
-                // Atualizar o nome da foto no banco
-                $sql_foto_update = "UPDATE Artista SET fotoPerfil = ? WHERE id_artista = ?";
-                $stmt_foto_update = $conn->prepare($sql_foto_update);
-                $stmt_foto_update->bind_param("si", $fotoNome, $id_artista);
-                $stmt_foto_update->execute();
-            }
-        }
-
-        // Deletar as relações anteriores de CDs associados
-        $conn->query("DELETE FROM CD_Artista WHERE id_artista = $id_artista");
-
-        // Inserir novos CDs associados
-        foreach ($cdsSelecionados as $id_cd) {
-            $stmt_insert_cd = $conn->prepare("INSERT INTO CD_Artista (id_artista, id_cd) VALUES (?, ?)");
-            $stmt_insert_cd->bind_param("ii", $id_artista, $id_cd);
-            $stmt_insert_cd->execute();
-        }
-
-        // Redireciona com sucesso
-        header("Location: editar_artistas.php?id_artista=$id_artista&success=1");
-        exit();
-    } else {
-        // Se houver falha na execução do update
-        die("Erro ao atualizar os dados do artista.");
+    // Move o arquivo
+    $destino = $caminhoPasta . $nomeFormatado . '.' . $extensao;
+    if (!move_uploaded_file($tmp, $destino)) {
+        die("Erro ao salvar a imagem.");
     }
 }
+
+// Atualiza os dados do artista
+if ($caminhoImagem) {
+    $sql = "UPDATE Artista SET nomeArtista=?, dataNascimento=?, descricao=?, fotoPerfil=? WHERE id_artista=?";
+    $stmt = $conn->prepare($sql);
+    $stmt->bind_param("ssssi", $nomeArtista, $dataNascimento, $descricao, $caminhoImagem, $id_artista);
+} else {
+    $sql = "UPDATE Artista SET nomeArtista=?, dataNascimento=?, descricao=? WHERE id_artista=?";
+    $stmt = $conn->prepare($sql);
+    $stmt->bind_param("sssi", $nomeArtista, $dataNascimento, $descricao, $id_artista);
+}
+
+if (!$stmt->execute()) {
+    die("Erro ao atualizar artista: " . $stmt->error);
+}
+
+// Atualiza CDs associados
+if (isset($_POST['cds']) && is_array($_POST['cds'])) {
+    $conn->query("DELETE FROM CD_Artista WHERE id_artista = $id_artista");
+    foreach ($_POST['cds'] as $id_cd) {
+        $conn->query("INSERT INTO CD_Artista (id_cd, id_artista) VALUES ($id_cd, $id_artista)");
+    }
+}
+
+echo "<script>alert('Artista atualizado com sucesso!'); window.location.href='listar_artistas.php';</script>";
+$conn->close();
 ?>

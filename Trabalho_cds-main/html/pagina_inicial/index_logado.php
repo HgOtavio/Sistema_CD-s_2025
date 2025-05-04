@@ -1,3 +1,73 @@
+<?php
+session_start();
+
+// Verificação de login
+if (!isset($_SESSION['id_usuario'])) {
+    header("Location: ../php/login.php");
+    exit();
+}
+
+// Conexão com o banco de dados
+$conn = new mysqli("localhost", "root", "", "LojaCDs");
+if ($conn->connect_error) {
+    die("Erro ao conectar ao banco de dados: " . $conn->connect_error);
+}
+
+$id_usuario = $_SESSION['id_usuario'];
+$res = $conn->query("SELECT * FROM Usuario WHERE id_usuario = $id_usuario");
+$usuarioLogado = $res->fetch_assoc();
+
+// Consulta para pegar uma única avaliação (vamos limitar a 1 com o 'LIMIT 1')
+$sqlAv = "
+    SELECT a.nota, a.comentario, a.data_avaliacao, u.login, u.foto_perfil
+    FROM avaliacao a
+    JOIN Usuario u ON a.id_usuario = u.id_usuario
+    ORDER BY a.data_avaliacao DESC
+    LIMIT 3
+";
+$stmtAv = $conn->prepare($sqlAv);
+$stmtAv->execute();
+$resultAv = $stmtAv->get_result();
+
+// Verifica se a avaliação foi encontrada
+if ($avaliacao = $resultAv->fetch_assoc()) {
+    // Função para exibir as estrelas como imagens (sempre 5)
+    function gerarEstrelasImg($nota) {
+        $html = "";
+        for ($i = 1; $i <= 5; $i++) {
+            // Se a estrela é cheia ou vazia dependendo da nota
+            $img = $i <= $nota ? "../../img/avaliacao/estrela_cheia.jpg" : "../../img/avaliacao/estrela_vazia.jpg";
+            $html .= "<img src='../../img/avaliacao/$img' alt='Estrela' width='20' height='20'>";
+        }
+        return $html;
+    }
+}
+
+// Puxar os 10 primeiros dados da tabela Gênero, Artista, Música
+$queryGenero = "SELECT DISTINCT genero FROM CD LIMIT 10";
+$queryArtista = "SELECT nomeArtista FROM Artista LIMIT 10";
+$queryMusica = "SELECT nomeMusica FROM Musica LIMIT 10";
+
+// Executando as consultas com a variável $conn
+$stmtGenero = $conn->query($queryGenero);
+$stmtArtista = $conn->query($queryArtista);
+$stmtMusica = $conn->query($queryMusica);
+
+// Recuperando os resultados das consultas
+$generos = $stmtGenero->fetch_all(MYSQLI_ASSOC);
+$artistas = $stmtArtista->fetch_all(MYSQLI_ASSOC);
+$musicas = $stmtMusica->fetch_all(MYSQLI_ASSOC);
+
+// Consultas ao banco
+$destaques = $conn->query("SELECT * FROM CD WHERE destaque IS NOT NULL LIMIT 3");
+$promocoes = $conn->query("SELECT CD.*, Promocao.desconto FROM CD 
+    JOIN Promocao ON CD.id_cd = Promocao.id_cd LIMIT 4");
+$lancamentos = $conn->query("SELECT * FROM CD ORDER BY id_cd DESC LIMIT 4");
+$avaliacoes = $conn->query("SELECT nota, comentario FROM avaliacao ORDER BY data_avaliacao DESC LIMIT 5");
+
+?>
+
+
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
@@ -48,9 +118,13 @@
             </div>
 
             <div id="login_carrinho"> <!-- Login e Carrinho -->
-                    <a href="#"><img src="../../img/cabeçario/icone_perfil.png" alt="Perfil" id="Perfil"></a><!-- Foto de perfil -->
+            <?php if (!empty($usuarioLogado['foto_perfil'])): ?>
+            <img src=" ../../img/<?php echo htmlspecialchars($usuarioLogado['foto_perfil']); ?>"  id="Perfil" alt="Perfil">
+        <?php else: ?>
+            <img src="../../img/uploads/perfil_padrao.jpg" alt="Perfil padrão"  id="Perfil" >
+        <?php endif; ?><!-- Foto de perfil -->
 
-                <a href="#"><img src="../../img/cabeçario/icone_carrinho.png" alt="Carrinho" id="Carrinho"></a><!-- Ícone de carrinho -->
+                <a href="../login_cadastro/perfil/butoes/carrinho.php"><img src="../../img/cabeçario/icone_carrinho.png" alt="Carrinho" id="Carrinho"></a><!-- Ícone de carrinho -->
             </div>
         </div>
 
@@ -64,7 +138,7 @@
             <ul id="menu">
 
                 <li class="p_menu"><a href="#" class="a_menu">Inicio</a></li>
-                <li class="p_menu"><a href="#" class="a_menu">Produtos</a></li>
+                <li class="p_menu"><a href="../produtos/todos_os_produtos.php" class="a_menu">Produtos</a></li>
                 
                  <!-- Menu suspenso de gêneros musicais -->
                 <li class="p_menu" id="menu_genero">
@@ -77,20 +151,11 @@
                     <ul class="subclasse_menu" id="sumir_g">
                         
                         <ul class="sub_subclasse_menu">
-                            <li><a href="#" class="sub_a">Clássica</a></li>
-                            <li><a href="#" class="sub_a">Eletrônica</a></li>
-                            <li><a href="#" class="sub_a">Forro</a></li>
-                            <li><a href="#" class="sub_a">Hip Hop</a></li>
-                            <li><a href="#" class="sub_a">MPB</a></li>
+                        <?php foreach ($generos as $genero): ?>
+                                 <li><a href="../produtos/todos_os_produtos.php?genero=<?= htmlspecialchars($genero['genero']) ?>" class="sub_a"><?= htmlspecialchars($genero['genero']) ?></a></li>
+                        <?php endforeach; ?>
                         </ul>
-                        
-                        <ul class="sub_subclasse_menu">
-                            <li><a href="#" class="sub_a">Pagode</a></li>
-                            <li><a href="#" class="sub_a">Pop</a></li>
-                            <li><a href="#" class="sub_a">Reggae</a></li>
-                            <li><a href="#" class="sub_a">Rock</a></li>
-                            <li><a href="#" class="sub_a">Sertanejo</a></li>
-                        </ul>
+        
                     </ul>
                 </li>
 
@@ -105,20 +170,11 @@
                     <ul class="subclasse_menu_a" id="sumir_a">
                         
                         <ul class="sub_subclasse_menu">
-                            <li><a href="#" class="sub_a">Ludwing Beethowen</a></li>
-                            <li><a href="#" class="sub_a">Marshmello</a></li>
-                            <li><a href="#" class="sub_a">Luiz Gonzaga</a></li>
-                            <li><a href="#" class="sub_a">Snoop Dogg</a></li>
-                            <li><a href="#" class="sub_a">Maria Bethânia</a></li>
+                        <?php foreach ($artistas as $artista): ?>
+                           <li><a href="../produtos/todos_os_produtos.php?busca_geral=<?= htmlspecialchars($artista['nomeArtista']) ?>"  class="sub_a"><?= htmlspecialchars($artista['nomeArtista']) ?></a></li>
+                        <?php endforeach; ?>
                         </ul>
                         
-                        <ul class="sub_subclasse_menu">
-                            <li><a href="#" class="sub_a">Péricles</a></li>
-                            <li><a href="#" class="sub_a">Michael Jackson</a></li>
-                            <li><a href="#" class="sub_a">Bob Marley</a></li>
-                            <li><a href="#" class="sub_a">Elvis Presley</a></li>
-                            <li><a href="#" class="sub_a">Luan Santana</a></li>
-                        </ul>
                     </ul>
                 </li>
             </ul>
@@ -197,27 +253,17 @@
         </div>
 
         <div id="conteudo_destaque">
+       
             <!-- Conteudo -->
             <div id="container">
-
+            <?php while ($cd = $destaques->fetch_assoc()) { ?>
                 <!-- CD Destaque -->
                 <div class="container_imagem">
-                    <a href="#" class="a_imagem"><img src="../../img/destaque/capa_de_album_destaque_1.jpg" alt="Musicas Destaques" class="imagem_destaque"></a>
+                    <a href="../produtos/todos_os_produtos.php?busca_geral=<?php echo urlencode($cd['titulo']); ?>" class="a_imagem"> <img src="../../img/<?php echo $cd['capa']; ?>" alt="Musicas Destaques" class="imagem_destaque" ></a>
                     <img src="../../img/destaque/disco.png" alt="Disco que gira" class="disco">
                 </div>
 
-                <!-- CD Destaque -->
-                <div class="container_imagem">
-                    <a href="#" class="a_imagem"><img src="../../img/destaque/capa_de_album_destaque_2.jpg" alt="Musicas Destaques" class="imagem_destaque"></a>
-                    <img src="../../img/destaque/disco.png" alt="Disco que gira" class="disco">
-                </div>
-
-                <!-- CD Destaque -->
-                <div class="container_imagem">
-                    <a href="#" class="a_imagem"><img src="../../img/destaque/capa_de_album_destaque_3.jpg" alt="Musicas Destaques" class="imagem_destaque"></a>
-                    <img src="../../img/destaque/disco.png" alt="Disco que gira" class="disco">
-                </div>
-
+                   <?php } ?>
             </div>
 
             <!-- Barra animada -->
@@ -326,62 +372,66 @@
                 <!-- Div que contém todas as imagens dos gêneros musicais -->
                 <div id="imagens_genero">
                     
-                    <!-- Primeira imagem do gênero musical com um botão -->
-                    <div class="img_genero" id="primeiro">
-                        <img src="../../img/genero/genero1.jpg" alt="genero musical">
-                        <button class="button_genero"><a href="#">Clássica</a></button>
-                    </div>
+                                                        <!-- Primeira imagem -->
+                                    <div class="img_genero" id="primeiro">
+                                        <img src="../../img/genero/genero1.jpg" alt="genero musical">
+                                        <button class="button_genero"><a href="../produtos/todos_os_produtos.php?genero=Classica">Clássica</a></button>
+                                    </div>
 
-                    <!-- Segunda imagem do gênero musical com um botão -->
-                    <div class="img_genero">
-                        <img src="../../img/genero/genero2.jpg" alt="genero musical">
-                        <button class="button_genero"><a href="#">Eletrônica</a></button>
-                    </div>
+                                    <!-- Segunda imagem -->
+                                    <div class="img_genero">
+                                        <img src="../../img/genero/genero2.jpg" alt="genero musical">
+                                        <button class="button_genero"><a href="../produtos/todos_os_produtos.php?genero=Eletronica">Eletrônica</a></button>
+                                    </div>
 
-                    <!-- Terceira imagem do gênero musical com um botão -->
-                    <div class="img_genero">
-                        <img src="../../img/genero/genero3.jpg" alt="genero musical">
-                        <button class="button_genero"><a href="#">Forro</a></button>
-                    </div>
-                    <!-- Quarta imagem do gênero musical com um botão -->
-                    <div class="img_genero">
-                        <img src="../../img/genero/genero4.jpg" alt="genero musical">
-                        <button class="button_genero"><a href="#">Hip Hop</a></button>
-                    </div>
+                                    <!-- Terceira imagem -->
+                                    <div class="img_genero">
+                                        <img src="../../img/genero/genero3.jpg" alt="genero musical">
+                                        <button class="button_genero"><a href="../produtos/todos_os_produtos.php?genero=Forro">Forró</a></button>
+                                    </div>
 
-                    <!-- Quinta imagem do gênero musical com um botão -->
-                    <div class="img_genero">
-                        <img src="../../img/genero/genero5.jpg" alt="genero musical">
-                        <button class="button_genero"><a href="#">MPB</a></button>
-                    </div>
-                    <!-- Sexta imagem do gênero musical com um botão -->
-                    <div class="img_genero">
-                        <img src="../../img/genero/genero6.jpg" alt="genero musical">
-                        <button class="button_genero"><a href="#">Pagode</a></button>
-                    </div>
+                                    <!-- Quarta imagem -->
+                                    <div class="img_genero">
+                                        <img src="../../img/genero/genero4.jpg" alt="genero musical">
+                                        <button class="button_genero"><a href="../produtos/todos_os_produtos.php?genero=HipHop">Hip Hop</a></button>
+                                    </div>
 
-                    <!-- Setima imagem do gênero musical com um botão -->
-                    <div class="img_genero">
-                        <img src="../../img/genero/genero7.jpg" alt="genero musical">
-                        <button class="button_genero"><a href="#">Pop</a></button>
-                    </div>
-                    <!-- Oitava imagem do gênero musical com um botão -->
-                    <div class="img_genero">
-                        <img src="../../img/genero/genero8.jpg" alt="genero musical">
-                        <button class="button_genero"><a href="#">Reggae</a></button>
-                    </div>
+                                    <!-- Quinta imagem -->
+                                    <div class="img_genero">
+                                        <img src="../../img/genero/genero5.jpg" alt="genero musical">
+                                        <button class="button_genero"><a href="../produtos/todos_os_produtos.php?genero=MPB">MPB</a></button>
+                                    </div>
 
-                    <!-- Nona imagem do gênero musical com um botão -->
-                    <div class="img_genero">
-                        <img src="../../img/genero/genero9.jpg" alt="genero musical">
-                        <button class="button_genero"><a href="#">Rock</a></button>
-                    </div>
+                                    <!-- Sexta imagem -->
+                                    <div class="img_genero">
+                                        <img src="../../img/genero/genero6.jpg" alt="genero musical">
+                                        <button class="button_genero"><a href="../produtos/todos_os_produtos.php?genero=Pagode">Pagode</a></button>
+                                    </div>
 
-                    <!-- Decima imagem do gênero musical com um botão -->
-                    <div class="img_genero" id="ultimo">
-                        <img src="../../img/genero/genero10.jpg" alt="genero musical">
-                        <button class="button_genero"><a href="#">Sertanejo</a></button>
-                    </div>
+                                    <!-- Sétima imagem -->
+                                    <div class="img_genero">
+                                        <img src="../../img/genero/genero7.jpg" alt="genero musical">
+                                        <button class="button_genero"><a href="../produtos/todos_os_produtos.php?genero=Pop">Pop</a></button>
+                                    </div>
+
+                                    <!-- Oitava imagem -->
+                                    <div class="img_genero">
+                                        <img src="../../img/genero/genero8.jpg" alt="genero musical">
+                                        <button class="button_genero"><a href="../produtos/todos_os_produtos.php?genero=Reggae">Reggae</a></button>
+                                    </div>
+
+                                    <!-- Nona imagem -->
+                                    <div class="img_genero">
+                                        <img src="../../img/genero/genero9.jpg" alt="genero musical">
+                                        <button class="button_genero"><a href="../produtos/todos_os_produtos.php?genero=Rock">Rock</a></button>
+                                    </div>
+
+                                    <!-- Décima imagem -->
+                                    <div class="img_genero" id="ultimo">
+                                        <img src="../../img/genero/genero10.jpg" alt="genero musical">
+                                        <button class="button_genero"><a href="../produtos/todos_os_produtos.php?genero=Sertanejo">Sertanejo</a></button>
+                                    </div>
+
                 </div>
 
                 <!-- Imagem decorativa de um disco ao lado da seção -->
@@ -399,64 +449,27 @@
             <!-- Contêiner que agrupa todas as avaliações -->
             <div id="div_avaliacao">
 
-                <!-- Primeira Avaliação -->
-                <div class="conteiner_avaliacao">
-                    <div class="part_de_cima_avaliacao">
 
-                        <!-- Imagem de perfil do cliente -->
-                        <img src="../../img/avaliacao/icone_perfil.png" alt="foto de perfil do cliente" class="img_avaliacao">
-                        <div class="lado_direito_avaliacao">
-
-                            <!-- Nome do cliente -->
-                            <h1 class="nome_cliente_avaliacao">Nome ficticio</h1>
-
-                            <!-- Imagem representando a avaliação em estrelas -->
-                            <img src="../../img/avaliacao/icone_estrelas.png" alt="estrelas" class="estrelas_avaliacao">
-                        </div>
-                    </div>
-
-                    <!-- Texto contendo a opinião do cliente -->
-                    <p class="texto_avalicao">Lorem ipsum dolor sit amet consectetur, adipisicing elit. Molestias, necessitatibus ipsum in, voluptas, quos voluptate aspernatur esse tenetur iste consectetur reprehenderit autem assumenda fugiat provident sequi officiis deleniti architecto possimus.</p>
-                </div>
-
-                <!-- Segunda Avaliação -->
-                <div class="conteiner_avaliacao">
-                    <div class="part_de_cima_avaliacao">
-
-                        <!-- Imagem de perfil do cliente -->
-                        <img src="../../img/avaliacao/icone_perfil.png" alt="foto de perfil do cliente" class="img_avaliacao">
-                        <div class="lado_direito_avaliacao">
-
-                            <!-- Nome do cliente -->
-                            <h1 class="nome_cliente_avaliacao">Nome ficticio</h1>
-
-                            <!-- Imagem representando a avaliação em estrelas -->
-                            <img src="../../img/avaliacao/icone_estrelas.png" alt="estrelas" class="estrelas_avaliacao">
-                        </div>
-                    </div>
-
-                    <!-- Texto contendo a opinião do cliente -->
-                    <p class="texto_avalicao">Lorem ipsum dolor sit amet consectetur, adipisicing elit. Molestias, necessitatibus ipsum in, voluptas, quos voluptate aspernatur esse tenetur iste consectetur reprehenderit autem assumenda fugiat provident sequi officiis deleniti architecto possimus.</p>
-                </div>
 
                 <!-- Terceira Avaliação -->
                 <div class="conteiner_avaliacao">
                     <div class="part_de_cima_avaliacao">
 
                         <!-- Imagem de perfil do cliente -->
-                        <img src="../../img/avaliacao/icone_perfil.png" alt="foto de perfil do cliente" class="img_avaliacao">
+                        <img src="../../img/<?= htmlspecialchars($avaliacao['foto_perfil'] ?? 'padrao.png') ?>" class="img_avaliacao">
                         <div class="lado_direito_avaliacao">
 
-                            <!-- Nome do cliente -->
-                            <h1 class="nome_cliente_avaliacao">Nome ficticio</h1>
 
-                            <!-- Imagem representando a avaliação em estrelas -->
-                            <img src="../../img/avaliacao/icone_estrelas.png" alt="estrelas" class="estrelas_avaliacao">
+                        
+                            <!-- Nome do cliente -->
+                            <h1 class="nome_cliente_avaliacao"><?= htmlspecialchars($avaliacao['login']) ?></h1><br><br>
+                            <!-- Estrelas de avaliação -->
+                            <div class="estrelas_avaliacao"><?= gerarEstrelasImg($avaliacao['nota']) ?></div>
                         </div>
                     </div>
 
                     <!-- Texto contendo a opinião do cliente -->
-                    <p class="texto_avalicao">Lorem ipsum dolor sit amet consectetur, adipisicing elit. Molestias, necessitatibus ipsum in, voluptas, quos voluptate aspernatur esse tenetur iste consectetur reprehenderit autem assumenda fugiat provident sequi officiis deleniti architecto possimus.</p>
+                    <p class="texto_avalicao"><?= nl2br(htmlspecialchars($avaliacao['comentario'])) ?>.</p>
                 </div>
             </div>
         </section>

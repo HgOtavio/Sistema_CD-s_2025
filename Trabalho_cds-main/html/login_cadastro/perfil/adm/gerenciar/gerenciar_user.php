@@ -136,12 +136,12 @@ $result = $conn->query($sql);
             </div>
         </section>
         </form>
-    <button class="button_voltar"><a href="adicionar_usuario.php" class="link_voltar">Adicionar Usuarios</a></button>
+    <button class="button_voltar"><a href="../adicionar/add_user.php" class="link_voltar">Adicionar Usuarios</a></button>
 
 
 
     <form method="post" action="excluir_selecionados.php">
-    <button id="button_excluir">Excluir</button>
+    <button id="button_excluir" type="submit">Excluir</button>
         <section id="tabelao">
             <table id="tabela">
                 <thead>
@@ -164,13 +164,12 @@ $result = $conn->query($sql);
                                 <th class="info id"><?php echo $usuario['id_usuario']; ?></th>
                                 <th class="info">  <?php
                         $foto = $usuario['foto_perfil'];
-                        $foto_cliente = "../php_cliente/uploads/" . basename($foto);
-                        $foto_admin = "../php_admin/uploads/" . basename($foto);
+                        $foto_cliente = "../../../../../img/php_cliente/uploads/" . basename($foto);
 
                         if (!empty($foto) && file_exists($foto_cliente)) {
                             echo "<img src='$foto_cliente' width='50' height='50'>";
-                        } elseif (!empty($foto) && file_exists($foto_admin)) {
-                            echo "<img src='$foto_admin' width='50' height='50'>";
+                        } elseif (!empty($foto) && file_exists($foto_cliente)) {
+                            echo "<img src='$foto_cliente' width='50' height='50'>";
                         } else {
                             echo "<img src='../php_cliente/uploads/default.png' width='50' height='50'>";
                         }
@@ -187,7 +186,11 @@ $result = $conn->query($sql);
                                         <a href="../editar/editar_user.php?id=<?php echo $usuario['id_usuario']; ?>" class="link_acao">Editar</a>
                                         <a href="atividades_usuario.php?id=<?= $usuario['id_usuario'] ?>" class="link_acao">Atividades</a>
                                     </div> 
-                                    <input type="checkbox" id="checkbox1" class="input"> <label for="checkbox1"></label>
+                                    <input type="checkbox" name="excluir[]" value="<?= $usuario['id_usuario']; ?>" id="checkbox_<?= $usuario['id_usuario']; ?>" class="input">
+                                <label for="checkbox_<?= $usuario['id_usuario']; ?>"></label>
+
+
+
                                 </th>
                             </tr>
                      </tbody>

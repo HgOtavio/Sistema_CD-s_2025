@@ -172,7 +172,7 @@ $result = $stmt->get_result();
    
 
     <section id="tabelao">
-    <form method="post" action="gerenciar_artista.php">
+    <form method="post" action="gerenciar_artistas.php">
     <button id="button_excluir" type="submit" onclick="return confirm('Tem certeza que deseja excluir os artistas selecionados?')">
         Excluir Selecionados
     </button>
@@ -195,12 +195,15 @@ $result = $stmt->get_result();
                 <th class="info"><?= htmlspecialchars($row['nomeArtista']) ?></th>
                 <th class="info">
                     <?php if ($row['fotoPerfil']) : ?>
-                        <img src="../../../../../img/artistas//<?= htmlspecialchars($row['fotoPerfil']) ?>" alt="Foto do Artista" width="50">
+                        <img src="../../../../../img/<?= htmlspecialchars($row['fotoPerfil']) ?>" alt="Foto do Artista" width="50">
                     <?php else : ?>
                         Sem Foto
                     <?php endif; ?>
                 </th>
-                <th class="info"><?= htmlspecialchars($row['dataNascimento']) ?></th>
+                <th class="info"><?php
+        $data_formatada = DateTime::createFromFormat('Y-m-d', $row['dataNascimento']);
+        echo $data_formatada ? $data_formatada->format('d/m/Y') : 'Data inválida';
+    ?></th>
                 <th class="info"><?= htmlspecialchars($row['descricao']) ?></th>
                 <th class="info">
                     <?php

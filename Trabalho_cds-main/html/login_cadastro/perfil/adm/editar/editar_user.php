@@ -93,7 +93,7 @@ $usuario = $result->fetch_assoc();
                                 <!-- Foto de perfil atual -->
     <?php if (!empty($usuario['foto_perfil'])): ?>
         <p>Foto atual:</p>
-        <img src="../<?php echo $usuario['foto_perfil']; ?>" width="100" height="100"><br>
+        <img src="../../../../../img/<?php echo $usuario['foto_perfil']; ?>" width="100" height="100"><br>
     <?php else: ?>
         Nenhuma foto enviada.<br>
     <?php endif; ?>

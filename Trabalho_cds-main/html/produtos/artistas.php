@@ -1,3 +1,40 @@
+<?php
+// Conectar ao banco de dados
+include "../login_cadastro/conexao.php";
+// Verificar se o parâmetro id_artista foi passado pela URL
+if (isset($_GET['id_artista'])) {
+    $id_artista = $_GET['id_artista'];
+
+    // Buscar informações do artista
+    $sql_artista = "SELECT * FROM Artista WHERE id_artista = ?";
+    $stmt = mysqli_prepare($conn, $sql_artista);
+    mysqli_stmt_bind_param($stmt, 'i', $id_artista);
+    mysqli_stmt_execute($stmt);
+    $result_artista = mysqli_stmt_get_result($stmt);
+
+    if (mysqli_num_rows($result_artista) > 0) {
+        $artista = mysqli_fetch_assoc($result_artista);
+    } else {
+        echo 'Artista não encontrado.';
+        exit;
+    }
+
+    // Buscar CDs relacionados ao artista
+    $sql_cds = "SELECT CD.id_cd, CD.titulo, CD.capa
+                FROM CD
+                INNER JOIN CD_Artista ON CD.id_cd = CD_Artista.id_cd
+                WHERE CD_Artista.id_artista = ?";
+    $stmt_cds = mysqli_prepare($conn, $sql_cds);
+    mysqli_stmt_bind_param($stmt_cds, 'i', $id_artista);
+    mysqli_stmt_execute($stmt_cds);
+    $result_cds = mysqli_stmt_get_result($stmt_cds);
+} else {
+    echo 'ID do artista não fornecido.';
+    exit;
+}
+
+mysqli_close($conn);
+?>
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
@@ -11,6 +48,10 @@
     <link rel="stylesheet" href="../../css/rodape/rodape.css">
 
     <script src="../../js/cabeçalho/menu.js" defer></script>
+
+
+
+    </style>
 </head>
 <body>
     <header> 
@@ -133,22 +174,31 @@
 
 <section id="section">
     
-        <img src="../../img/destaque/capa_de_album_destaque_1.jpg" alt="Imagem do artista" id="img">
+        <img src=" ../../img/Artista//<?php echo $artista['fotoPerfil']; ?>" alt="Imagem do artista" id="img">
     
         <div id="corpo">
-            <h1 id="nome">Nome do Artista</h1>
-            <p id="data_nasc">1990-05-50</p>
+            <h1 id="nome"><?php echo $artista['nomeArtista']; ?></h1>
+            <p id="data_nasc"><?php echo date('d/m/Y', strtotime($artista['dataNascimento'])); ?></p>
             <p id="cds">Cds associados
                 <ul id="lista">
-                    <li><a href="#">Cd_1</a></li>
-                    <li><a href="#">Cd_2</a></li>
-                    <li><a href="#">Cd_3</a></li>
-                    <li><a href="#">Cd_4</a></li>
-                    <li><a href="#">Cd_5</a></li>
+                <?php
+            if (mysqli_num_rows($result_cds) > 0) {
+                while ($cd = mysqli_fetch_assoc($result_cds)) {
+                    echo '<div class="cd">';
+                    echo '<img src="' . $cd['capa'] . '" alt="Capa do CD">';
+                    echo '<a href="todos_os_produtos.php?busca_geral=' . urlencode($cd['titulo']) . '">' . htmlspecialchars($cd['titulo']) . '</a>';
+                    
+                    echo '</div>';
+                }
+            } else {
+                echo '<p style="text-align:center;">Este artista ainda não possui CDs registrados.</p>';
+            }
+            ?>
+                    
                 </ul>
             </p>
             <h2 id="descricao">Descrição</h2>
-            <p id="texto">Lorem, ipsum dolor sit amet consectetur adipisicing elit. Nulla voluptatem necessitatibus voluptatum. Cumque vitae aspernatur qui inventore minus perferendis in magni hic nesciunt aliquid, odit ipsa iste sed, impedit odio! Lorem ipsum dolor sit amet consectetur adipisicing elit. Consequuntur, quis cupiditate quam expedita dolorem, nobis veniam in qui eos, quibusdam pariatur ut saepe quia. Quidem tempora dolore error. Voluptatem, id?</p>
+            <p id="texto"><?php echo $artista['descricao']; ?></p>
         </div>
 </section>
 

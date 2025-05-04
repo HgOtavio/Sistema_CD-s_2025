@@ -56,17 +56,17 @@ if (!empty($_FILES['foto_perfil']['name'])) {
     $foto_tmp = $_FILES['foto_perfil']['tmp_name'];
     $foto_ext = pathinfo($foto_nome, PATHINFO_EXTENSION);
 
-    // Define o novo nome da foto
-    $novo_nome_foto = "foto_" . $id_usuario . "." . $foto_ext;
+    // Define o novo nome da foto como o login do usuário
+    $novo_nome_foto = $login . "." . $foto_ext;
 
     // Diretório para salvar a foto
-    $diretorio = "../uploads/";
+    $diretorio = "../../../../../img/php_cliente/uploads/";
 
     // Movendo o arquivo
     move_uploaded_file($foto_tmp, $diretorio . $novo_nome_foto);
 
     // Atualizar caminho salvo no banco
-    $foto_perfil = "uploads/" . $novo_nome_foto;
+    $foto_perfil = "../uploads/" . $novo_nome_foto;
 }
 
 // Atualizar os dados do usuário no banco

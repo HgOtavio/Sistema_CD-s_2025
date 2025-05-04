@@ -62,7 +62,7 @@
 .produto {
     border: 2px solid var(--roxo); /* Borda com a cor roxa padrão */
     width: 220px;
-    height: 380px;
+    height: 390px;
     justify-content: space-between;
     display: flex;
     flex-direction: column;
@@ -83,6 +83,10 @@
 .nome_cd, .valor {
     font-size: 25px;
     color: var(--roxo);
+}
+
+.nome_cd{
+    transition: font-size 0.2s ease;
 }
 
 /* === DESCRIÇÃO E INFORMAÇÃO DE PROMOÇÃO === */

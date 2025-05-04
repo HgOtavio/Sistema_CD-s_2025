@@ -19,7 +19,30 @@ $filtro_preco_max = isset($_GET['preco_max']) ? $_GET['preco_max'] : '';
 $filtro_artista = isset($_GET['artista']) ? $_GET['artista'] : '';
 $filtro_musica = isset($_GET['musica']) ? $_GET['musica'] : '';
 
-// Consulta CDs com base nos filtros
+
+// Consultas para obter as opções de filtro disponíveis
+$sql_titulos = "SELECT DISTINCT titulo FROM CD";
+$result_titulos = $conn->query($sql_titulos);
+
+$sql_generos = "SELECT DISTINCT genero FROM CD";
+$result_generos = $conn->query($sql_generos);
+
+$sql_artistas = "SELECT DISTINCT nomeArtista FROM Artista";
+$result_artistas = $conn->query($sql_artistas);
+
+$sql_musicas = "SELECT DISTINCT nomeMusica FROM Musica";
+$result_musicas = $conn->query($sql_musicas);
+
+$sql_anos = "SELECT DISTINCT anoLancamento FROM CD";
+$result_anos = $conn->query($sql_anos);
+
+$sql_disponibilidades = "SELECT DISTINCT disponibilidade FROM CD";  // Alterado de "durabilidade" para "disponibilidade"
+$result_disponibilidades = $conn->query($sql_disponibilidades);
+
+$sql_preco_max = "SELECT DISTINCT preco FROM CD";
+$result_preco_max = $conn->query($sql_preco_max);
+
+
 // Consulta CDs com base nos filtros
 $sql_cd = "SELECT DISTINCT CD.id_cd, CD.titulo, CD.capa, CD.disponibilidade, CD.preco, CD.destaque, CD.anoLancamento, CD.genero, CD.descricao AS descricao_cd, CD.numero_vendas 
            FROM CD
@@ -124,39 +147,123 @@ $result_cd = $conn->query($sql_cd);
     <button id="btn_filtro">Filtros</button>
 
     <section id="filtro">
-        <form action="" method="GET">
-            <div id="separar">
-                <div class="separar_pc">
-                    <div class="lado">
-                        <p class="p_filtro">Titulo:<input type="text" class="input_filtro" name="titulo" value="<?= $filtro_titulo ?>"></p>
-                        <p class="p_filtro">Gênero:<input type="text" class="input_filtro" name="genero" value="<?= $filtro_genero ?>"></p>
-                    </div>
-                    <div class="lado">
-                        <p class="p_filtro">Lançamento:<input type="text" class="input_filtro ano" name="ano" value="<?= $filtro_ano ?>"></p>
-                        <p class="p_filtro">Durabilidade:<input type="text" class="input_filtro tempo" name="disponibilidade" value="<?= $filtro_disponibilidade ?>"></p>
-                    </div>
-                    <div class="lado">
-                        <p class="p_filtro">Preço max:<input type="number"  step="0.01" class="input_filtro preco"  name="preco_max" value="<?= $filtro_preco_max ?>"></p>
-                        <p class="p_filtro">Preço min:<input type="number" step="0.01" class="input_filtro preco" name="preco_min" value="<?= $filtro_preco_min ?>" ></p>
-                    </div>
-                </div>
-                <div class="separar_pc">
-                    <div class="lado">
-                        <p class="p_filtro">Artistas:<input name="artista" type="text" class="input_filtro" value="<?= $filtro_artista ?>" ></p>
-                        <p class="p_filtro">Musicas:<input name="musica" type="text" class="input_filtro" value="<?= $filtro_musica ?>"></p>
-                    </div>
-                    <p class="p_filtro">Destaque:<input   type="text" class="input_filtro" name="destaque" value="<?= $filtro_destaque ?>"></p>
-                </div>
+
+<form action="" method="GET">
+    <div id="separar">
+        <div class="separar_pc">
+            <div class="lado">
+                <!-- Filtro Título -->
+                <p class="p_filtro">Título:
+                    <input type="text" class="input_filtro" name="titulo" value="<?= $filtro_titulo ?>" list="titulos_sugestoes">
+                    <datalist id="titulos_sugestoes">
+                        <?php while ($titulo = $result_titulos->fetch_assoc()) { ?>
+                            <option value="<?= $titulo['titulo'] ?>">
+                        <?php } ?>
+                    </datalist>
+                </p>
+
+                <!-- Filtro Gênero -->
+                <p class="p_filtro">Gênero:
+                    <input type="text" class="input_filtro" name="genero" value="<?= $filtro_genero ?>" list="generos_sugestoes">
+                    <datalist id="generos_sugestoes">
+                        <?php while ($genero = $result_generos->fetch_assoc()) { ?>
+                            <option value="<?= $genero['genero'] ?>">
+                        <?php } ?>
+                    </datalist>
+                </p>
             </div>
-            <div>
-                <button id="button_filtro" type="submit">Procurar</button>
-                <button id="button_filtro" href="gerenciar_cds.php">Todos</button>
+
+            <div class="lado">
+                <!-- Filtro Lançamento (AnoLancamento) -->
+                <p class="p_filtro">Lançamento:
+                    <input type="text" class="input_filtro ano" name="ano" value="<?= $filtro_ano ?>" list="anos_sugestoes">
+                    <datalist id="anos_sugestoes">
+                        <?php while ($ano = $result_anos->fetch_assoc()) { ?>
+                            <option value="<?= $ano['anoLancamento'] ?>">
+                        <?php } ?>
+                    </datalist>
+                </p>
+
+                <!-- Filtro Disponibilidade (alterado de "Durabilidade") -->
+                <p class="p_filtro">Disponibilidade:
+                    <input type="text" class="input_filtro tempo" name="disponibilidade" value="<?= $filtro_disponibilidade ?>" list="disponibilidades_sugestoes">
+                    <datalist id="disponibilidades_sugestoes">
+                        <?php while ($disponibilidade = $result_disponibilidades->fetch_assoc()) { ?>
+                            <option value="<?= $disponibilidade['disponibilidade'] ?>">
+                        <?php } ?>
+                    </datalist>
+                </p>
             </div>
-        </form>  
+
+            <div class="lado">
+               
+
+                <!-- Filtro Preço Mínimo -->
+                <p class="p_filtro">Preço Min:
+                    <input type="number" step="0.01" class="input_filtro preco" name="preco_min" value="<?= $filtro_preco_min ?>" list="preco_min_sugestoes">
+                    <datalist id="preco_min_sugestoes">
+                        <?php while ($preco = $result_preco_max->fetch_assoc()) { ?>
+                            <option value="<?= $preco['preco'] ?>">
+                        <?php } ?>
+                    </datalist>
+                </p>
+                 <!-- Filtro Preço Máximo -->
+                 <p class="p_filtro">Preço Max:
+                    <input type="number" step="0.01" class="input_filtro preco" name="preco_max" value="<?= $filtro_preco_max ?>" list="preco_max_sugestoes">
+                    <datalist id="preco_max_sugestoes">
+                        <?php while ($preco = $result_preco_max->fetch_assoc()) { ?>
+                            <option value="<?= $preco['preco'] ?>">
+                        <?php } ?>
+                    </datalist>
+                </p>
+            </div>
+        </div>
+
+        <div class="separar_pc">
+            <div class="lado">
+                <!-- Filtro Artistas -->
+                <p class="p_filtro">Artistas:
+                    <input name="artista" type="text" class="input_filtro" value="<?= $filtro_artista ?>" list="artistas_sugestoes">
+                    <datalist id="artistas_sugestoes">
+                        <?php while ($artista = $result_artistas->fetch_assoc()) { ?>
+                            <option value="<?= $artista['nomeArtista'] ?>">
+                        <?php } ?>
+                    </datalist>
+                </p>
+
+                <!-- Filtro Músicas -->
+                <p class="p_filtro">Músicas:
+                    <input name="musica" type="text" class="input_filtro" value="<?= $filtro_musica ?>" list="musicas_sugestoes">
+                    <datalist id="musicas_sugestoes">
+                        <?php while ($musica = $result_musicas->fetch_assoc()) { ?>
+                            <option value="<?= $musica['nomeMusica'] ?>">
+                        <?php } ?>
+                    </datalist>
+                </p>
+            </div>
+
+            <p class="p_filtro">Destaque:
+                <input type="text" class="input_filtro" name="destaque" value="<?= $filtro_destaque ?>" list="destaque_sugestoes">
+                <datalist id="destaque_sugestoes">
+                    <option value="Sim">
+                    <option value="Não">
+                </datalist>
+            </p>
+        </div>
+    </div>
+
+    <div>
+        <button id="button_filtro" type="submit">Procurar</button>
+        <button id="button_filtro" href="gerenciar_cds.php">Todos</button>
+    </div>
+</form>
+
     </section>
 
-    <button class="button_voltar"><a href="#" class="link_voltar">Adicionar CDs</a></button>
-    <button id="button_excluir">Excluir</button>
+    <button class="button_voltar"><a href="../adicionar/add_cds.php" class="link_voltar">Adicionar CDs</a></button>
+    <form action="deletar_cd.php" method="POST">
+
+    <button id="button_excluir" type="submit">Excluir</button>
     
     <section id="tabelao">
         <table id="tabela">
@@ -221,7 +328,7 @@ $result_cd = $conn->query($sql_cd);
                     echo "<tr class='informações' >
                             <th class='info' >{$cd['id_cd']}</th>
                             <th class='info' >{$cd['titulo']}</th>
-                            <th class='info' ><img src='../{$cd['capa']}' alt='Capa do CD'></th>
+                            <th class='info' ><img src='../../../../../img/{$cd['capa']}' alt='Capa do CD'></th>
                             <th class='info' >{$cd['disponibilidade']}</th>
                             <th class='info' >R$ {$preco_original}</th>
                           <th class='info' >";
@@ -250,7 +357,9 @@ $result_cd = $conn->query($sql_cd);
                             <th class='info' >{$cd['numero_vendas']}</th>
                             <th class='info' >
                                 <a href='../editar/editar_cds.php?id_cd={$cd['id_cd']}' class='link_acao'>Editar</a> <br>
-                                <input type='checkbox'id='checkbox1'  value='{$cd['id_cd']}' class='input' /> <label for='checkbox1'></label>
+                                <input type='checkbox' name='cd_selecionadas[]' value='{$cd['id_cd']}' class='input' id='cd_{$cd['id_cd']}' /> 
+                                <label for='cd_{$cd['id_cd']}'></label>
+
 
                             </th>
                         </tr>";
@@ -262,5 +371,7 @@ $result_cd = $conn->query($sql_cd);
             </tbody>
         </table>
     </section>
+    </form>
+
 </body>
 </html>

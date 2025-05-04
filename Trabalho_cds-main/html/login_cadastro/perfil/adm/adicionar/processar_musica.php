@@ -1,60 +1,60 @@
 <?php
-// Conexão com o banco de dados
-$conn = new mysqli("localhost", "root", "", "LojaCDs");
-if ($conn->connect_error) {
-    die("Erro de conexão: " . $conn->connect_error);
+include "../../../../login_cadastro/conexao.php";
+session_start();
+
+if (!isset($_POST['id_musica'])) {
+    die("ID da música não fornecido.");
 }
 
-// Verifica se o formulário foi enviado
-if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    // Pega os dados do formulário
-    $nomeMusica = $conn->real_escape_string($_POST['nomeMusica']);
-    $tempo = (float) $_POST['tempo'];
-    $cdsSelecionados = $_POST['id_cd']; // Vai ser um array com os CDs
+$id_musica = $_POST['id_musica'];
+$nomeMusica = $_POST['nomeMusica'];
+$tempo = $_POST['tempo'];
 
-    // Upload do arquivo de áudio (se existir)
-    $caminhoAudio = null;
-    if (isset($_FILES['audio']) && $_FILES['audio']['error'] == UPLOAD_ERR_OK) {
-        $pastaDestino = "uploads_audio/";
-        if (!is_dir($pastaDestino)) {
-            mkdir($pastaDestino, 0777, true);
-        }
-        $nomeArquivo = uniqid() . "_" . basename($_FILES['audio']['name']);
-        $caminhoCompleto = $pastaDestino . $nomeArquivo;
+$audioPath = null;
 
-        if (move_uploaded_file($_FILES['audio']['tmp_name'], $caminhoCompleto)) {
-            $caminhoAudio = $caminhoCompleto;
-        } else {
-            die("Erro ao enviar o arquivo de áudio.");
-        }
+// Se o usuário enviar um novo áudio
+if (isset($_FILES['audio']) && $_FILES['audio']['error'] === UPLOAD_ERR_OK) {
+    $tmp = $_FILES['audio']['tmp_name'];
+    $extensao = pathinfo($_FILES['audio']['name'], PATHINFO_EXTENSION);
+
+    // Força extensão .mp3
+    $nomeArquivo = $id_musica . ".mp3";
+
+    $pastaDestino = "../../../../../audio/";
+    if (!is_dir($pastaDestino)) {
+        mkdir($pastaDestino, 0777, true);
     }
 
-    // 1. Inserir a música na tabela Musica
-    $sql_musica = "INSERT INTO Musica (nomeMusica, tempo, audio) VALUES (?, ?, ?)";
-    $stmt = $conn->prepare($sql_musica);
-    $stmt->bind_param("sds", $nomeMusica, $tempo, $caminhoAudio);
-    if ($stmt->execute()) {
-        // Pegamos o ID da música recém inserida
-        $id_musica = $conn->insert_id;
+    $caminhoCompleto = $pastaDestino . $nomeArquivo;
+    $audioPath = $caminhoCompleto;
 
-        // 2. Inserir relações na tabela CD_Musica
-        foreach ($cdsSelecionados as $id_cd) {
-            $sql_relacao = "INSERT INTO CD_Musica (id_cd, id_musica) VALUES (?, ?)";
-            $stmt_relacao = $conn->prepare($sql_relacao);
-            $stmt_relacao->bind_param("ii", $id_cd, $id_musica);
-            $stmt_relacao->execute();
-            $stmt_relacao->close();
-        }
-
-        echo "Música adicionada com sucesso e associada aos CDs!";
-    } else {
-        echo "Erro ao adicionar música: " . $stmt->error;
+    if (!move_uploaded_file($tmp, $caminhoCompleto)) {
+        die("Erro ao salvar o novo arquivo de áudio.");
     }
+}
 
-    $stmt->close();
+// Atualiza os dados da música
+if ($audioPath) {
+    $stmt = $conn->prepare("UPDATE Musica SET nomeMusica=?, tempo=?, audio=? WHERE id_musica=?");
+    $stmt->bind_param("sssi", $nomeMusica, $tempo, $audioPath, $id_musica);
 } else {
-    echo "Formulário não enviado corretamente.";
+    $stmt = $conn->prepare("UPDATE Musica SET nomeMusica=?, tempo=? WHERE id_musica=?");
+    $stmt->bind_param("ssi", $nomeMusica, $tempo, $id_musica);
 }
 
+if (!$stmt->execute()) {
+    die("Erro ao atualizar música: " . $stmt->error);
+}
+
+// Atualiza os CDs associados
+if (isset($_POST['cdsSelecionados']) && is_array($_POST['cdsSelecionados'])) {
+    $conn->query("DELETE FROM CD_Musica WHERE id_musica = $id_musica");
+
+    foreach ($_POST['cdsSelecionados'] as $id_cd) {
+        $conn->query("INSERT INTO CD_Musica (id_cd, id_musica) VALUES ($id_cd, $id_musica)");
+    }
+}
+
+echo "<script>alert('Música atualizada com sucesso!'); window.location.href='lista_musicas.php';</script>";
 $conn->close();
 ?>
