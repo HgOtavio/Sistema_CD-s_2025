@@ -13,16 +13,14 @@
 
 /* === CONTAINER QUE AGRUPA OS PRODUTOS EM FILEIRAS === */
 .fileira_produtos {
-    display: flex;                 /* Exibe os produtos em linha */
-    width: 1000px;
-    height: auto;
-    margin-top: 35px;
-    flex-wrap: wrap;              /* Quebra linha caso não caibam na mesma */
-    margin-bottom: 30px;
+    display: flex;
+    flex-wrap: wrap;
     gap: 30px;
     justify-content: center;
+    width: 100%;
+    max-width: 1400px; /* opcional */
+    margin: 35px auto 30px auto;
 }
-
 /* === LINK SOBRE O PRODUTO COM BOTÃO SOBREPOSTO === */
 .link_produto2 {
     width: 140px;
@@ -62,7 +60,7 @@
 .produto {
     border: 2px solid var(--roxo); /* Borda com a cor roxa padrão */
     width: 220px;
-    height: 390px;
+    height: 450px;
     justify-content: space-between;
     display: flex;
     flex-direction: column;
@@ -144,6 +142,11 @@
     width: 50px;
     cursor: pointer; /* Mostra que o ícone é clicável */
     transition: transform 0.2s ease-in-out; /* Suaviza o efeito de clique */
+}
+
+.btn-favorito{
+    border: none;
+    background-color: transparent;
 }
 
 /* === EFEITO DE CLIQUE NO ÍCONE DE FAVORITO === */

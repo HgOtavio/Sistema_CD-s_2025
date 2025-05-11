@@ -38,7 +38,6 @@ $generos_result = $conn->query("SELECT DISTINCT genero FROM CD");
 // Buscar anos com destaque
 $anosResult = $conn->query("SELECT DISTINCT anoLancamento FROM CD WHERE destaque = 'Destaque' ORDER BY anoLancamento DESC");
 
-// Consulta principal
 $sql = "
     SELECT 
         CD.id_cd, 
@@ -81,7 +80,6 @@ if ($mostrarDestaques && !$mostrarNaoDestaques) {
     $sql .= " AND (CD.destaque IS NULL OR CD.destaque != 'Sim')";
 }
 
-// Filtros com múltiplos valores
 if (!empty($genero)) {
     $generoFiltrado = array_map([$conn, 'real_escape_string'], $genero);
     $sql .= " AND CD.genero IN ('" . implode("','", $generoFiltrado) . "')";
@@ -102,6 +100,9 @@ if ($desconto == 'com') {
 } elseif ($desconto == 'sem') {
     $sql .= " AND (P.desconto = 0 OR P.desconto IS NULL)";
 }
+
+// Agrupamento para evitar duplicidade
+$sql .= " GROUP BY CD.id_cd";
 
 // Ordenação
 $ordem_sql = '';
@@ -131,6 +132,7 @@ if (!empty($ordem_sql)) {
     $sql .= " ORDER BY $ordem_sql";
 }
 
+
 // Executa
 $stmt = $conn->prepare($sql);
 $stmt->execute();
@@ -143,17 +145,43 @@ if (isset($_SESSION['msg'])) {
     unset($_SESSION['msg']); // Limpa a mensagem da sessão após exibição
 }
 
-
 // Processa a ação de favoritar (POST)
 if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['favoritar'])) {
+    // Recebe o ID do CD e o ID do usuário (supondo que o ID do usuário está na sessão)
     $cd_id = $_POST['cd_id'];
-    $ja_favoritado = false; // valor padrão
+    $user_id = $_SESSION['id_usuario'];
 
-   
+    // Verificar se o CD já está favoritado
+    $sql_verificar = "SELECT 1 FROM Favoritos WHERE id_usuario = ? AND id_cd = ?";
+    $stmt = $conn->prepare($sql_verificar);
+    $stmt->bind_param("ii", $user_id, $cd_id);
+    $stmt->execute();
+    $stmt->store_result();
 
+    // Se o CD já estiver favoritado, vamos removê-lo
+    if ($stmt->num_rows > 0) {
+        // CD favoritado, vamos removê-lo
+        $sql_remover = "DELETE FROM Favoritos WHERE id_usuario = ? AND id_cd = ?";
+        $stmt_remover = $conn->prepare($sql_remover);
+        $stmt_remover->bind_param("ii", $user_id, $cd_id);
+        $stmt_remover->execute();
+        $stmt_remover->close();
 
-    // $conn->query("INSERT INTO Favoritos (user_id, cd_id) VALUES ($user_id, $cd_id)");
-    $_SESSION['msg'] = "CD adicionado aos favoritos!";
+        // Mensagem de sucesso
+        $_SESSION['msg'] = "CD removido dos favoritos!";
+    } else {
+        // CD não favoritado, vamos adicionar
+        $sql_adicionar = "INSERT INTO Favoritos (id_usuario, id_cd) VALUES (?, ?)";
+        $stmt_adicionar = $conn->prepare($sql_adicionar);
+        $stmt_adicionar->bind_param("ii", $user_id, $cd_id);
+        $stmt_adicionar->execute();
+        $stmt_adicionar->close();
+
+        // Mensagem de sucesso
+        $_SESSION['msg'] = "CD adicionado aos favoritos!";
+    }
+    
+    // Redirecionar para a página atual após o processamento
     header("Location: " . $_SERVER['PHP_SELF']);
     exit();
 }
@@ -179,6 +207,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['adicionar_carrinho']))
     header("Location: " . $_SERVER['PHP_SELF']);
     exit();
 }
+
 ?>
 <!DOCTYPE html>
 <html lang="pt-br">
@@ -336,7 +365,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['adicionar_carrinho']))
                         <div id="generos" class="contener">
                         <?php while ($genero_item = $generos_result->fetch_assoc()) { ?>
                         <label class="itens">
-                            <input  class="input" type="checkbox" name="genero[]" value="<?php echo $genero_item['genero']; ?>" <?php echo (in_array($genero_item['genero'], $genero)) ? 'checked' : ''; ?>>
+                            <input  class="isput" type="checkbox" name="genero[]" value="<?php echo $genero_item['genero']; ?>" <?php echo (in_array($genero_item['genero'], $genero)) ? 'checked' : ''; ?>>
                             <?php echo ucfirst($genero_item['genero']); ?>
                         </label><br>
                     <?php } ?>
@@ -351,7 +380,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['adicionar_carrinho']))
                         <div id="artistas" class="contener">
                         <?php while ($artista = $artistas_result->fetch_assoc()) { ?>
                         <label class="itens">
-                            <input class="input" type="checkbox" name="artista_nome[]" value="<?php echo $artista['nomeArtista']; ?>" <?php echo (in_array($artista['nomeArtista'], $artista_nome)) ? 'checked' : ''; ?>>
+                            <input class="inpt" type="checkbox" name="artista_nome[]" value="<?php echo $artista['nomeArtista']; ?>" <?php echo (in_array($artista['nomeArtista'], $artista_nome)) ? 'checked' : ''; ?>>
                             <?php echo $artista['nomeArtista']; ?>
                                 </label><br>
                             <?php } ?>
@@ -366,7 +395,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['adicionar_carrinho']))
                         <div id="musicas" class="contener">
                         <?php while ($musica = $musicas_result->fetch_assoc()) { ?>
                                 <label class="itens">
-                                    <input class="input" type="checkbox" name="musica_nome[]" value="<?php echo $musica['nomeMusica']; ?>" <?php echo (in_array($musica['nomeMusica'], $musica_nome)) ? 'checked' : ''; ?>>
+                                    <input class="inpu" type="checkbox" name="musica_nome[]" value="<?php echo $musica['nomeMusica']; ?>" <?php echo (in_array($musica['nomeMusica'], $musica_nome)) ? 'checked' : ''; ?>>
                                     <?php echo $musica['nomeMusica']; ?>
                                 </label><br>
                                 <?php } ?>
@@ -447,10 +476,20 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['adicionar_carrinho']))
                 <p class="promo">R$ <?php echo number_format($cd['preco'] * (1 - $cd['desconto'] / 100), 2, ',', '.'); ?></p>
             <?php } ?>
                                    </div>
-                                   <form method="post" action="favoritar.php">
-                            <input type="hidden" name="id_cd" value="<?= $cd['id_cd'] ?>">
-                            <?php
-                            // Verificar se o CD já está favoritado
+                    <form method="post" action="favoritar.php" id="favoritar-form">
+    <input type="hidden" name="id_cd" value="<?= $cd['id_cd'] ?>">
+    <input type="hidden" name="id_usuario" value="<?= $_SESSION['id_usuario'] ?>">
+
+    <?php
+    // Verificar se o usuário está logado
+    if (isset($_SESSION['id_usuario'])) {
+        $id_usuario = $_SESSION['id_usuario'];
+    } else {
+        echo "Você precisa estar logado para favoritar CDs.";
+        exit;
+    }
+
+    // Verificar se o CD já está favoritado
     $sql_verificar = "SELECT 1 FROM Favoritos WHERE id_usuario = ? AND id_cd = ?";
     $stmt = $conn->prepare($sql_verificar);
     $stmt->bind_param("ii", $id_usuario, $cd['id_cd']);
@@ -464,18 +503,51 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['adicionar_carrinho']))
         // CD não favoritado, mostrar imagem de favorito inativo
         $img_favorito = '../../img/todos_produtos/icone_favoritos.png'; 
     }
-
     $stmt->close();
     ?>
 
-                            <button type="submit" class="btn-favorito">
-                                <img src="../../img/todos_produtos/<?= $img_favorito ?>" alt="Favoritar" class="img_favorito">
-                            </button>
-                        </form>                
+    <button type="button" class="btn-favorito" id="favorito-button">
+        <img src="<?= $img_favorito ?>" alt="Favoritar" class="img_favorito" id="favorito-img">
+    </button>
+</form>
+
+<script>
+    // Seleciona o botão e a imagem
+    const favoritoButton = document.getElementById("favorito-button");
+    const favoritoImg = document.getElementById("favorito-img");
+    const form = document.getElementById("favoritar-form");
+
+    // Adiciona o evento de clique
+    favoritoButton.addEventListener("click", function() {
+        // Envia os dados do formulário com AJAX
+        const formData = new FormData(form);
+        
+        fetch('favoritar.php', {
+            method: 'POST',
+            body: formData
+        })
+        .then(response => response.json())
+        .then(data => {
+            // Verifica se o favorito foi adicionado ou removido
+            if (data.favoritado) {
+                // CD favoritado, troca a imagem
+                favoritoImg.src = '../../img/todos_produtos/icone_favoritos_selecionado.png';
+            } else {
+                // CD não favoritado, troca a imagem
+                favoritoImg.src = '../../img/todos_produtos/icone_favoritos.png';
+            }
+        })
+        .catch(error => {
+            console.error('Erro ao favoritar:', error);
+        });
+    });
+</script>
+
+
                      </div>
-                           </div>
+           </div>
                     </div>
-                    <a href="#" class="link_produto2"> <div class="butao">Ver Mais</div></a>
+                    <a href="produto.php?id_cd=<?php echo $cd['id_cd']; ?>" class="link_produto2"> <div class="butao">Ver Mais</div></a>
                 </div>
             <?php } ?>
 

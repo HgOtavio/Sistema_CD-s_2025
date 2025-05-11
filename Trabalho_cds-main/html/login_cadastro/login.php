@@ -109,9 +109,7 @@
                             <h2 class="titulo_input">Senha</h2>
                             <input type="password" id="password" class="input" placeholder="Digite sua senha" name="senha" required>
                             <!-- Botão para alternar a visibilidade da senha -->
-                            <button id="olho">
                                 <img src="../../img/login/icone_olho_fechado.png" alt="olho" id="img_olho" onclick="togglePassword()">
-                            </button>
                         </div>
                     </div>
                     <!-- Botão de acesso -->

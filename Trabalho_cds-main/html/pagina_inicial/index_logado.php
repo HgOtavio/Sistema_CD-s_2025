@@ -3,7 +3,7 @@ session_start();
 
 // Verificação de login
 if (!isset($_SESSION['id_usuario'])) {
-    header("Location: ../php/login.php");
+    header("Location: ../login_cadastro/login.php");
     exit();
 }
 
@@ -17,14 +17,21 @@ $id_usuario = $_SESSION['id_usuario'];
 $res = $conn->query("SELECT * FROM Usuario WHERE id_usuario = $id_usuario");
 $usuarioLogado = $res->fetch_assoc();
 
-// Consulta para pegar uma única avaliação (vamos limitar a 1 com o 'LIMIT 1')
 $sqlAv = "
-    SELECT a.nota, a.comentario, a.data_avaliacao, u.login, u.foto_perfil
+    SELECT a.nota, a.comentario, a.data_avaliacao, u.login, u.foto_perfil, u.id_usuario
     FROM avaliacao a
-    JOIN Usuario u ON a.id_usuario = u.id_usuario
+    INNER JOIN Usuario u ON a.id_usuario = u.id_usuario
+    WHERE a.id_cd IS NULL
+      AND a.data_avaliacao = (
+          SELECT MAX(a2.data_avaliacao)
+          FROM avaliacao a2
+          WHERE a2.id_usuario = a.id_usuario AND a2.id_cd IS NULL
+      )
     ORDER BY a.data_avaliacao DESC
-    LIMIT 3
 ";
+
+
+
 $stmtAv = $conn->prepare($sqlAv);
 $stmtAv->execute();
 $resultAv = $stmtAv->get_result();
@@ -36,8 +43,8 @@ if ($avaliacao = $resultAv->fetch_assoc()) {
         $html = "";
         for ($i = 1; $i <= 5; $i++) {
             // Se a estrela é cheia ou vazia dependendo da nota
-            $img = $i <= $nota ? "../../img/avaliacao/estrela_cheia.jpg" : "../../img/avaliacao/estrela_vazia.jpg";
-            $html .= "<img src='../../img/avaliacao/$img' alt='Estrela' width='20' height='20'>";
+            $img = $i <= $nota ? "../../img/avaliar/estrela_amarela.png" : "../../img/avaliar/estrela_escura.png";
+            $html .= "<img src='../../img/avaliar/$img' alt='Estrela' width='20' height='20'>";
         }
         return $html;
     }
@@ -469,8 +476,9 @@ $avaliacoes = $conn->query("SELECT nota, comentario FROM avaliacao ORDER BY data
                     </div>
 
                     <!-- Texto contendo a opinião do cliente -->
-                    <p class="texto_avalicao"><?= nl2br(htmlspecialchars($avaliacao['comentario'])) ?>.</p>
+                    <p class="texto_avalicao"><?= nl2br(htmlspecialchars($avaliacao['comentario'])) ?></p>
                 </div>
+                
             </div>
         </section>
 </main>
@@ -512,7 +520,7 @@ $avaliacoes = $conn->query("SELECT nota, comentario FROM avaliacao ORDER BY data
                 <h1 class="titulo">Suporte</h1>
                 <ul>
                     <li class="lista_rodape"><a href="../rodape/perguntas_frequentes.html" class="link_rodape">Perguntas Frequentes</a></li>
-                    <li class="lista_rodape"><a href="../rodape/avaliar.html" class="link_rodape">Avaliar</a></li>
+                    <li class="lista_rodape"><a href="../rodape/avaliar.php" class="link_rodape">Avaliar</a></li>
                     <li class="lista_rodape"><a href="#" class="link_rodape">Recomendar Produtos</a></li>
                 </ul>
             </div>

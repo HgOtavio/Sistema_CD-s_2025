@@ -100,7 +100,7 @@ $result = $conn->query($sql);
 
             <div id="login_carrinho">
                     <div id="perfil_usuario_logado">
-                        <img src="<?php echo $foto_exibir; ?>" alt="Perfil" id="Perfil" width="40" height="40" style="border-radius: 50%;">
+                    <a href="../../adm.php"><img src="<?php echo $foto_exibir; ?>" alt="Perfil" id="Perfil" width="40" height="40" style="border-radius: 50%;">
                         <span id="login_usuario" style="margin-left: 10px;"><?php echo htmlspecialchars($login_usuario_logado); ?></span>
                     </div>
              <a href="#"><img src="../../../../../img/cabeçario/icone_carrinho.png" alt="Carrinho" id="Carrinho"></a>
@@ -113,29 +113,101 @@ $result = $conn->query($sql);
 
     <h1 id="titulo">Gerenciar Usuarios</h1>
     <form method="get" action="">
-        <button id="btn_filtro">Filtros</button>
-        <section id="filtro">
-            <div id="separar">
-                <div class="lado">
-                    <p class="p_filtro">Usuario:<input type="text" class="input_filtro" name="login" value="<?php echo $filtro_login; ?>"></p>
-                    <p class="p_filtro">E-mail:<input type="email" class="input_filtro" name="email" value="<?php echo $filtro_email; ?>"></p>
-                </div>
-                <div class="lado">
-                    <p class="p_filtro">Nome:<input type="text" name="nome" class="input_filtro" value="<?php echo $filtro_nome; ?>" ></p>
-                    <p class="p_filtro">CPF:<input type="text" class="input_filtro" id="cpf" maxlength="14" name="cpf" value="<?php echo $filtro_cpf; ?>"></p>
-                </div>
-                <div class="lado">
-                    <p class="p_filtro">CEP:<input type="text" name="cpf" class="input_filtro" id="cep" maxlength="9"  name="cep" value="<?php echo $filtro_cep; ?>"></p>
-                    <p class="p_filtro">Telefone:<input type="text" name="telefone" class="input_filtro" id="telefone" maxlength="15" value="<?php echo $filtro_telefone; ?>"></p>
-                </div>
-            </div>
-            <div>
-                <button id="button_filtro" type="submit">Procurar</button>
-                <button type="button" id="button_filtro" onclick="window.location.href='gerenciar_user.php';">Todos</button>
+    <button id="btn_filtro">Filtros</button>
+    <section id="filtro">
+        <div id="separar">
+            <div class="lado">
+                <p class="p_filtro">
+                    Usuario:
+                    <input type="text" class="input_filtro" name="login" list="logins" value="<?php echo $filtro_login; ?>">
+                    <datalist id="logins">
+                        <?php
+                        $res = $conn->query("SELECT DISTINCT login FROM Usuario");
+                        while ($row = $res->fetch_assoc()) {
+                            echo "<option value='{$row['login']}'>";
+                        }
+                        ?>
+                    </datalist>
+                </p>
 
+                <p class="p_filtro">
+                    E-mail:
+                    <input type="email" class="input_filtro" name="email" list="emails" value="<?php echo $filtro_email; ?>">
+                    <datalist id="emails">
+                        <?php
+                        $res = $conn->query("SELECT DISTINCT email FROM Usuario");
+                        while ($row = $res->fetch_assoc()) {
+                            echo "<option value='{$row['email']}'>";
+                        }
+                        ?>
+                    </datalist>
+                </p>
             </div>
-        </section>
-        </form>
+
+            <div class="lado">
+                <p class="p_filtro">
+                    Nome:
+                    <input type="text" name="nome" class="input_filtro" list="nomes" value="<?php echo $filtro_nome; ?>">
+                    <datalist id="nomes">
+                        <?php
+                        $res = $conn->query("SELECT DISTINCT nome_completo FROM Usuario");
+                        while ($row = $res->fetch_assoc()) {
+                            echo "<option value='{$row['nome_completo']}'>";
+                        }
+                        ?>
+                    </datalist>
+                </p>
+
+                <p class="p_filtro">
+                    CPF:
+                    <input type="text" class="input_filtro" id="cpf" maxlength="14" name="cpf" list="cpfs" value="<?php echo $filtro_cpf; ?>">
+                    <datalist id="cpfs">
+                        <?php
+                        $res = $conn->query("SELECT DISTINCT cpf FROM Usuario");
+                        while ($row = $res->fetch_assoc()) {
+                            echo "<option value='{$row['cpf']}'>";
+                        }
+                        ?>
+                    </datalist>
+                </p>
+            </div>
+
+            <div class="lado">
+                <p class="p_filtro">
+                    CEP:
+                    <input type="text" class="input_filtro" id="cep" maxlength="9" name="cep" list="ceps" value="<?php echo $filtro_cep; ?>">
+                    <datalist id="ceps">
+                        <?php
+                        $res = $conn->query("SELECT DISTINCT cep FROM Usuario");
+                        while ($row = $res->fetch_assoc()) {
+                            echo "<option value='{$row['cep']}'>";
+                        }
+                        ?>
+                    </datalist>
+                </p>
+
+                <p class="p_filtro">
+                    Telefone:
+                    <input type="text" class="input_filtro" id="telefone" maxlength="15" name="telefone" list="telefones" value="<?php echo $filtro_telefone; ?>">
+                    <datalist id="telefones">
+                        <?php
+                        $res = $conn->query("SELECT DISTINCT telefone FROM Usuario");
+                        while ($row = $res->fetch_assoc()) {
+                            echo "<option value='{$row['telefone']}'>";
+                        }
+                        ?>
+                    </datalist>
+                </p>
+            </div>
+        </div>
+
+        <div>
+            <button id="button_filtro" type="submit">Procurar</button>
+            <button type="button" id="button_filtro" onclick="window.location.href='gerenciar_user.php';">Todos</button>
+        </div>
+    </section>
+</form>
+
     <button class="button_voltar"><a href="../adicionar/add_user.php" class="link_voltar">Adicionar Usuarios</a></button>
 
 
@@ -184,7 +256,7 @@ $result = $conn->query($sql);
                                 <th class="info">
                                     <div class="separar">
                                         <a href="../editar/editar_user.php?id=<?php echo $usuario['id_usuario']; ?>" class="link_acao">Editar</a>
-                                        <a href="atividades_usuario.php?id=<?= $usuario['id_usuario'] ?>" class="link_acao">Atividades</a>
+                                        <a href="gerenciar_atividades.php?id=<?= $usuario['id_usuario'] ?>" class="link_acao">Atividades</a>
                                     </div> 
                                     <input type="checkbox" name="excluir[]" value="<?= $usuario['id_usuario']; ?>" id="checkbox_<?= $usuario['id_usuario']; ?>" class="input">
                                 <label for="checkbox_<?= $usuario['id_usuario']; ?>"></label>

@@ -1,0 +1,279 @@
+/* Reset de estilo para todos os elementos da página */
+*{
+    padding: 0px; /* Remove o preenchimento de todos os elementos */
+    margin: 0px; /* Remove a margem de todos os elementos */
+    font-family: Arial, Helvetica, sans-serif; /* Define a fonte padrão */
+}
+
+:root{
+    --cinza-1: #303030;
+    --cinza-2: #5d5d5d;
+    --cinza-3: #6d6d6d;
+    --cinza-4: #7b7a7a;
+    --cinza-5: #888888;
+    --cinza-6: #949494;
+    --cinza-7: #abaaaa;
+    --branco: #ffffff;
+    --roxo: #7445cc;
+}
+
+main{
+    display: flex; /* Define o uso do flexbox */
+    justify-content: center; /* Centraliza o conteúdo dentro do main */
+}
+
+.button_voltar{
+    border-radius: 5px;
+    border: none;
+    background-color: var(--roxo); /* Cor de fundo */
+    padding: 5px;
+    font-weight: bold;
+    margin: 10px;
+    margin-left: 100px;
+}
+.link_voltar{
+    color: var(--branco); /* Cor do texto */
+    text-decoration: none;
+}
+
+.link_voltar:hover{
+    color: var(--cinza-1); /* Cor do texto ao passar o mouse */
+}
+
+.button_voltar:hover{
+    background-color: var(--cinza-7); /* Cor de fundo ao passar o mouse */
+    transition: 0.3s;
+}
+
+#sugestao{
+    background-color: rgb(247, 247, 247); /* Cor de fundo */
+    border-radius: 10px; /* Borda arredondada */
+    box-shadow: 10px 10px 15px rgba(0, 0, 0, 0.3); /* Sombra para dar profundidade */
+    width: 90%;  /* Em vez de um tamanho fixo */
+    max-width: 900px; /* Mantém um limite */
+    height: auto; /* Deixa altura dinâmica */
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 20px;
+}
+
+#titulo{
+    color: var(--roxo); /* Cor do título */
+    font-size: 70px; /* Tamanho da fonte */
+    text-align: center;
+}
+
+#subtitulo{
+    color: var(--roxo); /* Cor do título */
+    font-size: 30px; /* Tamanho da fonte */
+    text-align: center;
+}
+
+#tipo_sugestao{
+    appearance: none; /* remove o estilo padrão */
+    -webkit-appearance: none; /* Safari/Chrome */
+    -moz-appearance: none; /* Firefox */
+    color: var(--cinza-2);
+    box-shadow: 0 0 5px rgba(102, 102, 255, 0.5);
+    background-color: var(--branco);
+    border: 1px solid var(--roxo);
+    padding: 10px;
+    font-size: 16px;
+    border-radius: 8px;
+    width: 200px;
+    background-image: url('../../img/todos_produtos/icone_seta_direita.png'); /* sua própria setinha */
+    background-repeat: no-repeat;
+    background-position: right 15px center; /* posição da seta */
+    background-size: 30px 30px; /* tamanho da seta */
+    cursor: pointer;
+}
+#tipo_sugestao:focus{
+    outline: none;
+    border-color: var(--roxo);
+    box-shadow: 0 0 5px rgba(102, 102, 255, 0.5);
+    background-image: url('../../img/todos_produtos/icone_seta_baixo.png'); /* sua própria setinha */
+}
+
+/* Inputs*/
+
+.itens_input {
+    display: none;
+    gap: 50px;
+}
+
+.lado{
+    display: flex;
+    flex-direction: column;
+}
+
+.input{
+    background-color: transparent; /* Fundo transparente */
+    margin: 15px 10px; /* Margens internas */
+    border: none; /* Remove as bordas padrão */
+    border-bottom: 2px solid var(--cinza-4); /* Apenas a borda inferior */
+    font-size: 20px; /* Tamanho da fonte */
+    width: 100%; /* Para evitar cortes laterais */
+    max-width: 350px;
+}
+/* Remover o contorno ao focar nos campos de entrada */
+.input:focus{
+    outline: none; /* Remove o outline ao focar */
+}
+
+.add_perfil_img {
+    display: inline-block;
+    cursor: pointer;
+    color: var(--cinza-4);
+}
+
+.add_perfil_img:hover {
+    background-color: #dedddd;
+}
+
+#upload {
+    display: none;
+}
+
+#audio {
+    color: var(--cinza-4);
+    cursor: pointer;
+    display: inline-block;
+    background-color: transparent; /* Fundo transparente */
+    margin: 15px 10px; /* Margens internas */
+    border: none; /* Remove as bordas padrão */
+    border-bottom: 2px solid var(--cinza-4); /* Apenas a borda inferior */
+    font-size: 1.2rem;
+    width: 350px;
+}
+
+#audio:hover {
+background-color: #dedddd;
+}
+
+#button{
+    width: 200px; /* Para evitar cortes laterais */
+    max-width: 350px;
+    height: 40px; /* Altura do botão */
+    border-radius: 10px; /* Bordas arredondadas */
+    border: none; /* Sem borda */
+    margin: 10px; /* Margem do botão */
+    color: var(--branco); /* Cor do texto */
+    background-color: var(--roxo); /* Cor de fundo */
+    font-size: 20px; /* Tamanho da fonte */
+    font-weight: bold; /* Texto em negrito */
+}
+
+/* Estilo do botão ao passar o mouse */
+#button:hover{
+    background-color: var(--cinza-7); /* Cor do fundo ao passar o mouse */
+    color: var(--cinza-2); /* Cor do texto ao passar o mouse */
+    transition: 0.2s; /* Transição suave */
+}
+
+
+/* == ESTILIZAÇÃO DAS IMAGENS LATERAIS == */
+
+/* Classe para esconder elementos específicos */
+.sumir {
+    display: none; /* Oculta as imagens */
+}
+
+/* Imagens decorativas posicionadas à direita */
+#imgs_direita {
+    display: flex; /* Usa flexbox para organização */
+    align-items: flex-end; /* Alinha as imagens ao fundo */
+    flex-direction: column; /* Organiza as imagens em coluna */
+    position: fixed; /* Posicionamento absoluto sobre o conteúdo */
+    bottom: 0; /* Alinha ao fundo da tela */
+    right: 0; /* Alinha à direita */
+    z-index: -1; /* Coloca as imagens atrás do conteúdo principal */
+    width: 100%;
+    height: 100%;
+}
+
+/* Imagens decorativas posicionadas à esquerda */
+#imgs_esquerda {
+    display: flex;
+    flex-direction: column;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    z-index: -1;
+    width: 100%;
+    height: 100%;
+}
+
+/* Ajuste de tamanho e margem das imagens da direita */
+.img_direita {
+    width: 300px; /* Define a largura das imagens */
+    margin-right: -200px; /* Ajusta a posição da imagem */
+}
+
+/* Ajuste de espaçamento entre imagens da direita, exceto a primeira */
+.img_direita:not(:first-child) {
+    margin-top: -5px;
+}
+
+/* Ajuste das imagens da esquerda (espelhadas horizontalmente) */
+.img_esquerda {
+    width: 300px;
+    margin-left: -200px;
+    transform: scaleX(-1); /* Inverte horizontalmente a imagem */
+}
+
+/* Ajuste de espaçamento entre imagens da esquerda, exceto a primeira */
+.img_esquerda:not(:first-child) {
+    margin-top: -5px;
+}
+
+.img_direita, .img_esquerda {
+    max-width: 300px; /* Mantém as imagens menores em telas pequenas */
+    opacity: 0.5; /* Reduz a opacidade para não sobrecarregar o layout */
+}
+
+
+@media only screen and (max-width: 743px){
+    #sugestao{
+        width: 450px; /* Ajuste de largura para telas menores */
+        height: auto;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        margin-bottom: 20px;
+    }
+
+    #titulo {
+        font-size: 3rem;
+        text-align: center;
+        margin-top: 10px;
+    }
+
+    .itens_input {
+        gap: 20px;
+    }
+
+    .input{
+        font-size: 20px; /* Tamanho da fonte */
+        width: 190px; /* Para evitar cortes laterais */
+        max-width: 350px;
+    }
+
+    .sumir {
+        display: block;
+    }
+
+    .img_direita {
+        width: 200%;
+        height: 100%;
+        object-fit: cover;
+    }
+
+    .cortar{
+        width: 150px;
+        overflow: hidden; /* Esconde parte da imagem fora da área */
+    }
+    .button_voltar{
+        margin-left: 10px;
+    }
+}

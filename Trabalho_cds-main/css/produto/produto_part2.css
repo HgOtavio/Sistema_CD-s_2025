@@ -1,0 +1,192 @@
+:root{
+    --cinza-1: #303030;
+    --cinza-2: #5d5d5d;
+    --cinza-3: #6d6d6d;
+    --cinza-4: #7b7a7a;
+    --cinza-5: #888888;
+    --cinza-6: #949494;
+    --cinza-7: #abaaaa;
+    --branco: #ffffff;
+    --roxo: #7445cc;
+}
+
+#areaConteudo{
+    margin-bottom: 20px;
+}
+
+.linha{
+    border: none; /* Tira a borda padrão */
+  height: 3px; /* Espessura da linha */
+  background-color: var(--roxo); /* Cor da linha */
+  margin: 20px auto;
+  width: 1320px;
+}
+
+#butoes{
+    margin: 0px 30px;
+}
+
+.but_baixo {
+    margin: 0px 20px;
+    cursor: pointer;
+    border: none;
+    background: white;
+    color: var(--cinza-2);
+    transition: 0.3s;
+    z-index: 1;
+    font-size: 20px;
+  }
+
+  .ativo {
+    border-bottom: 2px solid var(--roxo);
+  }
+
+  .dentro {
+    display: none;
+  }
+  
+  .dentro.ativo {
+    display: block;
+    margin-top: 15px;
+    padding: 20px;
+    border: 1px solid var(--roxo);
+    background: var(--branco);
+    border-radius: 5px;
+  }
+
+  /*Descriçao*/
+
+  .separar_tip_cont{
+    display: flex;
+    gap: 500px;
+  }
+
+  .tipo{
+    color: var(--cinza-2);
+    font-size: 20px;
+    font-weight: bold;
+    width: 200px;
+  }
+
+  .cont{
+    color: var(--cinza-2);
+    font-size: 20px;
+    width: 200px;
+  }
+
+  .linha_separcao{
+    border: none; /* Tira a borda padrão */
+    height: 2px; /* Espessura da linha */
+    background-color: var(--cinza-5); /* Cor da linha */
+    margin-bottom: 20px;
+  }
+
+  #decri{
+    color: var(--cinza-2);
+    font-size: 35px;
+  }
+
+  #p_des{
+    color: var(--cinza-2);
+    text-align: justify;
+  }
+
+/* Musica*/  
+
+.separar_tip_cont_m{
+    display: flex;
+    gap: 250px;
+    align-items: center;
+  }
+
+  .audio {
+    border: 2px solid var(--cinza-4);
+    border-radius: 30px;
+    height: 20px;
+}
+
+/* Avaliar*/
+
+/* Estilização da área de conteúdo principal */
+
+/* Título principal */
+#titulo_avaliar {
+    font-size: 5vw; /* Define o tamanho da fonte */
+    margin-bottom: 20px; /* Espaçamento inferior */
+    color: var(--roxo);
+}
+
+/* == AVALIAÇÃO COM ESTRELAS == */
+
+#avaliar_estrelas {
+    margin-bottom: 20px;
+    cursor: pointer; /* Cursor interativo */
+}
+
+/* Linha contendo as estrelas */
+#linha_de_estrelas {
+    display: flex;
+    gap: 10px; /* Espaçamento entre as estrelas */
+}
+
+/* Estilos para os títulos das seções de avaliação */
+#avaliar_estrelas_titulo, 
+#text_avalicao_titulo {
+    margin-bottom: 5px;
+    color: var(--cinza-2);
+}
+
+/* Estilização das estrelas */
+.estrela {
+    width: 20px;
+    height: 20px; 
+    background: url('../../img/avaliar/estrela_escura.png'); /* Define a estrela padrão */
+    background-size: cover;
+    transition: transform 0.2s; /* Suaviza a animação ao passar o mouse */
+}
+
+/* Efeito ao passar o mouse sobre a estrela */
+.estrela:hover {
+    transform: scale(1.2); /* Aumenta ligeiramente a estrela */
+}
+
+/* Classe que define a estrela como selecionada */
+.selecionada {
+    background: url('../../img/avaliar/estrela_amarela.png'); /* Altera a imagem para a estrela amarela */
+    background-size: cover;
+}
+
+/* == CAMPO DE TEXTO DA AVALIAÇÃO == */
+
+#input_text {
+    width: 1260px; /* Define a largura do campo */
+    height: 100px; /* Altura do campo de texto */
+    font-size: 18px;
+    padding: 5px;
+    resize: none; /* Impede redimensionamento */
+    border: 1px solid var(--roxo);
+    border-radius: 5px; /* Bordas arredondadas */
+    margin-top: 5px;
+}
+
+
+/* == BOTÃO DE ENVIO == */
+
+#enviar {
+    margin-top: 30px;
+    width: 200px; /* Largura do botão */
+    height: 40px; /* Altura do botão */
+    border-radius: 10px; /* Bordas arredondadas */
+    border: none; /* Sem borda */
+    color: var(--cinza-2); /* Cor do texto */
+    background-color: var(--cinza-7); /* Cor de fundo */
+    font-size: 20px; /* Tamanho da fonte */
+    font-weight: bold; /* Texto em negrito */
+}
+
+/* Efeito hover no botão */
+#enviar:hover {
+    background-color: var(--roxo); /* Cor do fundo ao passar o mouse */
+    color: var(--branco); /* Cor do texto ao passar o mouse */
+    transition: 0.2s; /* Transição suave */
+}

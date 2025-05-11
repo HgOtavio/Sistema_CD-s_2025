@@ -21,7 +21,7 @@
 /* === PARTE SUPERIOR DA LISTAGEM DE PRODUTOS === */
 #part_cima_produtos {
     display: flex;           /* Exibe os elementos lado a lado */
-    width: 900px;            /* Largura fixa */
+    width: 70%;            /* Largura fixa */
     justify-content: space-between; /* Distribui os elementos uniformemente */
     z-index: 5;              /* Define sobreposição no layout */
     position: absolute;       /* Posicionamento absoluto em relação ao contêiner pai */

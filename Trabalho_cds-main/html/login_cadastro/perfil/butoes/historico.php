@@ -1,3 +1,31 @@
+<?php
+session_start();
+include "../../../login_cadastro/conexao.php";
+
+// Verifica se o usuário está logado
+if (!isset($_SESSION['id_usuario'])) {
+    echo "Você precisa estar logado para ver o histórico de compras.";
+    exit;
+}
+
+date_default_timezone_set('America/Sao_Paulo'); // Define o fuso horário para o Brasil
+$dataAtual = date('d/m/Y'); // Formato brasileiro: dia/mês/ano
+
+$id_usuario = $_SESSION['id_usuario'];
+
+$sql = "SELECT c.id_compra, c.id_cd, c.quantidade, c.forma_pagamento, c.tipo_pagamento, c.tipo_envio, 
+               c.enderecoEntrega, c.valorTotal, c.cep_entrega, c.estimativa_entrega, c.taxa_entrega, 
+               cd.titulo AS cd_titulo, cd.capa
+        FROM Compra c
+        JOIN CD cd ON c.id_cd = cd.id_cd
+        WHERE c.id_usuario = ? AND c.data_compra >= DATE_SUB(NOW(), INTERVAL 13 DAY)
+        ORDER BY c.data_compra DESC";
+
+$stmt = $conn->prepare($sql);
+$stmt->bind_param("i", $id_usuario);
+$stmt->execute();
+$result = $stmt->get_result();
+?>
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
@@ -116,60 +144,40 @@
     <section id="section">
     <h1 id="titulo">Historico de compras</h1>
     <button class="button" id="voltar"><a href="#" class="link">Voltar</a></button>
+    <?php
+if ($result->num_rows > 0) {
+    while ($row = $result->fetch_assoc()) {
+        echo "<div id='produtos'>";
+        echo "<div class='produto'>";
 
-    <div id="produtos">
-        <div class="produto">
-            <div class="duas primeiro">
-                <h1 class="nome">Nome do Cd</h1>
-                <img src="../../../../img/destaque/capa_de_album_destaque_2.jpg" alt="Imagem do cd" class="img">
-            </div>
-            <div class="duas part1">
-                <p class="sub_titulo">Quantidade: <span class="info_sub">15</span></p>
-                <p class="sub_titulo">Pagamento: <span class="info_sub">Á vista</span></p>
-                <p class="sub_titulo">Envio: <span class="info_sub">Aêreo</span></p>
-            </div>
-            <div class="duas">
-                <p class="sub_titulo">Endereço de Envio: <span class="info_sub">Rua Principal, 123, Apartamento 4, Bairro do Monte, Lisboa, Portugal.</span></p>
-                <p class="sub_titulo">Taxa de Entrega: <span class="info_sub">R$20</span></p>
-                <p class="sub_titulo">Preço Total: <span class="info_sub">R$200</span></p>
-            </div>
-            
-    </div>
-        <div class="produto">
-                <div class="duas primeiro">
-                    <h1 class="nome">Nome do Cd</h1>
-                    <img src="../../../../img/destaque/capa_de_album_destaque_2.jpg" alt="Imagem do cd" class="img">
-                </div>
-                <div class="duas part1">
-                    <p class="sub_titulo">Quantidade: <span class="info_sub">15</span></p>
-                    <p class="sub_titulo">Pagamento: <span class="info_sub">Á vista</span></p>
-                    <p class="sub_titulo">Envio: <span class="info_sub">Aêreo</span></p>
-                </div>
-                <div class="duas">
-                    <p class="sub_titulo">Endereço de Envio: <span class="info_sub">Rua Principal, 123, Apartamento 4, Bairro do Monte, Lisboa, Portugal.</span></p>
-                    <p class="sub_titulo">Taxa de Entrega: <span class="info_sub">R$20</span></p>
-                    <p class="sub_titulo">Preço Total: <span class="info_sub">R$200</span></p>
-                </div>
-                
-        </div>
-        <div class="produto">
-            <div class="duas primeiro">
-                <h1 class="nome">Nome do Cd</h1>
-                <img src="../../../../img/destaque/capa_de_album_destaque_2.jpg" alt="Imagem do cd" class="img">
-            </div>
-            <div class="duas part1">
-                <p class="sub_titulo">Quantidade: <span class="info_sub">15</span></p>
-                <p class="sub_titulo">Pagamento: <span class="info_sub">Á vista</span></p>
-                <p class="sub_titulo">Envio: <span class="info_sub">Aêreo</span></p>
-            </div>
-            <div class="duas">
-                <p class="sub_titulo">Endereço de Envio: <span class="info_sub">Rua Principal, 123, Apartamento 4, Bairro do Monte, Lisboa, Portugal.</span></p>
-                <p class="sub_titulo">Taxa de Entrega: <span class="info_sub">R$20</span></p>
-                <p class="sub_titulo">Preço Total: <span class="info_sub">R$200</span></p>
-            </div>
-            
-    </div>
-    </div>
+        echo "<div class='duas primeiro'>";
+        echo "<h1 class='nome'>{$row['cd_titulo']}</h1>";
+        echo "<img src='../../../../img/{$row['capa']}' alt='Capa' class='img'>";
+        echo "</div>";
+
+        echo "<div class='duas part1'>";
+        echo "<p class='sub_titulo'>Quantidade: <span class='info_sub'>{$row['quantidade']}</span></p>";
+        echo "<p class='sub_titulo'>Forma de pagamento: <span class='info_sub'>{$row['forma_pagamento']}</span></p>";
+        echo "<p class='sub_titulo'>Tipo de envio: <span class='info_sub'>{$row['tipo_envio']}</span></p>";
+        echo "</div>";
+
+        echo "<div class='duas'>";
+        echo "<p class='sub_titulo'>Endereço: <span class='info_sub'>{$row['enderecoEntrega']}</span></p>";
+        echo "<p class='sub_titulo'>Total: <span class='info_sub'>R$ " . number_format($row['valorTotal'], 2, ',', '.') . "</span></p>";
+        echo "<p class='sub_titulo'>Taxa de entrega: <span class='info_sub'>R$ " . number_format($row['taxa_entrega'], 2, ',', '.') . "</span></p>";
+        echo "<p class='sub_titulo'>Previsão de entrega: <span class='info_sub'>" . date('d/m/Y', strtotime($row['estimativa_entrega'])) . "</span></p>";
+        echo "</div>";
+
+        echo "</div>"; // Fecha produto
+        echo "</div>"; // Fecha produtos
+    }
+} else {
+    echo "<p style='text-align:center;'>Você ainda não realizou nenhuma compra.</p>";
+}
+
+$stmt->close();
+?>
+
     </section>
 
     <div id="div_but_prod" ><button class="button" id="but_prod"><a href="#" class="link" id="link_prod">Tela de Produtos</a></button></div>

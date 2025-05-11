@@ -1,67 +1,80 @@
 <?php
-session_start();
 include "../../login_cadastro/conexao.php";
 
-if ($_SERVER["REQUEST_METHOD"] === "POST") {
-    $id_usuario = $_POST["id_usuario"];
-    $nome_completo = $_POST["nome_completo"];
-    $email = $_POST["email"];
-    $cpf = $_POST["cpf"];
-    $telefone = $_POST["telefone"];
-    $login = $_POST["login"];
-    $senha = $_POST["senha"];
-    $confirmar_senha = $_POST["confirmar_senha"];
-    $cep = $_POST["cep"];
-    $estado = $_POST["estado"];
-    $cidade = $_POST["cidade"];
-    $bairro = $_POST["bairro"];
-    $logradouro = $_POST["logradouro"];
-    $numero = $_POST["numero"];
-    $complemento = $_POST["complemento"];
+// 1. Recebe os dados do formulário
+$id_usuario = $_POST['id_usuario'];
+$login = $_POST['login'];
+$email = $_POST['email'];
+$senha = $_POST['senha'];
+$confirmar_senha = $_POST['confirmar_senha'];
+$nome_completo = $_POST['nome_completo'];
+$telefone = $_POST['telefone'];
+$cpf = $_POST['cpf'];
+$cep = $_POST['cep'];
+$estado = $_POST['estado'];
+$cidade = $_POST['cidade'];
+$bairro = $_POST['bairro'];
+$logradouro = $_POST['logradouro'];
+$numero = $_POST['numero'];
+$complemento = $_POST['complemento'];
 
-    // Validação de senha
-    if (!empty($senha)) {
-        if ($senha !== $confirmar_senha) {
-            echo "As senhas não coincidem.";
-            exit();
-        }
-        $senha_hash = password_hash($senha, PASSWORD_DEFAULT);
-    }
+// 2. Verifica se senha e confirmação foram preenchidas e se são iguais
+$senha_sql = "";
+if (!empty($senha) && $senha === $confirmar_senha) {
+    $senha_hash = password_hash($senha, PASSWORD_DEFAULT);
+    $senha_sql = ", senha = '$senha_hash'";
+} elseif (!empty($senha) && $senha !== $confirmar_senha) {
+    echo "As senhas não coincidem.";
+    exit;
+}
 
-    // Verifica se foi enviada uma nova foto
-    if (isset($_FILES['foto_perfil']) && $_FILES['foto_perfil']['error'] === UPLOAD_ERR_OK) {
-        $foto_nome = $_FILES['foto_perfil']['name'];
-        $foto_tmp = $_FILES['foto_perfil']['tmp_name'];
+// 3. Processamento da imagem, se enviada
+$foto_perfil_sql = "";
+if (isset($_FILES['foto_perfil']) && $_FILES['foto_perfil']['error'] === UPLOAD_ERR_OK) {
+    $extensao = pathinfo($_FILES['foto_perfil']['name'], PATHINFO_EXTENSION);
+    $nome_arquivo = $login . '.' . $extensao;
 
-        $caminho_destino = "uploads/" . uniqid() . "_" . basename($foto_nome);
-        move_uploaded_file($foto_tmp, $caminho_destino);
-    } else {
-        // Se não houver nova foto, mantemos a antiga
-        $stmt = $conn->prepare("SELECT foto_perfil FROM Usuario WHERE id_usuario = ?");
-        $stmt->bind_param("i", $id_usuario);
-        $stmt->execute();
-        $result = $stmt->get_result();
-        $usuario = $result->fetch_assoc();
-        $caminho_destino = $usuario['foto_perfil'];
-        $stmt->close();
-    }
+    // Caminho físico onde a imagem será salva
+    $pasta_destino = "../../../img/php_cliente/uploads/";
+    $caminho_completo = $pasta_destino . $nome_arquivo;
 
-    // Atualização no banco
-    if (!empty($senha)) {
-        $stmt = $conn->prepare("UPDATE Usuario SET nome_completo=?, email=?, cpf=?, telefone=?, login=?, senha=?, cep=?, estado=?, cidade=?, bairro=?, logradouro=?, numero=?, complemento=?, foto_perfil=? WHERE id_usuario=?");
-        $stmt->bind_param("sssssssssssssssi", $nome_completo, $email, $cpf, $telefone, $login, $senha_hash, $cep, $estado, $cidade, $bairro, $logradouro, $numero, $complemento, $caminho_destino, $id_usuario);
-    } else {
-        $stmt = $conn->prepare("UPDATE Usuario SET nome_completo=?, email=?, cpf=?, telefone=?, login=?, cep=?, estado=?, cidade=?, bairro=?, logradouro=?, numero=?, complemento=?, foto_perfil=? WHERE id_usuario=?");
-        $stmt->bind_param("sssssssssssssi", $nome_completo, $email, $cpf, $telefone, $login, $cep, $estado, $cidade, $bairro, $logradouro, $numero, $complemento, $caminho_destino, $id_usuario);
-    }
+    // Caminho que será salvo no banco
+    $caminho_banco = "../uploads/" . $nome_arquivo;
 
-    if ($stmt->execute()) {
-        header("Location: alterar_dados.php?msg=sucesso");
-    } else {
-        echo "Erro ao atualizar: " . $stmt->error;
-    }
+    // Move o arquivo
+    move_uploaded_file($_FILES['foto_perfil']['tmp_name'], $caminho_completo);
 
-    $stmt->close();
-    $conn->close();
+    $foto_perfil_sql = ", foto_perfil = '$caminho_banco'";
+}
+
+// 4. Atualiza os dados no banco
+$sql = "UPDATE Usuario SET 
+            login = ?, 
+            email = ?, 
+            nome_completo = ?, 
+            telefone = ?, 
+            cpf = ?, 
+            cep = ?, 
+            estado = ?, 
+            cidade = ?, 
+            bairro = ?, 
+            logradouro = ?, 
+            numero = ?, 
+            complemento = ?
+            $senha_sql
+            $foto_perfil_sql
+        WHERE id_usuario = ?";
+
+$stmt = $conn->prepare($sql);
+$stmt->bind_param("ssssssssssssi", 
+    $login, $email, $nome_completo, $telefone, $cpf, 
+    $cep, $estado, $cidade, $bairro, $logradouro, 
+    $numero, $complemento, $id_usuario);
+
+if ($stmt->execute()) {
+    header("Location: adm.php?editado=1");
+    exit;
+} else {
+    echo "Erro ao atualizar: " . $conn->error;
 }
 ?>

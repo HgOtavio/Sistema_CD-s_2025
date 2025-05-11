@@ -4,7 +4,7 @@ include "../../login_cadastro/conexao.php";
 
 // Verifica se o usuário está logado e é do tipo administrador
 if (!isset($_SESSION["id_usuario"]) || $_SESSION["tipo"] != "admin") {
-    header("Location: ../php/login.php");
+    header("Location: ../../login_cadastro/login.php");
     exit();
 }
 
@@ -25,13 +25,12 @@ if ($stmt = $conn->prepare($sql)) {
 
 // Lógica para buscar em dois diretórios
 $foto = $usuario['foto_perfil'];
-$foto_cliente = "../php_cliente/uploads/" . basename($foto);
-$foto_admin = "php_cliente/uploads/" . basename($foto);
+$foto_cliente = "../../../img/php_cliente/uploads/" . basename($foto);
 
 if (!empty($foto) && file_exists($foto_cliente)) {
     $foto_perfil = $foto_cliente;
-} elseif (!empty($foto) && file_exists($foto_admin)) {
-    $foto_perfil = $foto_admin;
+} elseif (!empty($foto) && file_exists($foto_cliente)) {
+    $foto_perfil = $foto_cliente;
 } else {
     $foto_perfil = "../php_cliente/uploads/default.png";
 }
@@ -162,7 +161,7 @@ if (!empty($foto) && file_exists($foto_cliente)) {
                 <h2 class="dados"><?= htmlspecialchars($usuario['nome_completo']) ?></h2>
                 <h2 class="dados"><?= htmlspecialchars($usuario['email']) ?></h2>
                 <h2 class="dados"><?= htmlspecialchars(string: $usuario['cep']) ?></h2>
-                <button id="button"><a href="#" id="a_buton_principal">Alterar Dados</a></button>
+                <button id="button"><a href="alterar_dados.php" id="a_buton_principal">Alterar Dados</a></button>
             </div>
         </div>
 
@@ -171,11 +170,11 @@ if (!empty($foto) && file_exists($foto_cliente)) {
         
         <div id="direita">
             <div id="butoes">
-                <button class="butoes"><a href="#" class="a_butoes">Usuarios</a></button>
-                <button class="butoes"><a href="#" class="a_butoes">CDs</a></button>
-                <button class="butoes"><a href="#" class="a_butoes">Artistas</a></button>
-                <button class="butoes"><a href="#" class="a_butoes">Músicas</a></button>
-                <button class="butoes"><a href="#" class="a_butoes">Atividades</a></button>
+                <button class="butoes"><a href="adm/gerenciar/gerenciar_user.php" class="a_butoes">Usuarios</a></button>
+                <button class="butoes"><a href="adm/gerenciar/gerenciar_cds.php" class="a_butoes">CDs</a></button>
+                <button class="butoes"><a href="adm/gerenciar/gerenciar_artistas.php" class="a_butoes">Artistas</a></button>
+                <button class="butoes"><a href="adm/gerenciar/gerenciar_musicas.php" class="a_butoes">Músicas</a></button>
+                <button class="butoes"><a href="adm/gerenciar/gerenciar_user.php" class="a_butoes">Atividades</a></button>
                 <button class="butoes"><a href="#" class="a_butoes">Sair</a></button>
             </div>
             <div id="cortar">

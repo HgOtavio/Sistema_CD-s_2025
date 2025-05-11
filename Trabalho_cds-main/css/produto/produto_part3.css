@@ -1,0 +1,46 @@
+:root{
+    --cinza-1: #303030;
+    --cinza-2: #5d5d5d;
+    --cinza-3: #6d6d6d;
+    --cinza-4: #7b7a7a;
+    --cinza-5: #888888;
+    --cinza-6: #949494;
+    --cinza-7: #abaaaa;
+    --branco: #ffffff;
+    --roxo: #7445cc;
+}
+
+#avaliacoes{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.aval{
+    margin-top: 15px;
+    margin-bottom: 20px;
+    padding: 20px;
+    border: 1px solid var(--roxo);
+    background: var(--branco);
+    border-radius: 5px;
+    width: 900px;
+    display: flex;
+}
+
+
+#img_estrelas_2{
+    margin-top: -30px;
+    margin-left: -10px;
+}
+
+#p_aval{
+    color: var(--cinza-2);
+    margin-top: 10px;
+    text-align: justify;
+}
+
+#titulo_aval{
+    font-size: 5vw; /* Define o tamanho da fonte */
+    margin-bottom: 20px; /* Espaçamento inferior */
+    color: var(--roxo);
+}

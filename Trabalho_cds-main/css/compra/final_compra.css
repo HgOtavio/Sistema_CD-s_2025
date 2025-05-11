@@ -1,0 +1,167 @@
+/* Reset de estilo para todos os elementos da página */
+*{
+    padding: 0px; /* Remove o preenchimento de todos os elementos */
+    margin: 0px; /* Remove a margem de todos os elementos */
+    font-family: Arial, Helvetica, sans-serif; /* Define a fonte padrão */
+}
+
+:root{
+    --cinza-1: #303030;
+    --cinza-2: #5d5d5d;
+    --cinza-3: #6d6d6d;
+    --cinza-4: #7b7a7a;
+    --cinza-5: #888888;
+    --cinza-6: #949494;
+    --cinza-7: #abaaaa;
+    --branco: #ffffff;
+    --roxo: #7445cc;
+}
+
+main{
+    display: flex; /* Define o uso do flexbox */
+    justify-content: center; /* Centraliza o conteúdo dentro do main */
+}
+
+/* Estilo da seção de cadastro */
+#compra{
+    background-color: rgb(247, 247, 247); /* Cor de fundo */
+    border-radius: 10px; /* Borda arredondada */
+    box-shadow: 10px 10px 15px rgba(0, 0, 0, 0.3); /* Sombra para dar profundidade */
+    width: 900px; /* Largura do formulário */
+    height: auto; /* Altura do formulário */
+    margin-top: 40px; /* Espaço acima do formulário */
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 90%; /* Permite que o formulário ocupe um espaço flexível */
+    max-width: 900px;
+    margin-bottom: 50px;
+}
+
+/* Estilo do título principal */
+#titulo{
+    color: var(--roxo); /* Cor do título */
+    margin-top: 10px; /* Margem à esquerda */
+    font-size: 6vw; /* Se adapta ao tamanho da tela */
+    text-align: center;
+}
+
+#conteudo{
+    display: flex;
+    gap: 0px;
+    align-items: center;
+    flex-direction: column;
+}
+
+.info{
+    font-size: 20px;
+    color: var(--cinza-2);
+    text-align: justify;
+    margin: 0px auto;
+    padding: 10px 200px;
+}
+
+#button{
+    width: 150px; /* Para evitar cortes laterais */
+    height: 40px; /* Altura do botão */
+    border-radius: 10px; /* Bordas arredondadas */
+    border: none; /* Sem borda */
+    margin: 10px; /* Margem do botão */
+    color: var(--branco); /* Cor do texto */
+    background-color: var(--cinza-1); /* Cor de fundo */
+    font-size: 30px; /* Tamanho da fonte */
+    font-weight: bold; /* Texto em negrito */
+}
+
+/* Estilo do botão ao passar o mouse */
+#button:hover{
+    background-color: var(--cinza-7); /* Cor do fundo ao passar o mouse */
+    color: var(--cinza-2); /* Cor do texto ao passar o mouse */
+    transition: 0.2s; /* Transição suave */
+}
+
+/* == Estilo das imagens laterais == */
+
+/* Esconde as imagens com IDs específicos */
+#sumir_d, #sumir_e{
+    display: none; /* Não exibe as imagens */
+}
+
+/* Estilo das imagens à direita */
+#imgs_direita {
+    display: flex; /* Flexbox para alinhar as imagens */
+    align-items: flex-end; /* Alinha as imagens ao fundo */
+    flex-direction: column; /* Organiza as imagens em coluna */
+    position: fixed; /* Posiciona as imagens sobre o conteúdo */
+    bottom: 0; /* Alinha ao fundo da tela */
+    right: 0; /* Alinha à direita */
+    z-index: -1; /* Coloca atrás de outros elementos */
+    width: 100%; /* Largura total */
+    height: 100%; /* Altura total */
+}
+
+/* Estilo das imagens à esquerda */
+#imgs_esquerda{
+    display: flex; /* Flexbox para alinhar as imagens */
+    flex-direction: column; /* Organiza as imagens em coluna */
+    position: fixed; /* Posiciona as imagens sobre o conteúdo */
+    bottom: 0; /* Alinha ao fundo da tela */
+    left: 0; /* Alinha à esquerda */
+    z-index: -1; /* Coloca atrás de outros elementos */
+    width: 100%; /* Largura total */
+    height: 100%; /* Altura total */
+}
+
+/* Estilo das imagens à direita */
+.img_direita {
+    width: 300px; /* Largura das imagens */
+    margin-right: -200px; /* Ajuste de margem para o posicionamento */
+}
+
+/* Ajuste na margem das imagens, exceto a primeira */
+.img_direita:not(:first-child) {
+    margin-top: -5px; /* Margem superior para não sobrepor */
+}
+
+/* Estilo das imagens à esquerda (invertidas) */
+.img_esquerda{
+    width: 300px; /* Largura das imagens */
+    margin-left: -200px; /* Ajuste de margem para o posicionamento */
+    transform: scaleX(-1); /* Inverte horizontalmente as imagens */
+}
+
+.img_esquerda:not(:first-child) {
+    margin-top: -5px; /* Margem superior para não sobrepor */
+}
+
+.img_direita, .img_esquerda {
+    max-width: 300px; /* Mantém as imagens menores em telas pequenas */
+    opacity: 0.5; /* Reduz a opacidade para não sobrecarregar o layout */
+}
+
+
+@media only screen and (max-width:  768px){
+    #compra{
+        width: 450px; /* Ajuste de largura para telas menores */
+        height: auto;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        margin-bottom: 20px;
+    }
+
+    .img_direita {
+        width: 200%;
+        height: 100%;
+        object-fit: cover;
+    }
+
+    .cortar{
+        width: 150px;
+        overflow: hidden; /* Esconde parte da imagem fora da área */
+    }
+
+    #sumir_d, #sumir_e{
+        display: block; /* Exibe as imagens */
+    }
+}

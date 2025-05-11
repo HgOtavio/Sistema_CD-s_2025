@@ -60,11 +60,6 @@
                         
                         <!-- Campos de entrada para usuário, e-mail, senha e confirmação de senha -->
                           
-        Tipo de Usuário:
-        <select name="tipo" class="input" required>
-            <option value="cliente">Cliente</option>
-            <option value="admin">Administrador</option>
-        </select><br>
                         <input type="text" placeholder="Usuario" class="input" name="login" required>
                         <input type="email" placeholder="E-mail" class="input"  name="email" required>
                         <input type="text" placeholder="Senha" maxlength="20" class="input" name="senha" required>

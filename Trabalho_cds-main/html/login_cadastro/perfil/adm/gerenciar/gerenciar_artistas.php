@@ -10,6 +10,31 @@ if (!isset($_SESSION["id_usuario"]) || $_SESSION["tipo"] != "admin") {
 
 // Obtém o id do usuário logado
 $id_usuario = $_SESSION['id_usuario'];
+// Busca dados do usuário logado
+$sql_usuario_logado = "SELECT login, foto_perfil FROM Usuario WHERE id_usuario = ?";
+$stmt = $conn->prepare($sql_usuario_logado);
+$stmt->bind_param("i", $id_usuario);
+$stmt->execute();
+$result_usuario_logado = $stmt->get_result();
+$usuario_logado = $result_usuario_logado->fetch_assoc();
+
+// Se não encontrar usuário, redireciona (por segurança)
+if (!$usuario_logado) {
+    header("Location: ../php/login.php");
+    exit();
+}
+
+// Guarda login e foto
+$login_usuario_logado = $usuario_logado['login'];
+$foto_perfil_usuario = $usuario_logado['foto_perfil'];
+
+// Define caminho correto da foto
+$caminho_foto = "../../../../../img/php_cliente/uploads/" . basename($foto_perfil_usuario);
+if (!empty($foto_perfil_usuario) && file_exists($caminho_foto)) {
+    $foto_exibir = $caminho_foto;
+} else {
+    $foto_exibir = "../php_cliente/uploads/default.png"; // Foto padrão
+}
 
 
 if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['artistas_selecionados'])) {
@@ -132,7 +157,7 @@ $result = $stmt->get_result();
             
 
             <div id="login_carrinho"> <!-- Conta e Carrinho -->
-                    <a href="#"><img src="../../../../../img/cabeçario/icone_perfil.png" alt="Perfil" id="Perfil"></a><!-- Imagem de perfil -->
+                    <a href="../../adm.php"><img src="<?php echo $foto_exibir; ?>" alt="Perfil" id="Perfil"></a><!-- Imagem de perfil -->
 
                 <a href="#"><img src="../../../../../img/cabeçario/icone_carrinho.png" alt="Carrinho" id="Carrinho"></a><!-- Ícone de carrinho -->
             </div>
@@ -145,27 +170,64 @@ $result = $stmt->get_result();
 
     <button id="btn_filtro">Filtros</button>
     <form method="get" action="gerenciar_artistas.php">
-            <section id="filtro">
-                 <div id="separar">
-                     <div class="lado">
-                        <p class="p_filtro">
-                            Nome:<input type="text" class="input_filtro" name="filtro_nome" value="<?= htmlspecialchars($_GET['filtro_nome'] ?? '') ?>">
-                        </p>
+    <section id="filtro">
+        <div id="separar">
+            <div class="lado">
+                <p class="p_filtro">
+                    Nome:
+                    <input type="text" class="input_filtro" name="filtro_nome" list="sugestoesArtistas" value="<?= htmlspecialchars($_GET['filtro_nome'] ?? '') ?>">
+                    <datalist id="sugestoesArtistas">
+                        <?php
+                        // Consulta para pegar os nomes dos artistas
+                        $artistas = $conn->query("SELECT DISTINCT nomeArtista FROM Artista ORDER BY nomeArtista ASC");
+                        while ($a = $artistas->fetch_assoc()) {
+                            echo "<option value='" . htmlspecialchars($a['nomeArtista']) . "'>";
+                        }
+                        ?>
+                    </datalist>
+                </p>
 
-                        <p class="p_filtro">
-                            Nascimento:<input type="text" class="input_filtro data" name="filtro_nascimento" value="<?= htmlspecialchars($_GET['filtro_nascimento'] ?? '') ?>">
-                        </p>
-                    </div>
-                        <p class="p_filtro">
-                            CDs Associados:<input type="text" class="input_filtro" name="filtro_cds" value="<?= htmlspecialchars($_GET['filtro_cds'] ?? '') ?>">
-                        </p>
-                </div>
+                <p class="p_filtro">
+                    Nascimento:
+                    <input type="text" class="input_filtro data" name="filtro_nascimento" list="sugestoesNascimento" value="<?= htmlspecialchars($_GET['filtro_nascimento'] ?? '') ?>">
+                    <datalist id="sugestoesNascimento">
+                        <?php
+                        // Consulta para pegar as datas de nascimento dos artistas
+                        $nascimentos = $conn->query("SELECT DISTINCT dataNascimento FROM Artista ORDER BY dataNascimento ASC");
+                        while ($n = $nascimentos->fetch_assoc()) {
+                            // Formata a data para o formato DD/MM/YYYY
+                            $dataFormatada = date("d/m/Y", strtotime($n['dataNascimento']));
+                            echo "<option value='" . htmlspecialchars($dataFormatada) . "'>";
+                        }
+                        ?>
+                    </datalist>
+                </p>
+            </div>
+
+            <p class="p_filtro">
+                CDs Associados:
+                <input type="text" class="input_filtro" name="filtro_cds" list="sugestoesCDs" value="<?= htmlspecialchars($_GET['filtro_cds'] ?? '') ?>">
+                <datalist id="sugestoesCDs">
+                    <?php
+                    // Consulta para pegar os títulos dos CDs
+                    $cds = $conn->query("SELECT DISTINCT titulo FROM CD ORDER BY titulo ASC");
+                    while ($cd = $cds->fetch_assoc()) {
+                        echo "<option value='" . htmlspecialchars($cd['titulo']) . "'>";
+                    }
+                    ?>
+                </datalist>
+            </p>
+        </div>
+
         <div>
             <button type="submit" id="button_filtro">Procurar</button>
             <a href="gerenciar_artistas.php"><button type="button" id="button_filtro">Todos</button></a>
         </div>
-</section>
+    </section>
 </form>
+
+
+
 
 
     <button class="button_voltar"><a href="../adicionar/add_artista.php" class="link_voltar">Adicionar Artistas</a></button>

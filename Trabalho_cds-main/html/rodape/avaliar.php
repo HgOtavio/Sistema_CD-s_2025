@@ -1,3 +1,20 @@
+<?php
+session_start();
+include "../login_cadastro/conexao.php";
+
+// Verifica se está logado
+if (!isset($_SESSION['id_usuario'])) {
+    echo "Você precisa estar logado para avaliar.";
+    exit;
+}
+
+// Verifica se é avaliação de CD ou do sistema
+$id_cd = $_GET['id_cd'] ?? null;
+$avaliando_cd = $id_cd !== null;
+
+// Título dinâmico
+$titulo = $avaliando_cd ? "Avaliar este CD" : "Avaliar o sistema";
+?>
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
@@ -36,29 +53,34 @@
     <main>
         <section id="conteudo">
             <!-- Título principal da página -->
-            <h1 id="titulo">Avaliar</h1>
+            <h1 id="titulo"><?= $titulo ?></h1>
+            <form action="salvar_avaliacao.php" method="POST">
+
 
             <!-- Seção para avaliação com estrelas -->
             <div id="avaliar_estrelas">
                 <p id="avaliar_estrelas_titulo">Sua Avaliação</p>
                 <div id="linha_de_estrelas">
-                    <!-- Cada div representa uma estrela interativa -->
-                    <div class="estrela" data-valor="1"></div>
-                    <div class="estrela" data-valor="2"></div>
-                    <div class="estrela" data-valor="3"></div>
-                    <div class="estrela" data-valor="4"></div>
-                    <div class="estrela" data-valor="5"></div>
-                </div>
+                <select name="nota" required>
+                        <option value="">Escolha</option>
+                        <option value="1">1 ★</option>
+                        <option value="2">2 ★</option>
+                        <option value="3">3 ★</option>
+                        <option value="4">4 ★</option>
+                        <option value="5">5 ★</option>
+              </select>
             </div>
 
             <!-- Campo para o usuário escrever um comentário sobre o site -->
             <div id="text_avalicao">
                 <p id="text_avalicao_titulo">Sua avaliação sobre o site</p>
-                <textarea rows="4" cols="50" placeholder="Digite seu texto aqui..." id="input_text"></textarea>
+                <textarea rows="4" cols="50" placeholder="Digite seu texto aqui..." id="input_text" name="comentario"  ></textarea>
             </div>
 
             <!-- Botão de envio da avaliação -->
-            <button id="enviar">Enviar</button>
+            <button id="enviar" type="submit">Enviar</button>
+            </form>
+ 
         </section>
     </main>
 

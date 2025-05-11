@@ -8,6 +8,9 @@ if (!isset($_SESSION["id_usuario"]) || $_SESSION["tipo"] != "admin") {
     exit();
 }
 
+// Obtém o id do usuário logado
+$id_usuario = $_SESSION['id_usuario'];
+
 // Obtém os filtros da URL (caso existam)
 $filtro_titulo = isset($_GET['titulo']) ? $_GET['titulo'] : '';
 $filtro_genero = isset($_GET['genero']) ? $_GET['genero'] : '';
@@ -19,8 +22,7 @@ $filtro_preco_max = isset($_GET['preco_max']) ? $_GET['preco_max'] : '';
 $filtro_artista = isset($_GET['artista']) ? $_GET['artista'] : '';
 $filtro_musica = isset($_GET['musica']) ? $_GET['musica'] : '';
 
-
-// Consultas para obter as opções de filtro disponíveis
+// Consultas para opções de filtro
 $sql_titulos = "SELECT DISTINCT titulo FROM CD";
 $result_titulos = $conn->query($sql_titulos);
 
@@ -36,21 +38,40 @@ $result_musicas = $conn->query($sql_musicas);
 $sql_anos = "SELECT DISTINCT anoLancamento FROM CD";
 $result_anos = $conn->query($sql_anos);
 
-$sql_disponibilidades = "SELECT DISTINCT disponibilidade FROM CD";  // Alterado de "durabilidade" para "disponibilidade"
+$sql_disponibilidades = "SELECT DISTINCT disponibilidade FROM CD";
 $result_disponibilidades = $conn->query($sql_disponibilidades);
 
 $sql_preco_max = "SELECT DISTINCT preco FROM CD";
 $result_preco_max = $conn->query($sql_preco_max);
 
+// Busca dados do usuário logado
+$sql_usuario_logado = "SELECT login, foto_perfil FROM Usuario WHERE id_usuario = ?";
+$stmt = $conn->prepare($sql_usuario_logado);
+$stmt->bind_param("i", $id_usuario);
+$stmt->execute();
+$result_usuario_logado = $stmt->get_result();
+$usuario_logado = $result_usuario_logado->fetch_assoc();
 
-// Consulta CDs com base nos filtros
-$sql_cd = "SELECT DISTINCT CD.id_cd, CD.titulo, CD.capa, CD.disponibilidade, CD.preco, CD.destaque, CD.anoLancamento, CD.genero, CD.descricao AS descricao_cd, CD.numero_vendas 
+if (!$usuario_logado) {
+    header("Location: ../php/login.php");
+    exit();
+}
+
+$login_usuario_logado = $usuario_logado['login'];
+$foto_perfil_usuario = $usuario_logado['foto_perfil'];
+
+// Define caminho da foto
+$caminho_foto = "../../../../../img/php_cliente/uploads/" . basename($foto_perfil_usuario);
+$foto_exibir = (!empty($foto_perfil_usuario) && file_exists($caminho_foto)) 
+    ? $caminho_foto 
+    : "../php_cliente/uploads/default.png";
+
+// Consulta principal sem JOINs
+$sql_cd = "SELECT CD.id_cd, CD.titulo, CD.capa, CD.disponibilidade, CD.preco, CD.destaque, CD.anoLancamento, CD.genero, CD.descricao AS descricao_cd, CD.numero_vendas 
            FROM CD
-           LEFT JOIN CD_Artista ON CD.id_cd = CD_Artista.id_cd
-           LEFT JOIN Artista ON CD_Artista.id_artista = Artista.id_artista
-           LEFT JOIN CD_Musica ON CD.id_cd = CD_Musica.id_cd
-           LEFT JOIN Musica ON CD_Musica.id_musica = Musica.id_musica
            WHERE 1=1";
+
+// Filtros aplicados à consulta
 if (!empty($filtro_titulo)) {
     $sql_cd .= " AND titulo LIKE '%$filtro_titulo%'";
 }
@@ -66,28 +87,30 @@ if (!empty($filtro_ano)) {
 if (!empty($filtro_disponibilidade)) {
     $sql_cd .= " AND disponibilidade LIKE '%$filtro_disponibilidade%'";
 }
-// Filtragem por destaque
+
 if (!empty($filtro_destaque)) {
     if ($filtro_destaque == 'Destaque') {
-        // Filtro para destacar CDs com destaque
         $sql_cd .= " AND destaque = 'Destaque'";
     } elseif ($filtro_destaque == 'Não Destaque') {
-        // Filtro para CDs sem destaque
         $sql_cd .= " AND (destaque IS NULL OR destaque != 'Destaque')";
     }
 }
-// Novo filtro por artista
+
 if (!empty($filtro_artista)) {
-    $sql_cd .= " AND Artista.nomeArtista LIKE '%$filtro_artista%'";
+    $sql_cd .= " AND id_cd IN (
+        SELECT id_cd FROM CD_Artista 
+        JOIN Artista ON CD_Artista.id_artista = Artista.id_artista 
+        WHERE nomeArtista LIKE '%$filtro_artista%'
+    )";
 }
 
-// Novo filtro por música
 if (!empty($filtro_musica)) {
-    $sql_cd .= " AND Musica.nomeMusica LIKE '%$filtro_musica%'";
+    $sql_cd .= " AND id_cd IN (
+        SELECT id_cd FROM CD_Musica 
+        JOIN Musica ON CD_Musica.id_musica = Musica.id_musica 
+        WHERE nomeMusica LIKE '%$filtro_musica%'
+    )";
 }
-
-
-
 
 if (!empty($filtro_preco_min)) {
     $sql_cd .= " AND preco >= $filtro_preco_min";
@@ -97,7 +120,9 @@ if (!empty($filtro_preco_max)) {
     $sql_cd .= " AND preco <= $filtro_preco_max";
 }
 
+// Executa a consulta final
 $result_cd = $conn->query($sql_cd);
+
 ?>
 
 <!DOCTYPE html>
@@ -131,7 +156,7 @@ $result_cd = $conn->query($sql_cd);
             
 
             <div id="login_carrinho"> <!-- Conta e Carrinho -->
-                    <a href="#"><img src="../../../../../img/cabeçario/icone_perfil.png" alt="Perfil" id="Perfil"></a><!-- Imagem de perfil -->
+                    <a href="../../adm.php"><img src="<?php echo $foto_exibir; ?>" alt="Perfil" id="Perfil"></a><!-- Imagem de perfil -->
 
                 <a href="#"><img src="../../../../../img/cabeçario/icone_carrinho.png" alt="Carrinho" id="Carrinho"></a><!-- Ícone de carrinho -->
             </div>
@@ -287,87 +312,94 @@ $result_cd = $conn->query($sql_cd);
                 </tr>
             </thead>
             <tbody>
-            <?php
-            if ($result_cd->num_rows > 0) {
-                while ($cd = $result_cd->fetch_assoc()) {
-                    $id_cd = $cd['id_cd'];
+           <?php
+if ($result_cd->num_rows > 0) {
+    while ($cd = $result_cd->fetch_assoc()) {
+        $id_cd = $cd['id_cd'];
 
-                    // Buscar os artistas associados ao CD
-                    $sql_artistas = "SELECT Artista.nomeArtista FROM CD_Artista 
-                                     JOIN Artista ON CD_Artista.id_artista = Artista.id_artista 
-                                     WHERE CD_Artista.id_cd = $id_cd";
-                    $result_artistas = $conn->query($sql_artistas);
+        // Buscar artistas
+        $sql_artistas = "SELECT A.nomeArtista FROM CD_Artista CA
+                         JOIN Artista A ON CA.id_artista = A.id_artista
+                         WHERE CA.id_cd = ?";
+        $stmt_artistas = $conn->prepare($sql_artistas);
+        $stmt_artistas->bind_param("i", $id_cd);
+        $stmt_artistas->execute();
+        $result_artistas = $stmt_artistas->get_result();
 
-                    $artistas = [];
-                    while ($artista = $result_artistas->fetch_assoc()) {
-                        $artistas[] = $artista['nomeArtista'];
-                    }
-                    $artistas_list = !empty($artistas) ? implode(", ", $artistas) : "Nenhum artista associado";
+        $artistas = [];
+        while ($artista = $result_artistas->fetch_assoc()) {
+            $artistas[] = $artista['nomeArtista'];
+        }
+        $artistas_list = !empty($artistas) ? implode(", ", $artistas) : "Nenhum artista associado";
 
-                    // Buscar as músicas associadas ao CD
-                    $sql_musicas = "SELECT Musica.nomeMusica FROM CD_Musica 
-                                    JOIN Musica ON CD_Musica.id_musica = Musica.id_musica 
-                                    WHERE CD_Musica.id_cd = $id_cd";
-                    $result_musicas = $conn->query($sql_musicas);
+        // Buscar músicas
+        $sql_musicas = "SELECT M.nomeMusica FROM CD_Musica CM
+                        JOIN Musica M ON CM.id_musica = M.id_musica
+                        WHERE CM.id_cd = ?";
+        $stmt_musicas = $conn->prepare($sql_musicas);
+        $stmt_musicas->bind_param("i", $id_cd);
+        $stmt_musicas->execute();
+        $result_musicas = $stmt_musicas->get_result();
 
-                    $musicas = [];
-                    while ($musica = $result_musicas->fetch_assoc()) {
-                        $musicas[] = $musica['nomeMusica'];
-                    }
-                    $musicas_list = !empty($musicas) ? implode(", ", $musicas) : "Nenhuma música associada";
+        $musicas = [];
+        while ($musica = $result_musicas->fetch_assoc()) {
+            $musicas[] = $musica['nomeMusica'];
+        }
+        $musicas_list = !empty($musicas) ? implode(", ", $musicas) : "Nenhuma música associada";
 
-                    // Buscar o desconto aplicado
-                    $sql_promocao = "SELECT desconto FROM Promocao WHERE id_cd = $id_cd";
-                    $result_promocao = $conn->query($sql_promocao);
-                    $desconto = ($result_promocao->num_rows > 0) ? $result_promocao->fetch_assoc()['desconto'] : 0;
+        // Buscar desconto
+        $sql_promocao = "SELECT desconto FROM Promocao WHERE id_cd = ?";
+        $stmt_promocao = $conn->prepare($sql_promocao);
+        $stmt_promocao->bind_param("i", $id_cd);
+        $stmt_promocao->execute();
+        $result_promocao = $stmt_promocao->get_result();
+        $desconto = ($result_promocao->num_rows > 0) ? $result_promocao->fetch_assoc()['desconto'] : 0;
 
-                    // Calcular o preço com desconto
-                    $preco_original = $cd['preco'];
-                    $preco_desconto = $preco_original - ($preco_original * ($desconto / 100));
+        // Cálculo do preço com desconto
+        $preco_original = $cd['preco'];
+        $preco_desconto = $preco_original - ($preco_original * ($desconto / 100));
+        $preco_desconto = number_format($preco_desconto, 2, ',', '.');
+        $preco_original = number_format($preco_original, 2, ',', '.');
 
-                    echo "<tr class='informações' >
-                            <th class='info' >{$cd['id_cd']}</th>
-                            <th class='info' >{$cd['titulo']}</th>
-                            <th class='info' ><img src='../../../../../img/{$cd['capa']}' alt='Capa do CD'></th>
-                            <th class='info' >{$cd['disponibilidade']}</th>
-                            <th class='info' >R$ {$preco_original}</th>
-                          <th class='info' >";
-                    
-                    // Imagem de destaque
-                    if ($cd['destaque'] == 'Destaque') {
-                        echo "<img src='../imagens/destaque.png' alt='Destaque'>";
-                    } else {
-                        echo "<img src='../imagens/nao_destaque.png' alt='Não Destaque'>";
-                    }
+        echo "<tr class='informações'>
+                <th class='info'>{$cd['id_cd']}</th>
+                <th class='info'>{$cd['titulo']}</th>
+                <th class='info'><img src='../../../../../img/{$cd['capa']}' alt='Capa do CD' class='capa'></th>
+                <th class='info'>{$cd['disponibilidade']}</th>
+                <th class='info'>R$ {$preco_original}</th>
+                <th class='info'>";
+        
+        echo ($cd['destaque'] === 'Destaque')
+            ? "<img src='../../../../../img/gerenciar/cd/icone_destaque.png' alt='Destaque' class='destaque'>"
+            : "<img src='../../../../../img/gerenciar/cd/icone_destaque2.png' alt='Não Destaque' class='destaque'>";
 
-                    echo "</th>
-                            <th class='info' >{$cd['anoLancamento']}</th>
-                            <th class='info' >{$cd['genero']}</th>
-                            <th class='info' >{$cd['descricao_cd']}</th>
-                            <th class='info' >{$artistas_list}</th>
-                            <th class='info' >{$musicas_list}</th>
-                            <th class='info' >
-                                <form action='promocao_cd.php' method='POST'>
-                                    <input type='hidden' name='id_cd' value='{$cd['id_cd']}'>
-                                    <input type='number' name='desconto' value='{$desconto}' min='0' max='100'>%
-                                    <button type='submit'>Aplicar Desconto</button>
-                                </form>
-                            </th>
-                            <th class='info' >R$ {$preco_desconto}</th>
-                            <th class='info' >{$cd['numero_vendas']}</th>
-                            <th class='info' >
-                                <a href='../editar/editar_cds.php?id_cd={$cd['id_cd']}' class='link_acao'>Editar</a> <br>
-                                <input type='checkbox' name='cd_selecionadas[]' value='{$cd['id_cd']}' class='input' id='cd_{$cd['id_cd']}' /> 
-                                <label for='cd_{$cd['id_cd']}'></label>
+        echo "</th>
+              <th class='info'>{$cd['anoLancamento']}</th>
+              <th class='info'>{$cd['genero']}</th>
+              <th class='info'>{$cd['descricao_cd']}</th>
+              <th class='info'>{$artistas_list}</th>
+              <th class='info'>{$musicas_list}</th>
+              <th class='info'>
+                  <form action='promocao_cd.php' method='POST'>
+                      <input type='hidden' name='id_cd' value='{$cd['id_cd']}'>
+                      <input type='number' name='desconto' value='{$desconto}' min='0' max='100'>%
+                      <button type='submit'>Aplicar Desconto</button>
+                  </form>
+              </th>
+              <th class='info'>R$ {$preco_desconto}</th>
+              <th class='info'>{$cd['numero_vendas']}</th>
+              <th class='info'>
+                  <a href='../editar/editar_cds.php?id_cd={$cd['id_cd']}' class='link_acao'>Editar</a><br>
+                  <input type='checkbox' name='cd_selecionadas[]' value='{$cd['id_cd']}' class='input' id='cd_{$cd['id_cd']}'>
+                  <label for='cd_{$cd['id_cd']}'></label>
+              </th>
+            </tr>";
+    }
+} else {
+    echo "<tr><th colspan='15'>Nenhum CD encontrado.</th></tr>";
+}
+?>
 
-
-                            </th>
-                        </tr>";
-                }
-            } else {
-                echo "<tr><th colspan='14'>Nenhum CD encontrado.</th></tr>";
-            }
-            ?>
             </tbody>
         </table>
     </section>

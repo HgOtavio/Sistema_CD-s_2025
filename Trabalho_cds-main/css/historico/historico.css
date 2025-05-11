@@ -1,0 +1,217 @@
+*{
+    padding: 0px;
+    margin: 0px;
+    font-family: Arial, Helvetica, sans-serif;
+}
+
+:root {
+    --cinza-1: #303030;
+    --cinza-2: #5d5d5d;
+    --cinza-3: #6d6d6d;
+    --cinza-4: #7b7a7a;
+    --cinza-5: #888888;
+    --cinza-6: #949494;
+    --cinza-7: #abaaaa;
+    --branco: #ffffff;
+    --roxo: #7445cc;
+}
+
+.button{
+    background-color: var(--roxo);
+    padding: 5px;
+    border-radius: 5px;
+    width: 110px;
+    font-size: 19px;
+    text-align: center;
+    height: 40px;
+    margin-top: 5px;
+    margin-left: 20px;
+    line-height: 15px;
+    border: none;
+}
+
+.button:hover{
+    background-color: var(--cinza-1);
+    transition: 0.2s;
+}
+
+.link{
+    color: var(--branco);
+    text-decoration: none;
+}
+
+#voltar{
+    margin-left: 300px;
+    margin-bottom: 10px;
+}
+
+#div_but_prod{
+    display: flex;
+    justify-content: center;
+}
+
+#but_prod{
+    width: 250px;
+    text-align: center;
+    margin: 20px;
+    padding: 10px;
+}
+
+#link_prod{
+    font-size: 25px;
+}
+
+
+#titulo{
+    margin: 30px;
+    text-align: center;
+    font-size: 80px;
+    color: var(--cinza-1);
+}
+
+#produtos{
+    display: flex;
+    flex-direction: column;
+    gap: 30px;
+}
+
+.produto {
+    border: 2px solid var(--roxo); /* Borda com a cor roxa padrão */
+    width: 800px;
+    height: auto;
+    margin: 0px auto ;
+    display: flex;
+    gap: 20px;
+    justify-content: center;
+    align-items: center;
+    padding: 15px;
+    border-radius: 10px;
+    background-color: var(--branco);
+    box-shadow: 10px 10px 20px rgba(0, 0, 0, 0.3); /* Sombra suave */
+}
+
+.duas{
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.primeiro{
+    gap: 10px;
+}
+
+.part1{
+    width: 300px;
+}
+
+.img{
+    width: 150px;
+    border-radius: 10px;
+    border: 1px solid var(--roxo);
+}
+
+.nome{
+    color: var(--cinza-2);
+    
+}
+
+.sub_titulo{
+    color: var(--cinza-2);
+    font-size: 18px;
+}
+
+.info_sub{
+    color: var(--roxo);
+}
+
+/* == Estilo das imagens laterais == */
+
+/* Esconde as imagens com IDs específicos */
+#sumir_d, #sumir_e{
+    display: none; /* Não exibe as imagens */
+}
+
+/* Estilo das imagens à direita */
+#imgs_direita {
+    display: flex; /* Flexbox para alinhar as imagens */
+    align-items: flex-end; /* Alinha as imagens ao fundo */
+    flex-direction: column; /* Organiza as imagens em coluna */
+    position: fixed; /* Posiciona as imagens sobre o conteúdo */
+    bottom: 0; /* Alinha ao fundo da tela */
+    right: 0; /* Alinha à direita */
+    z-index: -1; /* Coloca atrás de outros elementos */
+    width: 100%; /* Largura total */
+    height: 100%; /* Altura total */
+}
+
+/* Estilo das imagens à esquerda */
+#imgs_esquerda{
+    display: flex; /* Flexbox para alinhar as imagens */
+    flex-direction: column; /* Organiza as imagens em coluna */
+    position: fixed; /* Posiciona as imagens sobre o conteúdo */
+    bottom: 0; /* Alinha ao fundo da tela */
+    left: 0; /* Alinha à esquerda */
+    z-index: -1; /* Coloca atrás de outros elementos */
+    width: 100%; /* Largura total */
+    height: 100%; /* Altura total */
+}
+
+/* Estilo das imagens à direita */
+.img_direita {
+    width: 300px; /* Largura das imagens */
+    margin-right: -200px; /* Ajuste de margem para o posicionamento */
+}
+
+/* Ajuste na margem das imagens, exceto a primeira */
+.img_direita:not(:first-child) {
+    margin-top: -5px; /* Margem superior para não sobrepor */
+}
+
+/* Estilo das imagens à esquerda (invertidas) */
+.img_esquerda{
+    width: 300px; /* Largura das imagens */
+    margin-left: -200px; /* Ajuste de margem para o posicionamento */
+    transform: scaleX(-1); /* Inverte horizontalmente as imagens */
+}
+
+.img_esquerda:not(:first-child) {
+    margin-top: -5px; /* Margem superior para não sobrepor */
+}
+
+.img_direita, .img_esquerda {
+    max-width: 300px; /* Mantém as imagens menores em telas pequenas */
+    opacity: 0.5; /* Reduz a opacidade para não sobrecarregar o layout */
+}
+
+@media only screen and (max-width:  768px){
+    #titulo{
+        background-color: var(--branco);
+        width: 350px;
+        margin: 20px auto;
+    }
+
+    .produto {
+        width: 450px;
+        padding: 10px;
+    }
+
+    #voltar{
+        margin-left: 10px;
+    }
+
+    /*Imagens laterais*/
+    #sumir_d, #sumir_e{
+        display: block; /* Exibe as imagens */
+    }
+
+    .img_direita {
+        width: 200%;
+        height: 100%;
+        object-fit: cover;
+    }
+
+    .cortar{
+        width: 150px;
+        overflow: hidden; /* Esconde parte da imagem fora da área */
+    }
+}

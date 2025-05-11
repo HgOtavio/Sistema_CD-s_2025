@@ -1,0 +1,232 @@
+*{
+    padding: 0px;
+    margin: 0px;
+    font-family: Arial, Helvetica, sans-serif;
+}
+
+/* === Definição de variáveis de cores === */
+:root{
+    --cinza-1: #303030;
+    --cinza-2: #5d5d5d;
+    --cinza-3: #6d6d6d;
+    --cinza-4: #7b7a7a;
+    --cinza-5: #888888;
+    --cinza-6: #949494;
+    --cinza-7: #abaaaa;
+    --branco: #ffffff;
+    --roxo: #7445cc;
+}
+
+/* === Estilização do caminho de navegação === */
+#caminho{
+    display: flex;
+    align-items: center;
+    margin: 20px 0px 20px 20px;
+}
+
+#home{
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 70px;
+}
+
+#img_home{
+    width: 25px;
+}
+
+.seta{
+    width: 20px;
+}
+
+.proxima_part{
+    display: flex;
+    align-items: center;
+}
+
+.link_caminho{
+    color: var(--cinza-1);
+    text-decoration: none;
+}
+
+.link_caminho:hover{
+    color: var(--cinza-4);
+}
+
+
+/*Começo*/
+
+#section_pri{
+    border: 2px solid var(--roxo);
+    box-shadow: 10px 10px 20px rgba(0, 0, 0, 0.3);
+    margin: 20px;
+    border-radius: 10px;
+}
+
+#section_cima{
+    display: flex;
+    align-items: center;
+    gap: 30px;
+    padding: 20px;
+}
+
+#img{
+    width: 500px;
+    border: 2px solid var(--roxo);
+}
+
+/* === ÍCONE DE FAVORITO === */
+.img_favorito {
+    width: 50px;
+    cursor: pointer; /* Mostra que o ícone é clicável */
+    transition: transform 0.2s ease-in-out; /* Suaviza o efeito de clique */
+}
+
+/* === EFEITO DE CLIQUE NO ÍCONE DE FAVORITO === */
+.img_favorito:active {
+    transform: scale(0.95); /* Reduz o tamanho ligeiramente ao clicar */
+}
+
+#corpo{
+    height: 450px;
+}
+
+/* Divs*/
+
+#primeira{
+    display: flex;
+    justify-content: space-between;
+    width: 800px;
+}
+
+#link_artista{
+    color: var(--cinza-2);
+    font-size: 30px;
+}
+
+#link_artista:hover{
+    color: var(--cinza-7);
+}
+
+#titulo{
+    color: var(--cinza-1);
+    font-size: 70px;
+    margin-top: -15px;
+}
+
+#estrelas{
+    color: var(--cinza-1);
+    font-size: 15px;
+    display: flex;
+    align-items: center;
+    height: 20px;
+    margin-top: -10px;
+}
+
+
+.img_estrelas{
+    width: 100px;
+}
+
+#preco{
+    margin-top: 20px;
+    color: var(--roxo);
+    font-size: 60px;
+    font-weight: bold;
+}
+
+#promo, #quant{
+    color: var(--roxo);
+    font-size: 15px;
+    font-weight: bold;
+    margin-top: -10px;
+}
+
+#but_car{
+    color: var(--branco);
+    background-color: var(--roxo);
+    border-radius: 10px;
+    padding: 5px;
+    width: 250px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
+    border: none;
+    margin: 20px 0px;
+}
+
+#but_car:hover{
+    background-color: var(--cinza-1);
+    transition: 0.2s;
+}
+
+#centralizar{
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+    width: 100px;
+}
+
+/* Chrome, Safari, Edge, Opera */
+input[type=number]::-webkit-inner-spin-button,
+input[type=number]::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+/* Firefox */
+input[type=number] {
+  -moz-appearance: textfield;
+}
+
+
+.input-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    
+  }
+
+  .input-wrapper input {
+    width: 40px;
+    text-align: center;
+    color: var(--roxo);
+    background-color: var(--branco);
+    border: none;
+  }
+
+  .input-wrapper button {
+    background-color: var(--roxo);
+    color: white;
+    border: none;
+    padding: 8px 12px;
+    border-radius: 4px;
+    cursor: pointer;
+  }
+
+  .input-wrapper button:hover {
+    background-color: var(--cinza-2);
+  }
+
+  #ultima{
+    display: flex;
+    gap: 20px;
+    align-items: center;
+    margin-top: 40px;
+  }
+
+  #comprar{
+    color: var(--branco);
+    background-color: var(--cinza-2);
+    border-radius: 5px;
+    padding: 5px;
+    width: 140px;
+    font-size: 25px;
+    border: none;
+  }
+
+  #comprar:hover{
+    background-color: var(--roxo);
+    transition: 0.2s;
+  }

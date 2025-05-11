@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Editar Atividades do Usuario</title>
+    <link rel="shortcut icon" href="../../../../../img/favicon/favicon.ico" type="image/x-icon">
+
+    <link rel="stylesheet" href="../../../../../css/adm/add_edit/add_edit.css">
+    <link rel="stylesheet" href="../../../../../css/adm/add_edit/add_edit_at.css">
+    <link rel="stylesheet" href="../../../../../css/cabeçalhos/cabeçalho_com_login_sem_menu.css">
+
+    <script src="../../../../../js/mascaras/mascara_num.js" defer></script>
+    <script src="../../../../../js/mascaras/mascara_data.js" defer></script>
+</head>
+<body>
+
+    <!-- Cabeçalho da página (com user logado) -->
+    <header> 
+
+        <div id="parte_de_cima_cab">
+
+              <!-- Logo da página -->
+              <a href="#" id="logo"><img src="../../../../../img/cabeçario/logo.png" alt="Logo" id="img_logo"></a> 
+            
+            <!-- Barra de pesquisa -->
+
+            <div id="login_carrinho"> <!-- Conta e Carrinho -->
+                    <a href="#"><img src="../../../../../img/cabeçario/icone_perfil.png" alt="Perfil" id="Perfil"></a><!-- Imagem de perfil -->
+
+                <a href="#"><img src="../../../../../img/cabeçario/icone_carrinho.png" alt="Carrinho" id="Carrinho"></a><!-- Ícone de carrinho -->
+            </div>
+        </div>
+    </header>
+    <main>
+        <section id="adicionar">
+        
+            <!-- Título principal da página -->
+            <h1 id="titulo">Alterar Atividades do Usuario</h1>
+        
+            <!-- Div que contém os campos de entrada do formulário -->
+            <div id="inputs">
+        
+                <!-- Div para os dados do Cd -->
+                <div id="lado_button">
+                    <div class="cima">
+                        <div class="separacao">
+                            <!-- Subtítulo para a seção de dados do Cd -->
+                            <h1 class="subtitulo" id="compras">Compras Realizadas:</h1>
+        
+                            <!-- Campos de entrada -->
+                            <input type="text" placeholder="Titulo" class="input">
+                            <input type="text" placeholder="Quantidade" maxlength="20" class="input num">
+                            <input type="text" placeholder="Forma" class="input">
+                        </div>
+        
+                        <!-- Div para o lado -->
+                        <div class="separacao" id="direita">
+        
+                            <!-- Campos de entrada -->
+        
+                            <input type="text" placeholder="Pagamento" class="input">
+                            <input type="text" placeholder="Envio" class="input">
+                            <input type="text" placeholder="Data" class="input data">
+                            <input type="text" placeholder="Status" class="input">
+        
+                        </div>
+                    </div>
+                    <div id="lado_baixo">
+                        <div class="cima">
+                            <div class="separacao">
+                                <!-- Subtítulo para a seção de dados do Cd -->
+                                <h1 class="subtitulo" id="carrinho">Itens no Carrinho:</h1>
+        
+                                <!-- Campos de entrada -->
+                                <input type="text" placeholder="CD" class="input">
+                                <input type="text" placeholder="Quantidade" maxlength="20" class="input num">
+                            </div>
+                        </div>
+                        <div class="cima">
+                            <div class="separacao">
+                                <!-- Subtítulo para a seção de dados do Cd -->
+                                <h1 class="subtitulo" id="favoitos">Favoritos:</h1>
+        
+                                <!-- Campos de entrada -->
+                                <input type="text" placeholder="Titulo" class="input">
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Botão de Alterar -->
+                    <button id="button">Alterar</button>
+                </div>
+            </div>
+        </section>
+    </main>
+</body>
+</html>

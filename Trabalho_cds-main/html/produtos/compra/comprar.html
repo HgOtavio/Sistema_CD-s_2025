@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Comprar Cd</title>
+    <link rel="shortcut icon" href="../../../img/favicon/favicon.ico" type="image/x-icon">
+
+    <link rel="stylesheet" href="../../../css/compra/comprar.css">
+    <link rel="stylesheet" href="../../../css/cabeçalhos/cabeçalho_com_login_sem_menu.css">
+
+    <script src="../../../js/mascaras/mascara_cep.js" defer></script>
+    <script src="../../../js/mascaras/mascara_num.js" defer></script>
+    <script src="../../../js/compra/compra.js" defer></script>
+</head>
+<body>
+    <header> 
+
+        <div id="parte_de_cima_cab">
+
+              <!-- Logo da página -->
+              <a href="#" id="logo"><img src="../../../../../img/cabeçario/logo.png" alt="Logo" id="img_logo"></a> 
+            
+            <!-- Barra de pesquisa -->
+            
+
+            <div id="login_carrinho"> <!-- Conta e Carrinho -->
+                    <a href="#"><img src="../../../../../img/cabeçario/icone_perfil.png" alt="Perfil" id="Perfil"></a><!-- Imagem de perfil -->
+
+                <a href="#"><img src="../../../../../img/cabeçario/icone_carrinho.png" alt="Carrinho" id="Carrinho"></a><!-- Ícone de carrinho -->
+            </div>
+        </div>
+    </header>
+
+    <main>
+        <section id="compra">
+        
+            <!-- Título principal da página -->
+            <h1 id="titulo">Comprar</h1>
+
+            <h1 class="subtitulo">Finazar Compra</h1>
+            <div class="inputs">
+                <div class="separar">
+                    <p class="subtitulo_p">Forma de Pagamento:</p>
+                    <select class="tipo">
+                        <option value="">Selecione...</option>
+                        <option value="vista">Á Vista</option>
+                        <option value="praso">Á Praso</option>
+                    </select>
+                    <div id="praso" class="item_input">
+                        <p class="subtitulo_p">Tipo de Pagamento:</p>
+                        <select class="tipo">
+                        <option value="">Selecione...</option>
+                        <option value="">Boleto</option>
+                        <option value="">Cartão</option>
+                    </select>
+                    </div>
+                    <p class="subtitulo_p">Tipo de Envio:</p>
+                    <select class="tipo">
+                        <option value="">Selecione...</option>
+                        <option value="">Aereo</option>
+                        <option value="">Maritimo</option>
+                    </select>
+                    
+                    
+                </div>
+            </div>
+            <h1 class="subtitulo">Endereço De Entrega</h1>
+            <p id="p_endereco">Opicional, se diferente do Cadastro</p>
+            <div class="inputs">
+                <div class="separar">
+                    <input type="text" placeholder="CEP"  maxlength="9" class="input cep">
+                    <input type="text" placeholder="Logradouro" class="input">
+                    <input type="text" placeholder="Estado" class="input">
+                    
+                </div>
+                <div class="separar">
+                    <input type="text" placeholder="Bairro" class="input">
+                    <input type="text" placeholder="Cidade" class="input">
+                    <input type="text" placeholder="Número" class="input num">
+                    
+                </div>
+            </div>
+            
+            
+            <button id="button">Comprar</button>
+        </section>
+    </main>
+
+     <!-- Seção de imagens à direita -->
+     <div id="imgs_direita">
+        <!-- Imagens decorativas à direita -->
+        <div class="cortar"><img src="../../../img/img_cantos/img_cantos.png" alt="notas musicais" class="img_direita"></div>
+        <div class="cortar"><img src="../../../img/img_cantos/img_cantos.png" alt="notas musicais" class="img_direita"></div>
+        <div class="cortar"><img src="../../../img/img_cantos/img_cantos.png" alt="notas musicais" class="img_direita"></div>
+        <div class="cortar"><img src="../../../img/img_cantos/img_cantos.png" alt="notas musicais" class="img_direita" id="sumir_e"></div>
+    </div>
+
+    <!-- Seção de imagens à esquerda -->
+    <div id="imgs_esquerda">
+        <!-- Imagens decorativas à esquerda -->
+        <img src="../../../img/img_cantos/img_cantos.png" alt="notas musicais" class="img_esquerda">
+        <img src="../../../img/img_cantos/img_cantos.png" alt="notas musicais" class="img_esquerda">
+        <img src="../../../img/img_cantos/img_cantos.png" alt="notas musicais" class="img_esquerda">
+        <img src="../../../img/img_cantos/img_cantos.png" alt="notas musicais" class="img_esquerda" id="sumir_d">
+    </div>
+
+    <script>
+        const pagamentoSelect = document.querySelectorAll("select.tipo")[0]; // Primeiro select é Forma de Pagamento
+        const divPraso = document.getElementById("praso");
+    
+        pagamentoSelect.addEventListener("change", () => {
+            if (pagamentoSelect.value === "praso") {
+                divPraso.style.display = "block";
+            } else {
+                divPraso.style.display = "none";
+            }
+        });
+    
+        // Oculta inicialmente
+        divPraso.style.display = "none";
+    </script>
+    
+    
+</body>
+</html>

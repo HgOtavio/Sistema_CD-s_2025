@@ -1,18 +1,32 @@
-document.addEventListener("DOMContentLoaded", function() {
-    const imgs = document.querySelectorAll(".img_favorito"); // Seleciona todas as imagens com a classe "img_favorito"
+document.addEventListener("DOMContentLoaded", function () {
+    const forms = document.querySelectorAll("#favoritar-form");
 
-    // Caminhos das imagens
-    const img1 = "../../img/todos_produtos/icone_favoritos.png"; // Imagem inicial
-    const img2 = "../../img/todos_produtos/icone_favoritos_selecionado.png"; // Imagem ao clicar
+    forms.forEach(function (form) {
+        const button = form.querySelector(".btn-favorito");
+        const img = form.querySelector(".img_favorito");
 
-    imgs.forEach(function(img) {
-        img.addEventListener("click", function() {
-            // Alterna entre as imagens
-            if (img.getAttribute("src") === img1) {
-                img.setAttribute("src", img2);
-            } else {
-                img.setAttribute("src", img1);
-            }
+        // Caminhos das imagens
+        const img1 = "../../img/todos_produtos/icone_favoritos.png";
+        const img2 = "../../img/todos_produtos/icone_favoritos_selecionado.png";
+
+        button.addEventListener("click", function () {
+            const formData = new FormData(form);
+
+            fetch("favoritar.php", {
+                method: "POST",
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.favoritado) {
+                    img.src = img2;
+                } else {
+                    img.src = img1;
+                }
+            })
+            .catch(error => {
+                console.error("Erro ao favoritar:", error);
+            });
         });
     });
 });

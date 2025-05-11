@@ -19,13 +19,12 @@ $result = $stmt->get_result();
 $usuario = $result->fetch_assoc();
 // Lógica para buscar em dois diretórios
 $foto = $usuario['foto_perfil'];
-$foto_cliente = "../php_cliente/uploads/" . basename($foto);
-$foto_admin = "php_cliente/uploads/" . basename($foto);
+$foto_cliente = "../../../../../img/php_cliente/uploads/" . basename($foto);
 
 if (!empty($foto) && file_exists($foto_cliente)) {
     $foto_perfil = $foto_cliente;
-} elseif (!empty($foto) && file_exists($foto_admin)) {
-    $foto_perfil = $foto_admin;
+} elseif (!empty($foto) && file_exists($foto_cliente)) {
+    $foto_perfil = $foto_cliente;
 } else {
     $foto_perfil = "../php_cliente/uploads/default.png";
 }
@@ -74,7 +73,7 @@ if (!empty($foto) && file_exists($foto_cliente)) {
         
             <!-- Título principal da página -->
             <h1 id="titulo">Alterar Dados</h1>
-            <form action="admin_editar_usuario_salvar.php" method="post" enctype="multipart/form-data">
+            <form action="admin_editar_usuario_salvar.php?id=<?php echo $id_usuario; ?>" method="post" enctype="multipart/form-data">
             <input type="hidden" name="id_usuario" value="<?php echo $usuario['id_usuario']; ?>">
 
             
@@ -105,7 +104,7 @@ if (!empty($foto) && file_exists($foto_cliente)) {
 
     <!-- Exibir a foto atual -->
     <?php if (!empty($usuario['foto_perfil'])): ?>
-        <img src="<?php echo $usuario['foto_perfil']; ?>" alt="Foto Atual" width="120" style="border-radius: 10px;"><br><br>
+        <img src="../../../img/<?php echo $usuario['foto_perfil']; ?>" alt="Foto Atual" width="120" style="border-radius: 10px;"><br><br>
     <?php endif; ?>                            <div>
                                 
                                 <label for="upload" class="input" id="add_perfil_img">Escolher foto de perfil</label>

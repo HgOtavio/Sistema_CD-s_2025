@@ -1,0 +1,66 @@
+/* === Definição de variáveis de cores === */
+:root{
+    --cinza-1: #303030;
+    --cinza-2: #5d5d5d;
+    --cinza-3: #6d6d6d;
+    --cinza-4: #7b7a7a;
+    --cinza-5: #888888;
+    --cinza-6: #949494;
+    --cinza-7: #abaaaa;
+    --branco: #ffffff;
+    --roxo: #7445cc;
+}
+
+
+@media only screen and (max-width: 768px){
+    #img{
+        width: 400px;
+    }
+
+    #section_cima{
+        display: flex;
+        flex-direction: column;
+    }
+    #primeira{
+        width: 400px;
+    }   
+    
+    #titulo{
+        font-size: 50px;
+    }
+
+    .linha{
+      height: 2px; /* Espessura da linha */
+      width: 400px;
+    }
+
+    #linha_1{
+        margin-top: -100px;
+    }
+
+    .separar_tip_cont{
+        gap: 70px;
+    }
+
+    .separar_tip_cont_m{
+        gap: 100px;
+    }
+
+    .dentro.ativo {
+        overflow: auto;
+      }
+
+    .m{
+        width: 700px;
+    }
+
+    #input_text {
+        width: 330px; /* Define a largura do campo */
+    }
+
+    .aval{
+        width: 350px;
+        flex-direction: column;
+    }
+
+}

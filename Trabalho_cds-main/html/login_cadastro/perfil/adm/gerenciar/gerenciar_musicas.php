@@ -7,6 +7,9 @@ if (!isset($_SESSION["id_usuario"]) || $_SESSION["tipo"] != "admin") {
     header("Location: ../php/login.php");
     exit();
 }
+// Obtém o id do usuário logado
+$id_usuario = $_SESSION['id_usuario'];
+
 // Filtros
 $nomeMusicaFiltro = isset($_GET['nomeMusica']) ? $_GET['nomeMusica'] : '';
 $ordemTempo = isset($_GET['ordemTempo']) ? $_GET['ordemTempo'] : '';
@@ -25,6 +28,33 @@ if (!empty($nomeMusicaFiltro)) {
 if (!empty($cdFiltro)) {
     $sql_musica .= " AND c.titulo LIKE '%$cdFiltro%'";
 }
+// Busca dados do usuário logado
+$sql_usuario_logado = "SELECT login, foto_perfil FROM Usuario WHERE id_usuario = ?";
+$stmt = $conn->prepare($sql_usuario_logado);
+$stmt->bind_param("i", $id_usuario);
+$stmt->execute();
+$result_usuario_logado = $stmt->get_result();
+$usuario_logado = $result_usuario_logado->fetch_assoc();
+
+// Se não encontrar usuário, redireciona (por segurança)
+if (!$usuario_logado) {
+    header("Location: ../php/login.php");
+    exit();
+}
+
+// Guarda login e foto
+$login_usuario_logado = $usuario_logado['login'];
+$foto_perfil_usuario = $usuario_logado['foto_perfil'];
+
+// Define caminho correto da foto
+$caminho_foto = "../../../../../img/php_cliente/uploads/" . basename($foto_perfil_usuario);
+if (!empty($foto_perfil_usuario) && file_exists($caminho_foto)) {
+    $foto_exibir = $caminho_foto;
+} else {
+    $foto_exibir = "../php_cliente/uploads/default.png"; // Foto padrão
+}
+
+
 
 if ($ordemTempo == 'maior') {
     $sql_musica .= " ORDER BY m.tempo DESC";
@@ -62,7 +92,7 @@ $result_musica = $conn->query($sql_musica);
             
             <!-- Conta e Carrinho -->
             <div id="login_carrinho">
-                <a href="#"><img src="../../../../../img/cabeçario/icone_perfil.png" alt="Perfil" id="Perfil"></a>
+                <a href="../../adm.php"><img src="<?php echo $foto_exibir; ?>" alt="Perfil" id="Perfil"></a>
                 <a href="#"><img src="../../../../../img/cabeçario/icone_carrinho.png" alt="Carrinho" id="Carrinho"></a>
             </div>
         </div>
@@ -72,32 +102,59 @@ $result_musica = $conn->query($sql_musica);
 
     <h1 id="titulo">Gerenciar Músicas</h1>
     <form method="GET" action="">
+    <button id="btn_filtro">Filtros</button>
 
-        <button id="btn_filtro">Filtros</button>
+    <section id="filtro">
+        <div id="separar">
+            <div class="lado">
+                <p class="p_filtro">
+                    Nome:
+                    <input type="text" name="nomeMusica" class="input_filtro" list="sugestoesMusica" value="<?php echo htmlspecialchars($nomeMusicaFiltro); ?>">
+                    <datalist id="sugestoesMusica">
+                        <?php
+                        // Sugestões de nomes de músicas
+                        $musicas = $conn->query("SELECT DISTINCT nomeMusica FROM Musica ORDER BY nomeMusica ASC");
+                        while ($m = $musicas->fetch_assoc()) {
+                            echo "<option value='" . htmlspecialchars($m['nomeMusica']) . "'>";
+                        }
+                        ?>
+                    </datalist>
+                </p>
 
-        <section id="filtro">
-            <div id="separar">
-                <div class="lado">
-                    <p class="p_filtro">Nome:<input type="text" name="nomeMusica" class="input_filtro" value="<?php echo htmlspecialchars($nomeMusicaFiltro); ?>"></p>
-                    <p class="p_filtro">Cds Associados:<input type="text" class="input_filtro" name="cd" value="<?php echo htmlspecialchars($cdFiltro); ?>"></p>
-                </div>
-                <div class="lado">
-                    <p class="p_filtro">
-                        Filtro de Duração:
-                        <select class="input_filtro tempo" name="ordemTempo" >
-                            <option value="">Selecione</option>
-                            <option value="maior" <?php if($ordemTempo == 'maior') echo 'selected'; ?>>Maior Duração</option>
-                            <option value="menor"  <?php if($ordemTempo == 'menor') echo 'selected'; ?>>Menor Duração</option>
-                        </select>
-                    </p>
-                </div>
+                <p class="p_filtro">
+                    CDs Associados:
+                    <input type="text" name="cd" class="input_filtro" list="sugestoesCD" value="<?php echo htmlspecialchars($cdFiltro); ?>">
+                    <datalist id="sugestoesCD">
+                        <?php
+                        // Sugestões de CDs
+                        $cds = $conn->query("SELECT DISTINCT titulo FROM CD ORDER BY titulo ASC");
+                        while ($c = $cds->fetch_assoc()) {
+                            echo "<option value='" . htmlspecialchars($c['titulo']) . "'>";
+                        }
+                        ?>
+                    </datalist>
+                </p>
             </div>
-            <div>
-                <button id="button_filtro" type="submit">Procurar</button>
-                <button id="button_filtro">Todos</button>
+
+            <div class="lado">
+                <p class="p_filtro">
+                    Filtro de Duração:
+                    <select class="input_filtro tempo" name="ordemTempo">
+                        <option value="">Selecione</option>
+                        <option value="maior" <?php if($ordemTempo == 'maior') echo 'selected'; ?>>Maior Duração</option>
+                        <option value="menor" <?php if($ordemTempo == 'menor') echo 'selected'; ?>>Menor Duração</option>
+                    </select>
+                </p>
             </div>
-        </section>
-    </form>
+        </div>
+
+        <div>
+            <button id="button_filtro" type="submit">Procurar</button>
+            <button type="button" id="button_filtro" onclick="window.location.href='gerenciar_musicas.php';">Todos</button>
+        </div>
+    </section>
+</form>
+
     <button class="button_voltar"><a href="../adicionar/add_musica.php" class="link_voltar">Adicionar Músicas</a></button>
     
 
