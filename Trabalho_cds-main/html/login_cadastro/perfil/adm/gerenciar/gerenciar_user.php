@@ -11,6 +11,28 @@ if (!isset($_SESSION["id_usuario"]) || $_SESSION["tipo"] != "admin") {
 // Obtém o id do usuário logado
 $id_usuario = $_SESSION['id_usuario'];
 
+$res = $conn->query("SELECT * FROM Usuario WHERE id_usuario = $id_usuario");
+$usuarioLogado = $res->fetch_assoc(); 
+// Busca os dados atuais do usuário
+$stmt = $conn->prepare("SELECT * FROM Usuario WHERE id_usuario = ?");
+$stmt->bind_param("i", $id_usuario);
+$stmt->execute();
+$result = $stmt->get_result();
+$usuario = $result->fetch_assoc();
+
+// Lógica para buscar em dois diretórios
+$foto = $usuario['foto_perfil'];
+$foto_cliente = "../../../img/php_cliente/uploads/" . basename($foto);
+
+if (!empty($foto) && file_exists($foto_cliente)) {
+    $foto_perfil = $foto_cliente;
+} elseif (!empty($foto) && file_exists($foto_cliente)) {
+    $foto_perfil = $foto_cliente;
+} else {
+    $foto_perfil = "../php_cliente/uploads/default.png";
+}
+
+
 // Filtros
 $filtro_nome = isset($_GET['nome']) ? $_GET['nome'] : '';
 $filtro_email = isset($_GET['email']) ? $_GET['email'] : '';
@@ -40,31 +62,7 @@ if (!empty($filtro_telefone)) {
     $sql .= " AND telefone LIKE '%" . $conn->real_escape_string($filtro_telefone) . "%'";
 }
 
-// Busca dados do usuário logado
-$sql_usuario_logado = "SELECT login, foto_perfil FROM Usuario WHERE id_usuario = ?";
-$stmt = $conn->prepare($sql_usuario_logado);
-$stmt->bind_param("i", $id_usuario);
-$stmt->execute();
-$result_usuario_logado = $stmt->get_result();
-$usuario_logado = $result_usuario_logado->fetch_assoc();
 
-// Se não encontrar usuário, redireciona (por segurança)
-if (!$usuario_logado) {
-    header("Location: ../php/login.php");
-    exit();
-}
-
-// Guarda login e foto
-$login_usuario_logado = $usuario_logado['login'];
-$foto_perfil_usuario = $usuario_logado['foto_perfil'];
-
-// Define caminho correto da foto
-$caminho_foto = "../php_php/uploads/" . basename($foto_perfil_usuario);
-if (!empty($foto_perfil_usuario) && file_exists($caminho_foto)) {
-    $foto_exibir = $caminho_foto;
-} else {
-    $foto_exibir = "../php_cliente/uploads/default.png"; // Foto padrão
-}
 
 
 $result = $conn->query($sql);
@@ -100,8 +98,33 @@ $result = $conn->query($sql);
 
             <div id="login_carrinho">
                     <div id="perfil_usuario_logado">
-                    <a href="../../adm.php"><img src="<?php echo $foto_exibir; ?>" alt="Perfil" id="Perfil" width="40" height="40" style="border-radius: 50%;">
-                        <span id="login_usuario" style="margin-left: 10px;"><?php echo htmlspecialchars($login_usuario_logado); ?></span>
+                      <?php
+// Verifica se o usuário tem uma foto de perfil
+if (!empty($usuarioLogado['foto_perfil'])):
+    // Define a URL de destino com base no tipo de usuário
+    if ($usuarioLogado['tipo'] === 'admin') {
+        $linkPerfil = "../../adm.php";
+    } else {
+        $linkPerfil = "../../user.php";
+    }
+?>
+    <a href="<?php echo $linkPerfil; ?>">
+        <img src="../../../../../img/php_cliente//<?php echo htmlspecialchars($usuarioLogado['foto_perfil']); ?>" id="Perfil" alt="Perfil">
+    </a>
+<?php else:
+    // Se não tiver foto, mesma lógica para o link com imagem padrão
+    if ($usuarioLogado['tipo'] === 'admin') {
+        $linkPerfil = "../../adm.php";
+    } else {
+        $linkPerfil = "../../user.php";
+    }
+?>
+    <a href="<?php echo $linkPerfil; ?>">
+        <img src="../../img/uploads/perfil_padrao.jpg" alt="Perfil padrão" id="Perfil">
+    </a>
+<?php endif; ?>
+
+                       
                     </div>
              <a href="#"><img src="../../../../../img/cabeçario/icone_carrinho.png" alt="Carrinho" id="Carrinho"></a>
         </div>

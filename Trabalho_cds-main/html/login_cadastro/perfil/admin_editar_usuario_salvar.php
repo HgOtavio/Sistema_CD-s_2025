@@ -72,7 +72,21 @@ $stmt->bind_param("ssssssssssssi",
     $numero, $complemento, $id_usuario);
 
 if ($stmt->execute()) {
-    header("Location: adm.php?editado=1");
+    // 5. Busca o tipo do usuário após atualização
+    $sql_tipo = "SELECT tipo FROM Usuario WHERE id_usuario = ?";
+    $stmt_tipo = $conn->prepare($sql_tipo);
+    $stmt_tipo->bind_param("i", $id_usuario);
+    $stmt_tipo->execute();
+    $stmt_tipo->bind_result($tipo_usuario);
+    $stmt_tipo->fetch();
+    $stmt_tipo->close();
+
+    // 6. Redireciona com base no tipo
+    if ($tipo_usuario === 'admin') {
+        header("Location: adm.php?editado=1");
+    } else {
+        header("Location: user.php?editado=1");
+    }
     exit;
 } else {
     echo "Erro ao atualizar: " . $conn->error;

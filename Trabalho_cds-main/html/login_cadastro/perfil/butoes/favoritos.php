@@ -8,20 +8,79 @@ if (!isset($_SESSION["id_usuario"]) || $_SESSION["tipo"] != "cliente") {
 
 include "../../../login_cadastro/conexao.php";
 
-// ID do usuário da sessão
-$id_usuario = $_SESSION["id_usuario"];
 
-// Query para pegar os CDs favoritos do usuário
-$sql = "SELECT CD.id_cd, CD.titulo, CD.capa, CD.preco, CD.disponibilidade
-        FROM Favoritos
-        INNER JOIN CD ON Favoritos.id_cd = CD.id_cd
-        WHERE Favoritos.id_usuario = ?";
+$id_usuario = $_SESSION['id_usuario'];
+$res = $conn->query("SELECT * FROM Usuario WHERE id_usuario = $id_usuario");
+$usuarioLogado = $res->fetch_assoc();
 
+
+
+// Query para pegar os CDs favoritos do usuário e o desconto da promoção, se houver
+$sql = "
+    SELECT 
+        CD.id_cd, 
+        CD.titulo, 
+        CD.capa, 
+        CD.preco, 
+        CD.descricao, 
+        CD.disponibilidade, 
+        COALESCE(P.desconto, 0) AS desconto,
+        CD.genero
+    FROM Favoritos
+    INNER JOIN CD ON Favoritos.id_cd = CD.id_cd
+    LEFT JOIN CD_Artista ON CD.id_cd = CD_Artista.id_cd
+    LEFT JOIN Artista ON CD_Artista.id_artista = Artista.id_artista
+    LEFT JOIN Promocao P ON CD.id_cd = P.id_cd
+    LEFT JOIN CD_Musica ON CD.id_cd = CD_Musica.id_cd
+    LEFT JOIN Musica ON CD_Musica.id_musica = Musica.id_musica
+    WHERE Favoritos.id_usuario = ?
+";
+
+// Processa a ação de favoritar (POST)
+if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['favoritar'])) {
+    $cd_id = $_POST['cd_id'];
+    $user_id = $_SESSION['id_usuario'];
+
+    // Verificar se o CD já está favoritado
+    $sql_verificar = "SELECT 1 FROM Favoritos WHERE id_usuario = ? AND id_cd = ?";
+    $stmt = $conn->prepare($sql_verificar);
+    $stmt->bind_param("ii", $user_id, $cd_id);
+    $stmt->execute();
+    $stmt->store_result();
+
+    if ($stmt->num_rows > 0) {
+        // CD já está favoritado — remover
+        $sql_remover = "DELETE FROM Favoritos WHERE id_usuario = ? AND id_cd = ?";
+        $stmt_remover = $conn->prepare($sql_remover);
+        $stmt_remover->bind_param("ii", $user_id, $cd_id);
+        $stmt_remover->execute();
+        $stmt_remover->close();
+        $_SESSION['msg'] = "CD removido dos favoritos!";
+    } else {
+        // CD não está favoritado — adicionar
+        $sql_adicionar = "INSERT INTO Favoritos (id_usuario, id_cd) VALUES (?, ?)";
+        $stmt_adicionar = $conn->prepare($sql_adicionar);
+        $stmt_adicionar->bind_param("ii", $user_id, $cd_id);
+        $stmt_adicionar->execute();
+        $stmt_adicionar->close();
+        $_SESSION['msg'] = "CD adicionado aos favoritos!";
+    }
+
+    // Redirecionar para a página atual
+    header("Location: " . $_SERVER['PHP_SELF']);
+    exit();
+}
+
+// Executa a query principal
 $stmt = $conn->prepare($sql);
 $stmt->bind_param("i", $id_usuario);
 $stmt->execute();
 $result = $stmt->get_result();
+
+// Aqui você pode usar $result para exibir os CDs favoritos
 ?>
+
+
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
@@ -64,7 +123,31 @@ $result = $stmt->get_result();
             </div>
 
             <div id="login_carrinho"> <!-- Login e Carrinho -->
-                    <a href="#"><img src="../../../../img/cabeçario/icone_perfil.png" alt="Perfil" id="Perfil"></a><!-- Foto de perfil -->
+                   <?php
+// Verifica se o usuário tem uma foto de perfil
+if (!empty($usuarioLogado['foto_perfil'])):
+    // Define a URL de destino com base no tipo de usuário
+    if ($usuarioLogado['tipo'] === 'admin') {
+        $linkPerfil = "../admin.php";
+    } else {
+        $linkPerfil = "../user.php";
+    }
+?>
+    <a href="<?php echo $linkPerfil; ?>">
+        <img src="../../../../img/php_cliente//<?php echo htmlspecialchars($usuarioLogado['foto_perfil']); ?>" id="Perfil" alt="Perfil">
+    </a>
+<?php else:
+    // Se não tiver foto, mesma lógica para o link com imagem padrão
+    if ($usuarioLogado['tipo'] === 'admin') {
+        $linkPerfil = "../admin.php";
+    } else {
+        $linkPerfil = "../user.php";
+    }
+?>
+    <a href="<?php echo $linkPerfil; ?>">
+        <img src="../../img/uploads/perfil_padrao.jpg" alt="Perfil padrão" id="Perfil">
+    </a>
+<?php endif; ?>
 
                 <a href="#"><img src="../../../../img/cabeçario/icone_carrinho.png" alt="Carrinho" id="Carrinho"></a><!-- Ícone de carrinho -->
             </div>
@@ -158,7 +241,7 @@ $result = $stmt->get_result();
 
     <div id="main">
         <div id="part_cima_produtos">
-            <p id="quantidade">0000 Produtos</p>
+            <p id="quantidade"><?php echo $result->num_rows; ?> Produtos</p>
             <div>
                 <div id="ordenar_produtos">
                     <p id="ordenar">Ordenar Por</p>
@@ -180,33 +263,109 @@ $result = $stmt->get_result();
                 </div>
             </div>
         </div>
-
+      <?php if ($result->num_rows === 0): ?>
+    <p style="text-align:center; font-size:20px; margin-top:20px;">NÃO HÁ FAVORITOS</p>
+<?php else: ?>
+    <?php while ($cd = $result->fetch_assoc()) { ?>
         <div class="fileira_produtos">
             <div>
                 <div class="produto">
-                       <img src="../../../../img/favoritos/capa_cd.jpg" alt="Capa cd" class="img_capa_cd">
-                       <div>
-                           <div>
-                               <h1 class="nome_cd">Nome</h1>
-                               <p class="descricao"><a href="#" class="artista">Artista</a></p>
-                               <p class="descricao">Disponibilidade</p>
-                           </div>
-                           <button class="carrinho">Adicionar ao Carrinho</button>
-                           <div class="baixo_part">
-                               <div>
-                                   <h1 class="valor">R$500</h1>
-                                   <p class="promo">Promoção</p>
-                               </div>
-                               <img src="../../../../img/favoritos/icone_favoritos_selecionado.png" alt="Favoritos" class="img_favorito">
-                           </div>
-                       </div>
+                    <img src="../../../../img/<?php echo $cd['capa']; ?>" alt="<?php echo $cd['titulo']; ?>" class="img_capa_cd">
+                    <div>
+                        <div>
+                            <h1 class="nome_cd"><?php echo $cd['titulo']; ?></h1>
+                            <p class="descricao"><a href="" class="artista"><?php echo substr($cd['descricao'], 0, 60); ?></a></p>
+                        </div>
+                        <form method="POST" action="">
+                            <input type="hidden" name="cd_id" value="<?php echo $cd['id_cd']; ?>">
+                            <button type="submit" name="adicionar_carrinho" class="carrinho">Adicionar ao Carrinho</button>
+                        </form>              
+                        <div class="baixo_part">
+                            <div>
+                                <h1 class="valor">R$<?php echo number_format($cd['preco'], 2, ',', '.'); ?></h1>
+                                <?php if ($cd['desconto'] > 0) { ?>
+                                    <p class="promo">R$ <?php echo number_format($cd['preco'] * (1 - $cd['desconto'] / 100), 2, ',', '.'); ?></p>
+                                <?php } ?>
+                            </div>
+                            <form method="post" action="../../../produtos/favoritar.php" id="favoritar-form">
+                                <input type="hidden" name="id_cd" value="<?= $cd['id_cd'] ?>">
+                                <input type="hidden" name="id_usuario" value="<?= $_SESSION['id_usuario'] ?>">
+
+                                <?php
+                                if (isset($_SESSION['id_usuario'])) {
+                                    $id_usuario = $_SESSION['id_usuario'];
+                                } else {
+                                    echo "Você precisa estar logado para favoritar CDs.";
+                                    exit;
+                                }
+
+                                $sql_verificar = "SELECT 1 FROM Favoritos WHERE id_usuario = ? AND id_cd = ?";
+                                $stmt = $conn->prepare($sql_verificar);
+                                $stmt->bind_param("ii", $id_usuario, $cd['id_cd']);
+                                $stmt->execute();
+                                $stmt->store_result();
+
+                                if ($stmt->num_rows > 0) {
+                                    $img_favorito = '../../../../img/todos_produtos/icone_favoritos_selecionado.png'; 
+                                } else {
+                                    $img_favorito = '../../../../img/todos_produtos/icone_favoritos.png'; 
+                                }
+                                $stmt->close();
+                                ?>
+
+                                <button type="button" class="btn-favorito" id="favorito-button">
+                                    <img src="<?= $img_favorito ?>" alt="Favoritar" class="img_favorito" id="favorito-img">
+                                </button>
+                            </form>
+
+                         <script>
+    document.querySelectorAll('.btn-favorito').forEach((favoritoButton, index) => {
+        const form = favoritoButton.closest('form');
+        const favoritoImg = favoritoButton.querySelector('.img_favorito');
+
+        favoritoButton.addEventListener("click", function () {
+            const formData = new FormData(form);
+
+            fetch('../../../produtos/favoritar.php', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                // Atualiza a imagem do botão clicado
+                favoritoImg.src = data.favoritado
+                    ? '../../../../img/todos_produtos/icone_favoritos_selecionado.png'
+                    : '../../../../img/todos_produtos/icone_favoritos.png';
+
+                // Verifica se todos os favoritos estão selecionados
+                let todosFavoritados = true;
+                document.querySelectorAll('.img_favorito').forEach(img => {
+                    if (!img.src.includes('icone_favoritos_selecionado.png')) {
+                        todosFavoritados = false;
+                    }
+                });
+
+                // Se nem todos estão favoritados, recarrega a página
+                if (!todosFavoritados) {
+                    location.reload();
+                }
+            })
+            .catch(error => {
+                console.error('Erro ao favoritar:', error);
+            });
+        });
+    });
+</script>
+
+                        </div>
+                    </div>
                 </div>
-                <a href="#" class="link_produto2"> <div class="butao">Ver Mais</div></a>
+                <a href="../../../produtos/produto.php?id_cd=<?php echo $cd['id_cd']; ?>"  class="link_produto2"> <div class="butao">Ver Mais</div></a>
             </div>
-            
         </div>
-    
-    </div>
+    <?php } ?>
+<?php endif; ?>
+
 
      <!-- Rodapé -->
 <footer>

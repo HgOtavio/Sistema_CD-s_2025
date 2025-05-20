@@ -1,3 +1,33 @@
+<?php
+session_start();
+
+// Verificação de login
+if (!isset($_SESSION['id_usuario'])) {
+    header("Location: ../login_cadastro/login.php");
+    exit();
+}
+
+// Conexão com o banco de dados
+$conn = new mysqli("localhost", "root", "", "LojaCDs");
+if ($conn->connect_error) {
+    die("Erro ao conectar ao banco de dados: " . $conn->connect_error);
+}
+
+$id_usuario = $_SESSION['id_usuario'];
+$res = $conn->query("SELECT * FROM Usuario WHERE id_usuario = $id_usuario");
+$usuarioLogado = $res->fetch_assoc();
+
+
+
+
+$stmtAv = $conn->prepare($sqlAv);
+$stmtAv->execute();
+$resultAv = $stmtAv->get_result();
+
+
+?>
+
+
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
@@ -25,7 +55,31 @@
 
             <!-- Ícones de perfil e carrinho de compras -->
             <div id="login_carrinho">
-                <a href="#"><img src="../../../../img/cabeçario/icone_perfil.png" alt="Perfil" id="Perfil"></a>
+                       <?php
+// Verifica se o usuário tem uma foto de perfil
+if (!empty($usuarioLogado['foto_perfil'])):
+    // Define a URL de destino com base no tipo de usuário
+    if ($usuarioLogado['tipo'] === 'admin') {
+        $linkPerfil = "../admin.php";
+    } else {
+        $linkPerfil = "../user.php";
+    }
+?>
+    <a href="<?php echo $linkPerfil; ?>">
+        <img src="../../../../img/php_cliente//<?php echo htmlspecialchars($usuarioLogado['foto_perfil']); ?>" id="Perfil" alt="Perfil">
+    </a>
+<?php else:
+    // Se não tiver foto, mesma lógica para o link com imagem padrão
+    if ($usuarioLogado['tipo'] === 'admin') {
+        $linkPerfil = "../admin.php";
+    } else {
+        $linkPerfil = "../user.php";
+    }
+?>
+    <a href="<?php echo $linkPerfil; ?>">
+        <img src="../../img/uploads/perfil_padrao.jpg" alt="Perfil padrão" id="Perfil">
+    </a>
+<?php endif; ?>
                 <a href="#"><img src="../../../../img/cabeçario/icone_carrinho.png" alt="Carrinho" id="Carrinho"></a>
             </div>
         </div>

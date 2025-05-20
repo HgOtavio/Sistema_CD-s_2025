@@ -57,7 +57,7 @@ $busca_login->close();
             </div>
         </div>
     </header>
-    <button class="button_voltar"><a href="#" class="link_voltar">Voltar</a></button>
+    <button class="button_voltar"><a href="../../adm.php" class="link_voltar">Voltar</a></button>
     
     <h1 class="titulo">Gerenciar Atividade do  <?= htmlspecialchars($login) ?></h1>
     <form method="post" action="processar_acoes_usuario.php?id=<?=$id_usuario?>">

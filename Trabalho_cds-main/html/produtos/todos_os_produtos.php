@@ -1,6 +1,8 @@
 <?php
 session_start();
 // Função para garantir que o parâmetro seja tratado como array
+$id_usuario = $_SESSION['id_usuario'];
+
 
 include "../login_cadastro/conexao.php";
 
@@ -132,7 +134,20 @@ if (!empty($ordem_sql)) {
     $sql .= " ORDER BY $ordem_sql";
 }
 
+// Puxar os 10 primeiros dados da tabela Gênero, Artista, Música
+$queryGenero = "SELECT DISTINCT genero FROM CD LIMIT 10";
+$queryArtista = "SELECT nomeArtista FROM Artista LIMIT 10";
+$queryMusica = "SELECT nomeMusica FROM Musica LIMIT 10";
 
+// Executando as consultas com a variável $conn
+$stmtGenero = $conn->query($queryGenero);
+$stmtArtista = $conn->query($queryArtista);
+$stmtMusica = $conn->query($queryMusica);
+
+// Recuperando os resultados das consultas
+$generos = $stmtGenero->fetch_all(MYSQLI_ASSOC);
+$artistas = $stmtArtista->fetch_all(MYSQLI_ASSOC);
+$musicas = $stmtMusica->fetch_all(MYSQLI_ASSOC);
 // Executa
 $stmt = $conn->prepare($sql);
 $stmt->execute();
@@ -227,8 +242,13 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['adicionar_carrinho']))
 
     <script src="../../js/todos_produtos/filtro_part1.js" defer></script>
     <script src="../../js/todos_produtos/filtro_part2.js" defer></script>
+    <script src="../../js/todos_produtos/filtro_itens_genero.js" defer></script>
+    <script src="../../js/todos_produtos/filtro_itens_artista.js" defer></script>
+    <script src="../../js/todos_produtos/filtro_itens_musica.js" defer></script>
+    <script src="../../js/todos_produtos/filtro_itens_destaque.js" defer></script>
     <script src="../../js/todos_produtos/ordernar.js" defer></script>
     <script src="../../js/todos_produtos/favoritos.js" defer></script>
+    <script src="../../js/todos_produtos/produto/nome_cd.js" defer></script>
     <script src="../../js/cabeçalho/menu.js" defer></script> <!-- Script do menu interativo -->
 </head>
 <body>
@@ -262,7 +282,11 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['adicionar_carrinho']))
             </div>
 
             <div id="login_carrinho"> <!-- Login e Carrinho -->
-                <a href=""><img src="../../img/cabeçario/icone_perfil.png" alt="Perfil" id="Perfil"></a><!-- Foto de perfil -->
+                <?php if (!empty($usuarioLogado['foto_perfil'])): ?>
+            <img src=" ../../img/<?php echo htmlspecialchars($usuarioLogado['foto_perfil']); ?>"  id="Perfil" alt="Perfil">
+        <?php else: ?>
+            <img src="../../img/uploads/perfil_padrao.jpg" alt="Perfil padrão"  id="Perfil" >
+        <?php endif; ?><!-- Foto de perfil -->
 
                 <a href="../login_cadastro/perfil/butoes/carrinho.php"><img src="../../img/cabeçario/icone_carrinho.png" alt="Carrinho" id="Carrinho"></a><!-- Ícone de carrinho -->
             </div>
@@ -291,19 +315,9 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['adicionar_carrinho']))
                     <ul class="subclasse_menu" id="sumir_g">
                         
                         <ul class="sub_subclasse_menu">
-                            <li><a href="#" class="sub_a">Clássica</a></li>
-                            <li><a href="#" class="sub_a">Eletrônica</a></li>
-                            <li><a href="#" class="sub_a">Forro</a></li>
-                            <li><a href="#" class="sub_a">Hip Hop</a></li>
-                            <li><a href="#" class="sub_a">MPB</a></li>
-                        </ul>
-                        
-                        <ul class="sub_subclasse_menu">
-                            <li><a href="#" class="sub_a">Pagode</a></li>
-                            <li><a href="#" class="sub_a">Pop</a></li>
-                            <li><a href="#" class="sub_a">Reggae</a></li>
-                            <li><a href="#" class="sub_a">Rock</a></li>
-                            <li><a href="#" class="sub_a">Sertanejo</a></li>
+                        <?php foreach ($generos as $genero): ?>
+                                 <li><a href="../produtos/todos_os_produtos.php?genero=<?= htmlspecialchars($genero['genero']) ?>" class="sub_a"><?= htmlspecialchars($genero['genero']) ?></a></li>
+                        <?php endforeach; ?>
                         </ul>
                     </ul>
                 </li>
@@ -319,20 +333,12 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['adicionar_carrinho']))
                     <ul class="subclasse_menu_a" id="sumir_a">
                         
                         <ul class="sub_subclasse_menu">
-                            <li><a href="#" class="sub_a">Ludwing Beethowen</a></li>
-                            <li><a href="#" class="sub_a">Marshmello</a></li>
-                            <li><a href="#" class="sub_a">Luiz Gonzaga</a></li>
-                            <li><a href="#" class="sub_a">Snoop Dogg</a></li>
-                            <li><a href="#" class="sub_a">Maria Bethânia</a></li>
+                        <?php foreach ($artistas as $artista): ?>
+                           <li><a href="../produtos/todos_os_produtos.php?busca_geral=<?= htmlspecialchars($artista['nomeArtista']) ?>"  class="sub_a"><?= htmlspecialchars($artista['nomeArtista']) ?></a></li>
+                        <?php endforeach; ?>
                         </ul>
                         
-                        <ul class="sub_subclasse_menu">
-                            <li><a href="#" class="sub_a">Péricles</a></li>
-                            <li><a href="#" class="sub_a">Michael Jackson</a></li>
-                            <li><a href="#" class="sub_a">Bob Marley</a></li>
-                            <li><a href="#" class="sub_a">Elvis Presley</a></li>
-                            <li><a href="#" class="sub_a">Luan Santana</a></li>
-                        </ul>
+                       
                     </ul>
                 </li>
             </ul>
@@ -365,8 +371,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['adicionar_carrinho']))
                         <div id="generos" class="contener">
                         <?php while ($genero_item = $generos_result->fetch_assoc()) { ?>
                         <label class="itens">
-                            <input  class="isput" type="checkbox" name="genero[]" value="<?php echo $genero_item['genero']; ?>" <?php echo (in_array($genero_item['genero'], $genero)) ? 'checked' : ''; ?>>
-                            <?php echo ucfirst($genero_item['genero']); ?>
+                            <input  class="input" type="checkbox" name="genero[]" value="<?php echo $genero_item['genero']; ?>" <?php echo (in_array($genero_item['genero'], $genero)) ? 'checked' : ''; ?>>
+                            <label class="checkbox_label_g"></label><?php echo ucfirst($genero_item['genero']); ?>
                         </label><br>
                     <?php } ?>
                         </div>
@@ -380,8 +386,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['adicionar_carrinho']))
                         <div id="artistas" class="contener">
                         <?php while ($artista = $artistas_result->fetch_assoc()) { ?>
                         <label class="itens">
-                            <input class="inpt" type="checkbox" name="artista_nome[]" value="<?php echo $artista['nomeArtista']; ?>" <?php echo (in_array($artista['nomeArtista'], $artista_nome)) ? 'checked' : ''; ?>>
-                            <?php echo $artista['nomeArtista']; ?>
+                            <input class="input" type="checkbox" name="artista_nome[]" value="<?php echo $artista['nomeArtista']; ?>" <?php echo (in_array($artista['nomeArtista'], $artista_nome)) ? 'checked' : ''; ?>>
+                            <label class="checkbox_label_a"></label><?php echo $artista['nomeArtista']; ?>
                                 </label><br>
                             <?php } ?>
                         </div>
@@ -389,14 +395,14 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['adicionar_carrinho']))
                     
                     <div>
                         <div class="part_cima">
-                            <h1 class="titulo">Musicas</h1>
+                            <h1 class="titulo">Músicas</h1>
                             <img src="../../img/todos_produtos/icone_seta_direita.png" alt="Seta para abrir seleção" id="button_filtro_musicas" class="setas_filtro">
                         </div>
                         <div id="musicas" class="contener">
                         <?php while ($musica = $musicas_result->fetch_assoc()) { ?>
                                 <label class="itens">
-                                    <input class="inpu" type="checkbox" name="musica_nome[]" value="<?php echo $musica['nomeMusica']; ?>" <?php echo (in_array($musica['nomeMusica'], $musica_nome)) ? 'checked' : ''; ?>>
-                                    <?php echo $musica['nomeMusica']; ?>
+                                    <input class="input" type="checkbox" name="musica_nome[]" value="<?php echo $musica['nomeMusica']; ?>" <?php echo (in_array($musica['nomeMusica'], $musica_nome)) ? 'checked' : ''; ?>>
+                                    <label class="checkbox_label_m"></label><?php echo $musica['nomeMusica']; ?>
                                 </label><br>
                                 <?php } ?>
                         </div>
@@ -409,9 +415,9 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['adicionar_carrinho']))
                         <div id="destaque" class="contener">
                         <?php while ($ano = $anosResult->fetch_assoc()): ?>
                             <label class="itens" >
-                                <input  class="itens" id="checkbox31" class="input"  type="checkbox" name="anos[]" value="<?php echo $ano['anoLancamento']; ?>"
+                                <input class="input"  type="checkbox" name="anos[]" value="<?php echo $ano['anoLancamento']; ?>"
                                     <?php if (in_array($ano['anoLancamento'], $anosSelecionados)) echo 'checked'; ?>>
-                                <?php echo $ano['anoLancamento']; ?>
+                                <label class="checkbox_label_d"></label><?php echo $ano['anoLancamento']; ?>
                             </label>
                         <?php endwhile; ?>
                         </div>
@@ -511,37 +517,46 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['adicionar_carrinho']))
     </button>
 </form>
 
-<script>
-    // Seleciona o botão e a imagem
-    const favoritoButton = document.getElementById("favorito-button");
-    const favoritoImg = document.getElementById("favorito-img");
-    const form = document.getElementById("favoritar-form");
 
-    // Adiciona o evento de clique
-    favoritoButton.addEventListener("click", function() {
-        // Envia os dados do formulário com AJAX
-        const formData = new FormData(form);
-        
-        fetch('favoritar.php', {
-            method: 'POST',
-            body: formData
-        })
-        .then(response => response.json())
-        .then(data => {
-            // Verifica se o favorito foi adicionado ou removido
-            if (data.favoritado) {
-                // CD favoritado, troca a imagem
-                favoritoImg.src = '../../img/todos_produtos/icone_favoritos_selecionado.png';
-            } else {
-                // CD não favoritado, troca a imagem
-                favoritoImg.src = '../../img/todos_produtos/icone_favoritos.png';
-            }
-        })
-        .catch(error => {
-            console.error('Erro ao favoritar:', error);
+                         <script>
+    document.querySelectorAll('.btn-favorito').forEach((favoritoButton, index) => {
+        const form = favoritoButton.closest('form');
+        const favoritoImg = favoritoButton.querySelector('.img_favorito');
+
+        favoritoButton.addEventListener("click", function () {
+            const formData = new FormData(form);
+
+            fetch('../../../produtos/favoritar.php', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                // Atualiza a imagem do botão clicado
+                favoritoImg.src = data.favoritado
+                    ? '../../../../img/todos_produtos/icone_favoritos_selecionado.png'
+                    : '../../../../img/todos_produtos/icone_favoritos.png';
+
+                // Verifica se todos os favoritos estão selecionados
+                let todosFavoritados = true;
+                document.querySelectorAll('.img_favorito').forEach(img => {
+                    if (!img.src.includes('icone_favoritos_selecionado.png')) {
+                        todosFavoritados = false;
+                    }
+                });
+
+                // Se nem todos estão favoritados, recarrega a página
+                if (!todosFavoritados) {
+                    location.reload();
+                }
+            })
+            .catch(error => {
+                console.error('Erro ao favoritar:', error);
+            });
         });
     });
 </script>
+
 
 
                      </div>

@@ -98,6 +98,7 @@ img.right.visible {
 
 .imagem_destaque {
   width: 300px;
+  height: 300px;
   border: 15px solid var(--roxo);
   margin-right: 120px;
 }

@@ -10,8 +10,11 @@ if (!isset($_SESSION['id_usuario'])) {
 
 date_default_timezone_set('America/Sao_Paulo'); // Define o fuso horário para o Brasil
 $dataAtual = date('d/m/Y'); // Formato brasileiro: dia/mês/ano
-
 $id_usuario = $_SESSION['id_usuario'];
+$res = $conn->query("SELECT * FROM Usuario WHERE id_usuario = $id_usuario");
+$usuarioLogado = $res->fetch_assoc();
+
+
 
 $sql = "SELECT c.id_compra, c.id_cd, c.quantidade, c.forma_pagamento, c.tipo_pagamento, c.tipo_envio, 
                c.enderecoEntrega, c.valorTotal, c.cep_entrega, c.estimativa_entrega, c.taxa_entrega, 
@@ -65,7 +68,31 @@ $result = $stmt->get_result();
             </div>
 
             <div id="login_carrinho"> <!-- Login e Carrinho -->
-                    <a href="#"><img src="../../../../img/cabeçario/icone_perfil.png" alt="Perfil" id="Perfil"></a><!-- Foto de perfil -->
+                      <?php
+// Verifica se o usuário tem uma foto de perfil
+if (!empty($usuarioLogado['foto_perfil'])):
+    // Define a URL de destino com base no tipo de usuário
+    if ($usuarioLogado['tipo'] === 'admin') {
+        $linkPerfil = "../admin.php";
+    } else {
+        $linkPerfil = "../user.php";
+    }
+?>
+    <a href="<?php echo $linkPerfil; ?>">
+        <img src="../../../../img/php_cliente//<?php echo htmlspecialchars($usuarioLogado['foto_perfil']); ?>" id="Perfil" alt="Perfil">
+    </a>
+<?php else:
+    // Se não tiver foto, mesma lógica para o link com imagem padrão
+    if ($usuarioLogado['tipo'] === 'admin') {
+        $linkPerfil = "../admin.php";
+    } else {
+        $linkPerfil = "../user.php";
+    }
+?>
+    <a href="<?php echo $linkPerfil; ?>">
+        <img src="../../img/uploads/perfil_padrao.jpg" alt="Perfil padrão" id="Perfil">
+    </a>
+<?php endif; ?>
 
                 <a href="#"><img src="../../../../img/cabeçario/icone_carrinho.png" alt="Carrinho" id="Carrinho"></a><!-- Ícone de carrinho -->
             </div>

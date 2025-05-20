@@ -164,7 +164,7 @@ $result = $stmt->get_result();
         </div>
     </header>
 
-    <button class="button_voltar"><a href="#" class="link_voltar">Voltar</a></button>
+    <button class="button_voltar"><a href="../../perfil/adm.php" class="link_voltar">Voltar</a></button>
 
     <h1 id="titulo">Gerenciar Artistas</h1>
 

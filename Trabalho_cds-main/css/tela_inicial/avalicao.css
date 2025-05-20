@@ -20,7 +20,7 @@
 #avliacoes {
     background-color: var(--cinza-1); /* Define um fundo escuro para a seção */
     width: 100%; /* Ocupa toda a largura da tela */
-    height: 500px; /* Define a altura da seção */
+    max-height: 500px; /* Define a altura da seção */
     margin-top: 60px; /* Adiciona espaçamento superior */
 }
 
@@ -47,6 +47,8 @@
     margin: 50px 40px; /* Adiciona espaçamento externo */
     flex-direction: column; /* Organiza os elementos verticalmente */
     border-radius: 20px; /* Bordas arredondadas para um design mais suave */
+    width: 400px;
+    height: 300px;
 }
 
 /* == Parte superior da avaliação (Imagem + Nome + Estrelas) == */

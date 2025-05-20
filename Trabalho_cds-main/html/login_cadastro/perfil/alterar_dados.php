@@ -2,24 +2,22 @@
 session_start();
 include "../../login_cadastro/conexao.php";
 
-// Verifica se o usuário está logado e é admin
-if (!isset($_SESSION["id_usuario"]) || $_SESSION["tipo"] != "admin") {
-    header("Location: ../php/login.php");
-    exit();
-}
+
 
 $id_usuario = $_SESSION["id_usuario"];
 
-
+$res = $conn->query("SELECT * FROM Usuario WHERE id_usuario = $id_usuario");
+$usuarioLogado = $res->fetch_assoc(); 
 // Busca os dados atuais do usuário
 $stmt = $conn->prepare("SELECT * FROM Usuario WHERE id_usuario = ?");
 $stmt->bind_param("i", $id_usuario);
 $stmt->execute();
 $result = $stmt->get_result();
 $usuario = $result->fetch_assoc();
+
 // Lógica para buscar em dois diretórios
 $foto = $usuario['foto_perfil'];
-$foto_cliente = "../../../../../img/php_cliente/uploads/" . basename($foto);
+$foto_cliente = "../../../img/php_cliente/uploads/" . basename($foto);
 
 if (!empty($foto) && file_exists($foto_cliente)) {
     $foto_perfil = $foto_cliente;
@@ -60,7 +58,31 @@ if (!empty($foto) && file_exists($foto_cliente)) {
             <!-- Barra de pesquisa -->
 
             <div id="login_carrinho"> <!-- Conta e Carrinho -->
-                    <a href="#"><img src="../../../img/cabeçario/icone_perfil.png" alt="Perfil" id="Perfil"></a><!-- Imagem de perfil -->
+                          <?php
+// Verifica se o usuário tem uma foto de perfil
+if (!empty($usuarioLogado['foto_perfil'])):
+    // Define a URL de destino com base no tipo de usuário
+    if ($usuarioLogado['tipo'] === 'admin') {
+        $linkPerfil = "adm.php";
+    } else {
+        $linkPerfil = "user.php";
+    }
+?>
+    <a href="<?php echo $linkPerfil; ?>">
+        <img src="../../../img/php_cliente//<?php echo htmlspecialchars($usuarioLogado['foto_perfil']); ?>" id="Perfil" alt="Perfil">
+    </a>
+<?php else:
+    // Se não tiver foto, mesma lógica para o link com imagem padrão
+    if ($usuarioLogado['tipo'] === 'admin') {
+        $linkPerfil = "../login_cadastro/perfil/admin.php";
+    } else {
+        $linkPerfil = "../login_cadastro/perfil/user.php";
+    }
+?>
+    <a href="<?php echo $linkPerfil; ?>">
+        <img src="../../img/uploads/perfil_padrao.jpg" alt="Perfil padrão" id="Perfil">
+    </a>
+<?php endif; ?>
 
                 <a href="#"><img src="../../../img/cabeçario/icone_carrinho.png" alt="Carrinho" id="Carrinho"></a><!-- Ícone de carrinho -->
             </div>
@@ -103,9 +125,8 @@ if (!empty($foto) && file_exists($foto_cliente)) {
                             <input type="text" id="cpf" placeholder="CPF" maxlength="14" class="input cpf" name="cpf" value="<?php echo $usuario['cpf']; ?>" required>
 
     <!-- Exibir a foto atual -->
-    <?php if (!empty($usuario['foto_perfil'])): ?>
-        <img src="../../../img/<?php echo $usuario['foto_perfil']; ?>" alt="Foto Atual" width="120" style="border-radius: 10px;"><br><br>
-    <?php endif; ?>                            <div>
+   <img src="<?= $foto_perfil ?>" alt="Foto de perfil" id="foto_perfil">
+                          <div>
                                 
                                 <label for="upload" class="input" id="add_perfil_img">Escolher foto de perfil</label>
                                 <input type="file" id="upload" hidden name="foto_perfil">

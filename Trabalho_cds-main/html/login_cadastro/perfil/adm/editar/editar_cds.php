@@ -109,7 +109,7 @@ while ($musica = $result_musicas->fetch_assoc()) {
 
                             <input type="text" placeholder="Titulo" class="input" name="titulo" value="<?= htmlspecialchars($cd['titulo']) ?>" required>
                             <div>
-                                <img src="<?= htmlspecialchars($cd['capa']) ?>" alt="Capa do CD" width="150"><br><br>
+                                <img src="../../../../../img/<?= htmlspecialchars($cd['capa']) ?>" alt="Capa do CD" width="150"><br><br>
                                 <label for="upload" class="input add_perfil_img" id="add_perfil_img">Alterar foto da Capa</label>
                                 <input type="file" id="upload" hidden name="nova_capa">
                             </div>

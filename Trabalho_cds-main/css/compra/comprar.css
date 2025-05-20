@@ -58,6 +58,7 @@ main{
     font-size:  20px; /* Se adapta ao tamanho da tela */
 }
 
+
 .tipo{
     appearance: none; /* remove o estilo padrão */
     -webkit-appearance: none; /* Safari/Chrome */
@@ -77,6 +78,68 @@ main{
     margin-bottom: 20px;
 }
 
+.parcela{
+     width: 360px;
+     padding: 5px;
+}
+
+#butoes_endereco{
+    display: flex;
+    justify-content: space-around;
+    margin-top: 20px;
+}
+
+.itens{
+    color: var(--cinza-2);
+    font-weight: bold;
+    display: flex;
+    align-items: center;
+    font-size: 20px;
+}
+
+.itens:hover{
+    color: var(--roxo);
+}
+
+/* === Estilização dos checkboxes === */
+.input[type="checkbox"] {
+    display: none;
+}
+
+.input[type="checkbox"] + label {
+    display: inline-block;
+    width: 20px;
+    height: 20px;
+    background-color: var(--branco);
+    border: 2px solid var(--cinza-2);
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease, border-color 0.3s ease;
+    margin-right: 5px;
+    position: relative;
+}
+
+.input[type="checkbox"]:checked + label {
+    background-color: var(--branco);
+    border-color: var(--branco);
+}
+
+.input[type="checkbox"]:checked + label::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 20px;
+    height: 20px;
+    border: 3px solid #1f1f1f;
+    border-radius: 50%;
+    background-color: var(--branco);
+    background-image: radial-gradient(circle, var(--roxo) 30%, var(--cinza-1) 40%);
+    background-size: 100%;
+    box-shadow: 0 0 5px rgba(0, 0, 0, 0.3);
+}
+
 .tipo:focus{
     outline: none;
     border-color: var(--roxo);
@@ -86,13 +149,6 @@ main{
 
 .item_input {
     display: none;
-}
-
-#p_endereco{
-    color: var(--roxo); /* Cor do título */
-    margin-left: 10px; /* Margem à esquerda */
-    font-size: 20px; /* Se adapta ao tamanho da tela */
-    text-align: center;
 }
 
 /* Estilo dos campos de entrada */
@@ -106,12 +162,15 @@ main{
     max-width: 350px;
 }
 
+.input:focus{
+    outline: none; /* Remove o outline ao focar */
+}
+
 .separar{
     display: flex; /* Flexbox para alinhar itens */
     flex-direction: column; /* Organiza os campos em coluna */
     width: 350px; /* Largura padrão das divisões */
     align-items: center;
-    max-width: 400px; /* Impede que fique muito largo */
 }
 
 .inputs{
@@ -120,7 +179,25 @@ main{
     justify-content: center;
 }
 
+.cima{
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    gap: 100px;
+    width: 700px;
+}
 
+.titulo_valor{
+    color: var(--roxo);
+}
+
+.alinhar{
+    display: flex;
+    margin-top: 20px;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
 
 #button{
     width: 100%; /* Para evitar cortes laterais */

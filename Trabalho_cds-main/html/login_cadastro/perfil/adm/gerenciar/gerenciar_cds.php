@@ -4,7 +4,7 @@ include "../../../../login_cadastro/conexao.php";
 
 // Verifica se o usuário está logado e é do tipo administrador
 if (!isset($_SESSION["id_usuario"]) || $_SESSION["tipo"] != "admin") {
-    header("Location: ../php/login.php");
+    header("Location: ../../../../login_cadastro/login.php");
     exit();
 }
 
@@ -163,7 +163,7 @@ $result_cd = $conn->query($sql_cd);
         </div>
     </header>
 
-    <button class="button_voltar"><a href="#" class="link_voltar">Voltar</a></button>
+    <button class="button_voltar"><a href="../../perfil/adm.php" class="link_voltar">Voltar</a></button>
     
     
     <h1 id="titulo">Gerenciar CDs</h1>

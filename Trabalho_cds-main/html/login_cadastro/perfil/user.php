@@ -22,15 +22,14 @@ if ($stmt = $conn->prepare($sql)) {
     exit();
 }
 
-// Definindo a foto do perfil
+// Lógica para buscar em dois diretórios
 $foto = $usuario['foto_perfil'];
-$foto_cliente = "../php_cliente/uploads/" . basename($foto);
-$foto_admin = "php_cliente/uploads/" . basename($foto);
+$foto_cliente = "../../../img/php_cliente/uploads/" . basename($foto);
 
 if (!empty($foto) && file_exists($foto_cliente)) {
     $foto_perfil = $foto_cliente;
-} elseif (!empty($foto) && file_exists($foto_admin)) {
-    $foto_perfil = $foto_admin;
+} elseif (!empty($foto) && file_exists($foto_cliente)) {
+    $foto_perfil = $foto_cliente;
 } else {
     $foto_perfil = "../php_cliente/uploads/default.png";
 }
@@ -167,7 +166,7 @@ $cep_usuario = $usuario['cep'];
                 <h2 class="dados"><?php echo htmlspecialchars($nome_usuario); ?></h2>
                 <h2 class="dados"><?php echo htmlspecialchars($email_usuario); ?></h2>
                 <h2 class="dados"><?php echo htmlspecialchars($cep_usuario); ?></h2>
-                <button id="button"><a href="#" id="a_buton_principal">Alterar Dados</a></button>
+                <button id="button"><a  href="alterar_dados.php" id="a_buton_principal">Alterar Dados</a></button>
             </div>
         </div>
 
@@ -176,11 +175,11 @@ $cep_usuario = $usuario['cep'];
         
         <div id="direita">
             <div id="butoes">
-                <button class="butoes"><a href="#" class="a_butoes">Carrinho</a></button>
-                <button class="butoes"><a href="#" class="a_butoes">Favoritos</a></button>
-                <button class="butoes"><a href="#" class="a_butoes">Sugestões</a></button>
-                <button class="butoes"><a href="#" class="a_butoes">Histórico</a></button>
-                <button class="butoes"><a href="#" class="a_butoes">Sair</a></button>
+                <button class="butoes"><a href="butoes/carrinho.php" class="a_butoes">Carrinho</a></button>
+                <button class="butoes"><a href="butoes/favoritos.php" class="a_butoes">Favoritos</a></button>
+                <button class="butoes"><a href="butoes/sugestao.php" class="a_butoes">Sugestões</a></button>
+                <button class="butoes"><a href="butoes/historico.php" class="a_butoes">Histórico</a></button>
+                <button class="butoes"><a href="../../login_cadastro/logout.php" class="a_butoes">Sair</a></button>
             </div>
             <div id="cortar">
                 <img src="../../../img/perfil/disco.png" alt="Cd lateral" id="img_cd">

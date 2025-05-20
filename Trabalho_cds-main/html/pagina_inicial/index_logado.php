@@ -125,11 +125,31 @@ $avaliacoes = $conn->query("SELECT nota, comentario FROM avaliacao ORDER BY data
             </div>
 
             <div id="login_carrinho"> <!-- Login e Carrinho -->
-            <?php if (!empty($usuarioLogado['foto_perfil'])): ?>
-            <img src=" ../../img/<?php echo htmlspecialchars($usuarioLogado['foto_perfil']); ?>"  id="Perfil" alt="Perfil">
-        <?php else: ?>
-            <img src="../../img/uploads/perfil_padrao.jpg" alt="Perfil padrão"  id="Perfil" >
-        <?php endif; ?><!-- Foto de perfil -->
+           <?php
+// Verifica se o usuário tem uma foto de perfil
+if (!empty($usuarioLogado['foto_perfil'])):
+    // Define a URL de destino com base no tipo de usuário
+    if ($usuarioLogado['tipo'] === 'admin') {
+        $linkPerfil = "../login_cadastro/perfil/admin.php";
+    } else {
+        $linkPerfil = "../login_cadastro/perfil/user.php";
+    }
+?>
+    <a href="<?php echo $linkPerfil; ?>">
+        <img src="../../img/php_cliente//<?php echo htmlspecialchars($usuarioLogado['foto_perfil']); ?>" id="Perfil" alt="Perfil">
+    </a>
+<?php else:
+    // Se não tiver foto, mesma lógica para o link com imagem padrão
+    if ($usuarioLogado['tipo'] === 'admin') {
+        $linkPerfil = "../login_cadastro/perfil/admin.php";
+    } else {
+        $linkPerfil = "../login_cadastro/perfil/user.php";
+    }
+?>
+    <a href="<?php echo $linkPerfil; ?>">
+        <img src="../../img/uploads/perfil_padrao.jpg" alt="Perfil padrão" id="Perfil">
+    </a>
+<?php endif; ?>
 
                 <a href="../login_cadastro/perfil/butoes/carrinho.php"><img src="../../img/cabeçario/icone_carrinho.png" alt="Carrinho" id="Carrinho"></a><!-- Ícone de carrinho -->
             </div>
