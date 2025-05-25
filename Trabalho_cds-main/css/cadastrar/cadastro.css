@@ -53,13 +53,10 @@ main{
 }
 
 /* Estilo do parágrafo com link para login */
-
-#ps{
-    margin: -10px 20px; /* Margens superiores e laterais */
-}
 .p_titulo{
     color: var(--cinza-1); /* Cor do texto */
     font-size: 15px; /* Tamanho da fonte */
+    text-align: center;
 }
 
 /* Estilo do link de login */
@@ -287,10 +284,6 @@ main{
     .cortar{
         width: 150px;
         overflow: hidden; /* Esconde parte da imagem fora da área */
-    }
-    #ps{
-        margin-top: 5px;
-
     }
 
     .p_titulo{

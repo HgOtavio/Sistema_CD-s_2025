@@ -195,9 +195,8 @@ $result = $stmt->get_result();
                         // Consulta para pegar as datas de nascimento dos artistas
                         $nascimentos = $conn->query("SELECT DISTINCT dataNascimento FROM Artista ORDER BY dataNascimento ASC");
                         while ($n = $nascimentos->fetch_assoc()) {
-                            // Formata a data para o formato DD/MM/YYYY
-                            $dataFormatada = date("d/m/Y", strtotime($n['dataNascimento']));
-                            echo "<option value='" . htmlspecialchars($dataFormatada) . "'>";
+                       
+                            echo "<option value='" . htmlspecialchars($n['dataNascimento']) . "'>";
                         }
                         ?>
                     </datalist>

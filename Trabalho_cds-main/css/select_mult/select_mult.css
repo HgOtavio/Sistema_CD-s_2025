@@ -1,0 +1,27 @@
+/* Estilo para o select */
+select.input {
+    width: 100%;
+    height: 200px; /* altura adequada para múltiplas opções */
+    padding: 10px;
+    border: 2px solid #ccc;
+    border-radius: 8px;
+    background-color: #f9f9f9;
+    font-size: 16px;
+    color: #333;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    outline: none;
+    transition: border-color 0.3s, box-shadow 0.3s;
+}
+
+/* Hover e foco */
+select.input:hover,
+select.input:focus {
+    border-color: #007BFF;
+    box-shadow: 0 0 8px rgba(0, 123, 255, 0.3);
+}
+
+/* Estilo para as opções (funciona em alguns navegadores) */
+select.input option {
+    padding: 5px;
+    font-size: 15px;
+}

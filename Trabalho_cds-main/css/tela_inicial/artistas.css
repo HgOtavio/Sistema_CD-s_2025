@@ -12,14 +12,15 @@
     --cinza-6: #949494;
     --cinza-7: #abaaaa;
     --branco: #ffffff;
-}
+    --roxo: #7445cc;
+  }
 
 /* === Estilos do Carrossel === */
 
 /* Contêiner principal do carrossel */
 .slider_artista {
     width: 100vw;
-    height: 250px;
+    height: 300px;
     overflow: hidden; /* Evita que imagens ultrapassem os limites */
 }
 
@@ -50,18 +51,19 @@
 /* === Estilos do botão sobre a imagem === */
 .button_artista .a_button_artista{
     position: absolute;
-    top: 29%; /* Posiciona o botão no topo da imagem */
-    left: 80%;
+    top: 15%; /* Posiciona o botão no topo da imagem */
+    left: 90%;
     transform: translateX(-50%); /* Centraliza horizontalmente */
-    background-color: rgba(0, 0, 0, 0.5); /* Fundo semitransparente */
+    background-color: #7445cc62; /* Fundo semitransparente */
     color: var(--branco);
     border: none;
-    padding: 15px 30px;
-    font-size: 38px;
+    padding: 20px 50px;
+    font-size: 50px;
     cursor: pointer;
-    border-radius: 5px;
+    border-radius: 10px;
     z-index: 1;
     text-decoration: none;
+    font-weight:bold ;
 }
 
 /* === Navegação do Carrossel === */
@@ -74,6 +76,10 @@
 /* === Responsividade === */
 
 @media screen and (max-width: 650px) {
+
+    .slider_artista{
+        height: 220px;
+    }
     /* Esconde as imagens para desktop */
     .img_desktop { display: none; }
 

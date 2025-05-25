@@ -223,7 +223,7 @@ if (!empty($usuarioLogado['foto_perfil'])):
             </ul>
         </nav>
     </header>
-
+<main>
     <section>
         <div id="caminho">
             <a href="#" id="home" class="link_caminho">
@@ -240,31 +240,11 @@ if (!empty($usuarioLogado['foto_perfil'])):
     <h1 id="titulo">Favoritos</h1>
 
     <div id="main">
-        <div id="part_cima_produtos">
+        
             <p id="quantidade"><?php echo $result->num_rows; ?> Produtos</p>
-            <div>
-                <div id="ordenar_produtos">
-                    <p id="ordenar">Ordenar Por</p>
-                    <img src="../../../../img/favoritos/icone_seta_direita.png" alt="Seta" id="seta_ordenar">
-                </div>
-
-                <div id="formas_de_ordenar">
-                    <div id="forma_ordenar">
-                        <button id="button_ordenar">Todos</button>
-                        <button id="button_ordenar">Preço: Baixo</button>
-                        <button id="button_ordenar">Preço: Alto</button>
-                        <button id="button_ordenar">Data de Adição: Recente</button>
-                        <button id="button_ordenar">Data de Adição: Antigo</button>
-                        <button id="button_ordenar">Maior Descontos</button>
-                        <button id="button_ordenar">Mais Vendido</button>
-                        <button id="button_ordenar">Relevancia</button>
-                        <button id="button_ordenar">Avaliação</button>
-                    </div>
-                </div>
-            </div>
-        </div>
+        
       <?php if ($result->num_rows === 0): ?>
-    <p style="text-align:center; font-size:20px; margin-top:20px;">NÃO HÁ FAVORITOS</p>
+    <p id="nada">Não há favoritos</p>
 <?php else: ?>
     <?php while ($cd = $result->fetch_assoc()) { ?>
         <div class="fileira_produtos">
@@ -366,7 +346,7 @@ if (!empty($usuarioLogado['foto_perfil'])):
     <?php } ?>
 <?php endif; ?>
 
-
+</main>
      <!-- Rodapé -->
 <footer>
 

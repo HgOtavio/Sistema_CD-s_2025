@@ -23,6 +23,7 @@
 .cotener_slide {
     width: 400%; /* Define a largura para comportar múltiplos slides */
     display: flex;
+    height: auto;
 }
 
 /* Esconde os inputs de rádio e as imagens da versão mobile */
@@ -35,6 +36,7 @@
     width: 25%; /* Cada slide ocupa 25% do contêiner */
     position: relative;
     text-align: center;
+    height: 630px;
     transition: 1s; /* Suaviza a transição entre slides */
 }
 
@@ -48,7 +50,7 @@
 .nav_manual, .nav_auto {
     position: absolute;
     width: 100%;
-    margin-top: 35%; /* Ajusta a posição dos botões */
+    margin-top: 600px; /* Ajusta a posição dos botões */
     display: flex;
     justify-content: center;
     background-color: var(--cinza-1);
@@ -87,7 +89,10 @@
 
 /* === Responsividade === */
 
-@media screen and (max-width: 900px) {
+@media screen and (max-width: 800px) {
+    .slide_box{
+        height: 300px;
+    }
     /* Esconde as imagens para desktop */
     .img_desktop {display: none;}
 

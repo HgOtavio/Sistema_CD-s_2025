@@ -17,6 +17,18 @@ $id_usuario = $_SESSION['id_usuario'];
 $res = $conn->query("SELECT * FROM Usuario WHERE id_usuario = $id_usuario");
 $usuarioLogado = $res->fetch_assoc();
 
+$sqlAv = "
+    SELECT a.nota, a.comentario, a.data_avaliacao, u.login, u.foto_perfil, u.id_usuario
+    FROM avaliacao a
+    INNER JOIN Usuario u ON a.id_usuario = u.id_usuario
+    WHERE a.id_cd IS NULL
+      AND a.data_avaliacao = (
+          SELECT MAX(a2.data_avaliacao)
+          FROM avaliacao a2
+          WHERE a2.id_usuario = a.id_usuario AND a2.id_cd IS NULL
+      )
+    ORDER BY a.data_avaliacao DESC
+";
 
 
 
@@ -84,9 +96,9 @@ if (!empty($usuarioLogado['foto_perfil'])):
             </div>
         </div>
     </header>
-    <button class="button_voltar"><a href="#" class="link_voltar">Voltar</a></button>
     <main>
         <section id="sugestao">
+            <div id="but_v"><button class="button_voltar"><a href="#" class="link_voltar">Voltar</a></button></div>
             <h1 id="titulo">Sugestões</h1>
             <p id="subtitulo">Tipo de sugestão</p>
             <form action="salvar_sugestao.php" method="POST" enctype="multipart/form-data">

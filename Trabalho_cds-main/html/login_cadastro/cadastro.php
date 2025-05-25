@@ -44,10 +44,10 @@
 
             
             <!-- Texto com link para redirecionar o usuário para a tela de login caso já tenha uma conta -->
-            <p id="ps">
+            
                 <p class="p_titulo">Preencha os campos com seus dados ou voltar para <a href="#" class="link_login">tela inicial.</a></p>
                 <p class="p_titulo">Já tem uma conta? <a href="#" class="link_login">Logar</a></p>
-            </p>
+          
             
             <!-- Div que contém os campos de entrada do formulário -->
             <div id="inputs">

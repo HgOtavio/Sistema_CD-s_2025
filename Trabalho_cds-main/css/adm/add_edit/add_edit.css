@@ -71,6 +71,16 @@ main{
     justify-content: center;
 }
 
+#foto_perfil{
+    width: 100px;
+    border-radius: 50px;
+}
+
+.foto{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
 
 /* Estilo comum para as divisões de entrada */
 .separacao,.separacao2{

@@ -113,8 +113,6 @@ while ($musica = $result_musicas->fetch_assoc()) {
                                 <label for="upload" class="input add_perfil_img" id="add_perfil_img">Alterar foto da Capa</label>
                                 <input type="file" id="upload" hidden name="nova_capa">
                             </div>
-                            <input type="text" placeholder="Estoque" maxlength="20" class="input num" name="disponibilidade" value="<?= htmlspecialchars($cd['disponibilidade']) ?>" required>
-                            <input type="text" placeholder="Preço" maxlength="20" class="input preco" name="preco" value="<?= htmlspecialchars($cd['preco']) ?>" required>
                             <div id="destaque" >
                                 <h1 id="titulo_destaque">Destaque</h1>
                                 <div id="inputs_destaque">
@@ -123,23 +121,22 @@ while ($musica = $result_musicas->fetch_assoc()) {
                             </div>
                         </div>
                         <div class="separacao" id="direita">
+                            <input type="text" placeholder="Estoque" maxlength="20" class="input num" name="disponibilidade" value="<?= htmlspecialchars($cd['disponibilidade']) ?>" required>
+                            <input type="text" placeholder="Preço" maxlength="20" class="input preco" name="preco" value="<?= htmlspecialchars($cd['preco']) ?>" required>
                             <input type="text" placeholder="Lançamento" class="input ano" name="anoLancamento" value="<?= htmlspecialchars($cd['anoLancamento']) ?>" required>
                             <input type="text" placeholder="Gênero" class="input" name="genero" value="<?= htmlspecialchars($cd['genero']) ?>" required>
-                            <textarea class="input" name="descricao" required><?= htmlspecialchars($cd['descricao']) ?></textarea><br>
+                            <textarea class="input" name="descricao" required><?= htmlspecialchars($cd['descricao']) ?></textarea>
                             
                             <!-- Artistas associados -->
                             <!-- Artistas associados -->
-    <label>Artistas:</label><br>
-    <input type="text" id="artistaSearch" onkeyup="searchArtistas()" placeholder="Pesquise artistas">
-    <div id="artistaSuggestions" style="border: 1px solid #ccc; max-height: 150px; overflow-y: auto;"></div>
+    <input type="text" id="artistaSearch" onkeyup="searchArtistas()" placeholder="Pesquise artistas" class="input">
+    <div id="artistaSuggestions" ></div>
     <div id="selectedArtistas"></div> <!-- Exibição dos artistas selecionados -->
-    <br>    <br>
 
 
                              <!-- Músicas associadas -->
-    <label>Músicas:</label><br>
-    <input type="text" id="musicaSearch" onkeyup="searchMusicas()" placeholder="Pesquise músicas">
-    <div id="musicaSuggestions" style="border: 1px solid #ccc; max-height: 150px; overflow-y: auto;"></div>
+    <input type="text" id="musicaSearch" onkeyup="searchMusicas()" placeholder="Pesquise músicas" class="input">
+    <div id="musicaSuggestions"></div>
     <div id="selectedMusicas"></div> <!-- Exibição das músicas selecionadas -->
                         </div>
                     </div>

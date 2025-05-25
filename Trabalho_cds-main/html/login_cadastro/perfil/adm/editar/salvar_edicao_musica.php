@@ -1,5 +1,9 @@
 <?php
-include_once("../../../../../conexao.php");
+// Conexão com o banco de dados
+$conn = new mysqli("localhost", "root", "", "LojaCDs");
+if ($conn->connect_error) {
+    die("Erro de conexão: " . $conn->connect_error);
+}
 
 // 1. Receber dados do formulário
 $id_musica = isset($_POST['id_musica']) ? intval($_POST['id_musica']) : 0;

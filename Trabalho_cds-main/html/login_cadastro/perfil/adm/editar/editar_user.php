@@ -86,17 +86,16 @@ $usuario = $result->fetch_assoc();
                             <input type="text" placeholder="Nome Completo" class="input" name="nome_completo" value="<?php echo $usuario['nome_completo']; ?>" required> 
                             <input type="text" id="telefone" placeholder="Telefone" maxlength="15" class="input"  name="telefone" value="<?php echo $usuario['telefone']; ?>" required>
                             <input type="text" id="cpf" placeholder="CPF" maxlength="14" class="input" name="cpf" value="<?php echo $usuario['cpf']; ?>" required>
-                            <div>
+                            <div class="foto"> 
+                                <?php if (!empty($usuario['foto_perfil'])): ?>
+                                    <img id="foto_perfil" src="../../../../../img/php_cliente//<?php echo $usuario['foto_perfil']; ?>" width="100" height="100"><br>
+                                <?php else: ?>
+                                    Nenhuma foto enviada.<br>
+                                <?php endif; ?>
                                 <label for="upload" class="input add_perfil_img">Escolher foto de perfil</label>
                                 <input type="file" id="upload" hidden name="foto_perfil">
 
                                 <!-- Foto de perfil atual -->
-    <?php if (!empty($usuario['foto_perfil'])): ?>
-        <p>Foto atual:</p>
-        <img src="../../../../../img/<?php echo $usuario['foto_perfil']; ?>" width="100" height="100"><br>
-    <?php else: ?>
-        Nenhuma foto enviada.<br>
-    <?php endif; ?>
                             </div>
                                 <!-- Div para os dados de endereço -->
                             </div>

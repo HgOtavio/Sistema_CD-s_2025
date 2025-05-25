@@ -125,9 +125,8 @@ if (!empty($usuarioLogado['foto_perfil'])):
                             <input type="text" id="cpf" placeholder="CPF" maxlength="14" class="input cpf" name="cpf" value="<?php echo $usuario['cpf']; ?>" required>
 
     <!-- Exibir a foto atual -->
-   <img src="<?= $foto_perfil ?>" alt="Foto de perfil" id="foto_perfil">
-                          <div>
-                                
+                            <div class="foto">
+                                <img src="<?= $foto_perfil ?>" alt="Foto de perfil" id="foto_perfil">
                                 <label for="upload" class="input" id="add_perfil_img">Escolher foto de perfil</label>
                                 <input type="file" id="upload" hidden name="foto_perfil">
                             </div>

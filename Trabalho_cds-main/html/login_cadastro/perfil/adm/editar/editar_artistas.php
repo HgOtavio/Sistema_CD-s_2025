@@ -95,6 +95,7 @@ $result_cds = $conn->query($sql_cds);
     <link rel="shortcut icon" href="../../../../../img/favicon/favicon.ico" type="image/x-icon">
     <link rel="stylesheet" href="../../../../../css/adm/add_edit/add_edit.css">
     <link rel="stylesheet" href="../../../../../css/cabeçalhos/cabeçalho_com_login_sem_menu.css">
+    <link rel="stylesheet" href="../../../../../css/select_mult/select_mult.css">
     <script src="../../../../../js/mascaras/mascara_data.js" defer></script>
     <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
 </head>
@@ -126,7 +127,7 @@ $result_cds = $conn->query($sql_cds);
                     <div>
                         <?php if ($artista['fotoPerfil']) : ?>
                             <p>Foto atual:</p>
-                            <img src="../Artista/<?= htmlspecialchars($artista['fotoPerfil']) ?>" alt="Foto do Artista" width="100">
+                            <img src="../../../../../img/<?= htmlspecialchars($artista['fotoPerfil']) ?>" alt="Foto do Artista" width="100">
                         <?php endif; ?>
                     </div>
                 </div>
@@ -134,7 +135,7 @@ $result_cds = $conn->query($sql_cds);
                 <div class="separacao" id="direita">
                     <input type="text" placeholder="Data de Nascimento" class="input data" name="dataNascimento" value="<?= isset($artista['dataNascimento']) ? date('m/d/Y', strtotime($artista['dataNascimento'])) : '' ?>" required>
                     <textarea placeholder="Descrição" class="input" name="descricao" required><?= htmlspecialchars($artista['descricao']) ?></textarea>
-                    <select id="cdsSelect" name="cds[]" multiple="multiple" style="width: 100%;" class="input">
+                    <select id="cdsSelect" name="cds[]" multiple="multiple" class="input">
                         <?php while ($cd = $result_cds->fetch_assoc()) : ?>
                             <option value="<?= $cd['id_cd'] ?>" <?= in_array($cd['id_cd'], $cds_associados) ? 'selected' : '' ?>>
                                 <?= htmlspecialchars($cd['titulo']) ?>

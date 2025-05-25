@@ -29,21 +29,18 @@ main{
     background-color: var(--roxo); /* Cor de fundo cinza */
     display: flex; /* Flexbox para organizar o layout dos elementos */
     margin-top: 70px;
-    width: 750px; /* Largura fixa do box de login */
+    width: 700px; /* Largura fixa do box de login */
     height: 420px; /* Altura fixa do box de login */
     border-radius: 20px; /* Bordas arredondadas */
     position: relative; /* Permite que elementos internos se posicionem em relação a esse container */
     width: 90%; /* Ocupa 90% da tela */
-    max-width: 750px; /* Máximo de 700px */
+    max-width: 700px; /* Máximo de 700px */
 }
 
 /* Estilos para a parte esquerda do container de login */
 #lado_esquerdo {
     margin: 20px;
     color: var(--branco); /* Cor do texto em branco */
-    display: flex;
-    flex-direction: column;
-    align-items: center;
 }
 
 /* Estilo do título principal */
@@ -80,7 +77,7 @@ main{
 
 /* Estilo para os campos de input */
 .input {
-    width: 300px;
+    width: 100%;
     max-width: 330px;
     height: 30px; /* Altura do campo */
     border-radius: 10px; /* Bordas arredondadas */
@@ -99,14 +96,15 @@ main{
     z-index: 0; /* Organiza a camada do elemento */
 }
 
+
 /* Tamanho da imagem do ícone do olho */
 #img_olho {
     width: 30px;
     height: 25px;
-    position: absolute; /* Posicionamento absoluto */
-    z-index: 1; /* Organiza a camada do elemento */
-    margin-left: -40px;
+    position: absolute;
+    margin-left: -35px;
     margin-top: 2px;
+    z-index: 1;
 }
 
 /* Estilos para os links relacionados à senha */
@@ -319,7 +317,7 @@ main{
     }
 
     /* Aumentar ícone do olho */
-    #olho {
+    #img_olho {
         width: 30px;
         height: 30px;
     }
@@ -377,6 +375,3 @@ main{
     }
     
 }
-
-
-

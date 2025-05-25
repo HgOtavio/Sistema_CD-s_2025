@@ -130,7 +130,7 @@ $avaliacoes = $conn->query("SELECT nota, comentario FROM avaliacao ORDER BY data
 if (!empty($usuarioLogado['foto_perfil'])):
     // Define a URL de destino com base no tipo de usuário
     if ($usuarioLogado['tipo'] === 'admin') {
-        $linkPerfil = "../login_cadastro/perfil/admin.php";
+        $linkPerfil = "../login_cadastro/perfil/adm.php";
     } else {
         $linkPerfil = "../login_cadastro/perfil/user.php";
     }
