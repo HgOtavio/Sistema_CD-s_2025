@@ -158,12 +158,12 @@ $result_cd = $conn->query($sql_cd);
             <div id="login_carrinho"> <!-- Conta e Carrinho -->
                     <a href="../../adm.php"><img src="<?php echo $foto_exibir; ?>" alt="Perfil" id="Perfil"></a><!-- Imagem de perfil -->
 
-                <a href="#"><img src="../../../../../img/cabeçario/icone_carrinho.png" alt="Carrinho" id="Carrinho"></a><!-- Ícone de carrinho -->
+                <a href="../../butoes/carrinho.php"><img src="../../../../../img/cabeçario/icone_carrinho.png" alt="Carrinho" id="Carrinho"></a><!-- Ícone de carrinho -->
             </div>
         </div>
     </header>
 
-    <button class="button_voltar"><a href="../../perfil/adm.php" class="link_voltar">Voltar</a></button>
+    <button class="button_voltar"><a href="../../adm.php" class="link_voltar">Voltar</a></button>
     
     
     <h1 id="titulo">Gerenciar CDs</h1>
@@ -289,6 +289,8 @@ $result_cd = $conn->query($sql_cd);
     <form action="deletar_cd.php" method="POST">
 
     <button id="button_excluir" type="submit">Excluir</button>
+    <button onclick="window.open('relatorio_semana.php', '_blank')">Relatório da Semana</button>
+
     
     <section id="tabelao">
         <table id="tabela">
@@ -312,7 +314,7 @@ $result_cd = $conn->query($sql_cd);
                 </tr>
             </thead>
             <tbody>
-           <?php
+         <?php
 if ($result_cd->num_rows > 0) {
     while ($cd = $result_cd->fetch_assoc()) {
         $id_cd = $cd['id_cd'];
@@ -368,7 +370,7 @@ if ($result_cd->num_rows > 0) {
                 <th class='info'>{$cd['disponibilidade']}</th>
                 <th class='info'>R$ {$preco_original}</th>
                 <th class='info'>";
-        
+
         echo ($cd['destaque'] === 'Destaque')
             ? "<img src='../../../../../img/gerenciar/cd/icone_destaque.png' alt='Destaque' class='destaque'>"
             : "<img src='../../../../../img/gerenciar/cd/icone_destaque2.png' alt='Não Destaque' class='destaque'>";
@@ -380,11 +382,7 @@ if ($result_cd->num_rows > 0) {
               <th class='info'>{$artistas_list}</th>
               <th class='info'>{$musicas_list}</th>
               <th class='info'>
-                  <form action='promocao_cd.php' method='POST'>
-                      <input type='hidden' name='id_cd' value='{$cd['id_cd']}'>
-                      <input type='number' name='desconto' value='{$desconto}' min='0' max='100'>%
-                      <button type='submit'>Aplicar Desconto</button>
-                  </form>
+                  <button  type='button' onclick=\"abrirModal('{$cd['id_cd']}', '{$desconto}')\">Aplicar Desconto</button>
               </th>
               <th class='info'>R$ {$preco_desconto}</th>
               <th class='info'>{$cd['numero_vendas']}</th>
@@ -400,10 +398,42 @@ if ($result_cd->num_rows > 0) {
 }
 ?>
 
+
             </tbody>
         </table>
     </section>
     </form>
+
+    <!-- Modal -->
+<div id="modalDesconto" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; 
+    background-color:rgba(0,0,0,0.7); z-index:9999;">
+  <div style="background:#ffe4e1; width:300px; margin:10% auto; padding:20px; border-radius:10px; position:relative;">
+    <h3>Aplicar Desconto</h3>
+    <form action="promocao_cd.php" method="POST">
+        <input type="hidden" name="id_cd" id="id_cd_modal">
+        <label>Desconto (%):</label>
+        <input type="number" name="desconto" id="desconto_modal" min="0" max="100" required> %
+        <br><br>
+        <button type="submit">Confirmar</button>
+        <button type="button" onclick="fecharModal()">Cancelar</button>
+    </form>
+</div>
+
+</div>
+
+<script>
+function abrirModal(id_cd, desconto) {
+    document.getElementById('id_cd_modal').value = id_cd;
+    document.getElementById('desconto_modal').value = desconto;
+    document.getElementById('modalDesconto').style.display = 'block';
+}
+
+function fecharModal() {
+    document.getElementById('modalDesconto').style.display = 'none';
+}
+</script>
+
+
 
 </body>
 </html>

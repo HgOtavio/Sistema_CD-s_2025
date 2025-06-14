@@ -63,7 +63,7 @@ if ($stmt->execute()) {
         }
     }
 
-    echo "<script>alert('CD atualizado com sucesso!'); window.location.href='lista_cds.php';</script>";
+    echo "<script>alert('CD atualizado com sucesso!'); window.location.href='editar_cds.php?id_cd=$id_cd';</script>";
 } else {
     echo "Erro ao atualizar CD: " . $stmt->error;
 }

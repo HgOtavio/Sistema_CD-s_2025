@@ -17,37 +17,36 @@ $id_usuario = $_SESSION['id_usuario'];
 $res = $conn->query("SELECT * FROM Usuario WHERE id_usuario = $id_usuario");
 $usuarioLogado = $res->fetch_assoc();
 
-$sqlAv = "
+// Consulta da avaliação do próprio usuário logado
+$sqlUserAv = "
     SELECT a.nota, a.comentario, a.data_avaliacao, u.login, u.foto_perfil, u.id_usuario
     FROM avaliacao a
     INNER JOIN Usuario u ON a.id_usuario = u.id_usuario
-    WHERE a.id_cd IS NULL
-      AND a.data_avaliacao = (
-          SELECT MAX(a2.data_avaliacao)
-          FROM avaliacao a2
-          WHERE a2.id_usuario = a.id_usuario AND a2.id_cd IS NULL
-      )
+    WHERE a.id_cd IS NULL AND a.id_usuario = $id_usuario
     ORDER BY a.data_avaliacao DESC
+    LIMIT 1
 ";
+$resultUserAv = $conn->query($sqlUserAv);
 
+// Consulta das avaliações de outros usuários
+$sqlOtherAv = "
+    SELECT a.nota, a.comentario, a.data_avaliacao, u.login, u.foto_perfil, u.id_usuario
+    FROM avaliacao a
+    INNER JOIN Usuario u ON a.id_usuario = u.id_usuario
+    WHERE a.id_cd IS NULL AND a.id_usuario != $id_usuario
+    ORDER BY a.data_avaliacao DESC
+    LIMIT 3
+";
+$resultOtherAv = $conn->query($sqlOtherAv);
 
-
-$stmtAv = $conn->prepare($sqlAv);
-$stmtAv->execute();
-$resultAv = $stmtAv->get_result();
-
-// Verifica se a avaliação foi encontrada
-if ($avaliacao = $resultAv->fetch_assoc()) {
-    // Função para exibir as estrelas como imagens (sempre 5)
-    function gerarEstrelasImg($nota) {
-        $html = "";
-        for ($i = 1; $i <= 5; $i++) {
-            // Se a estrela é cheia ou vazia dependendo da nota
-            $img = $i <= $nota ? "../../img/avaliar/estrela_amarela.png" : "../../img/avaliar/estrela_escura.png";
-            $html .= "<img src='../../img/avaliar/$img' alt='Estrela' width='20' height='20'>";
-        }
-        return $html;
+// Função para exibir as estrelas como imagens (sempre 5)
+function gerarEstrelasImg($nota) {
+    $html = "";
+    for ($i = 1; $i <= 5; $i++) {
+        $img = $i <= $nota ? "estrela_amarela.png" : "estrela_escura.png";
+        $html .= "<img src='../../img/avaliar/$img' alt='Estrela' width='20' height='20'>";
     }
+    return $html;
 }
 
 // Puxar os 10 primeiros dados da tabela Gênero, Artista, Música
@@ -55,12 +54,10 @@ $queryGenero = "SELECT DISTINCT genero FROM CD LIMIT 10";
 $queryArtista = "SELECT nomeArtista FROM Artista LIMIT 10";
 $queryMusica = "SELECT nomeMusica FROM Musica LIMIT 10";
 
-// Executando as consultas com a variável $conn
 $stmtGenero = $conn->query($queryGenero);
 $stmtArtista = $conn->query($queryArtista);
 $stmtMusica = $conn->query($queryMusica);
 
-// Recuperando os resultados das consultas
 $generos = $stmtGenero->fetch_all(MYSQLI_ASSOC);
 $artistas = $stmtArtista->fetch_all(MYSQLI_ASSOC);
 $musicas = $stmtMusica->fetch_all(MYSQLI_ASSOC);
@@ -71,8 +68,8 @@ $promocoes = $conn->query("SELECT CD.*, Promocao.desconto FROM CD
     JOIN Promocao ON CD.id_cd = Promocao.id_cd LIMIT 4");
 $lancamentos = $conn->query("SELECT * FROM CD ORDER BY id_cd DESC LIMIT 4");
 $avaliacoes = $conn->query("SELECT nota, comentario FROM avaliacao ORDER BY data_avaliacao DESC LIMIT 5");
-
 ?>
+
 
 
 <!DOCTYPE html>
@@ -147,7 +144,7 @@ if (!empty($usuarioLogado['foto_perfil'])):
     }
 ?>
     <a href="<?php echo $linkPerfil; ?>">
-        <img src="../../img/uploads/perfil_padrao.jpg" alt="Perfil padrão" id="Perfil">
+        <img src="../../img/uploads/default.jpeg" alt="Perfil padrão" id="Perfil">
     </a>
 <?php endif; ?>
 
@@ -223,7 +220,7 @@ if (!empty($usuarioLogado['foto_perfil'])):
             <div class="slide_box primeiro">
 
                 <!-- Slide 1 -->
-                <a href="#">
+                <a href="../produtos/todos_os_produtos.php?busca_geral=THE+DOORS">
                     <img class="img_desktop" src="../../img/slide/slide1_pc.jpg" alt="slide 1">
                     <img class="img_mobile" src="../../img/slide/slide1_cel.jpg" alt="slide 1">
                 </a>
@@ -232,7 +229,7 @@ if (!empty($usuarioLogado['foto_perfil'])):
             <div class="slide_box">
 
                 <!-- Slide 2 -->
-                <a href="#">
+                <a href="../produtos/todos_os_produtos.php?busca_geral=The+Dark+Side+of+the+Moon">
                     <img class="img_desktop" src="../../img/slide/slide2_pc.jpg" alt="slide 2">
                     <img class="img_mobile" src="../../img/slide/slide2_cel.jpg" alt="slide 2">
                 </a>
@@ -241,7 +238,7 @@ if (!empty($usuarioLogado['foto_perfil'])):
             <div class="slide_box">
 
                 <!-- Slide 3 -->
-                <a href="#">
+                <a href="../produtos/todos_os_produtos.php?busca_geral=Siamese+Dream">
                     <img class="img_desktop" src="../../img/slide/slide3_pc.jpg" alt="slide 3">
                     <img class="img_mobile" src="../../img/slide/slide3_cel.jpg" alt="slide 3"> 
                 </a>
@@ -466,41 +463,51 @@ if (!empty($usuarioLogado['foto_perfil'])):
             
             </div>
         </section>
+<section id="avliacoes">
+    <h1 id="avaliacao">Nossos Clientes falam:</h1>
+    <div id="div_avaliacao">
 
-        <!-- Seção dedicada às avaliações dos clientes -->
-        <section id="avliacoes">
-
-            <!-- Título principal da seção de avaliações -->
-            <h1 id="avaliacao">Nossos Clientes falam:</h1>
-
-            <!-- Contêiner que agrupa todas as avaliações -->
-            <div id="div_avaliacao">
-
-
-
-                <!-- Terceira Avaliação -->
+        <?php 
+        if ($resultUserAv->num_rows == 0 && $resultOtherAv->num_rows == 0): 
+        ?>
+            <p>Nenhuma avaliação disponível no momento.</p>
+        <?php 
+        else: 
+            // Exibe a avaliação do próprio usuário, se existir
+            while($avaliacao = $resultUserAv->fetch_assoc()): ?>
                 <div class="conteiner_avaliacao">
                     <div class="part_de_cima_avaliacao">
-
-                        <!-- Imagem de perfil do cliente -->
-                        <img src="../../img/<?= htmlspecialchars($avaliacao['foto_perfil'] ?? 'padrao.png') ?>" class="img_avaliacao">
+                        <img src="../../img/php_cliente//<?= htmlspecialchars($avaliacao['foto_perfil'] ?? 'padrao.png') ?>" class="img_avaliacao">
                         <div class="lado_direito_avaliacao">
-
-
-                        
-                            <!-- Nome do cliente -->
                             <h1 class="nome_cliente_avaliacao"><?= htmlspecialchars($avaliacao['login']) ?></h1><br><br>
-                            <!-- Estrelas de avaliação -->
                             <div class="estrelas_avaliacao"><?= gerarEstrelasImg($avaliacao['nota']) ?></div>
                         </div>
                     </div>
-
-                    <!-- Texto contendo a opinião do cliente -->
                     <p class="texto_avalicao"><?= nl2br(htmlspecialchars($avaliacao['comentario'])) ?></p>
                 </div>
-                
-            </div>
-        </section>
+            <?php endwhile;
+
+            // Exibe as avaliações dos outros usuários
+            while($avaliacao = $resultOtherAv->fetch_assoc()): ?>
+                <div class="conteiner_avaliacao">
+                    <div class="part_de_cima_avaliacao">
+                        <img src="../../img/php_cliente//<?= htmlspecialchars($avaliacao['foto_perfil'] ?? 'padrao.png') ?>" class="img_avaliacao">
+                        <div class="lado_direito_avaliacao">
+                            <h1 class="nome_cliente_avaliacao"><?= htmlspecialchars($avaliacao['login']) ?></h1><br><br>
+                            <div class="estrelas_avaliacao"><?= gerarEstrelasImg($avaliacao['nota']) ?></div>
+                        </div>
+                    </div>
+                    <p class="texto_avalicao"><?= nl2br(htmlspecialchars($avaliacao['comentario'])) ?></p>
+                </div>
+            <?php endwhile;
+        endif;
+        ?>
+
+    </div>
+</section>
+
+
+
 </main>
     <!-- Rodapé -->
 <footer>

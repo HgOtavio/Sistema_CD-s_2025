@@ -20,7 +20,7 @@ $telefone = $_POST['telefone'];
 $login = $_POST['login'];
 $senha = $_POST['senha'];
 $confirma_senha = $_POST['confirma_senha'];
-$tipo = $_POST['tipo'];
+
 $cep = $_POST['cep'];
 $estado = $_POST['estado'];
 $cidade = $_POST['cidade'];
@@ -34,8 +34,31 @@ if ($senha !== $confirma_senha) {
     echo "As senhas não coincidem. <a href='cadastro.php'>Tente novamente</a>.";
     exit();
 }
+// Processar a foto de perfil
+$foto_perfil = null;
+if (!empty($_FILES['foto_perfil']['name'])) {
+    $foto_nome = $_FILES['foto_perfil']['name'];
+    $foto_tmp = $_FILES['foto_perfil']['tmp_name'];
+    $foto_ext = pathinfo($foto_nome, PATHINFO_EXTENSION);
 
-// Verifica se login ou email ou cpf já existem
+    // Define o novo nome da foto
+    $novo_nome_foto = "foto_" . $id_usuario . "." . $foto_ext;
+
+    // Diretório para salvar a foto
+    $diretorio = "../../../../../img/php_cliente/uploads/";
+
+    // Movendo o arquivo
+    if (move_uploaded_file($foto_tmp, $diretorio . $novo_nome_foto)) {
+        // Atualizar caminho salvo no banco
+        $foto_perfil = "../uploads/" . $novo_nome_foto;
+    } else {
+        echo "Erro ao fazer upload da foto!";
+        exit();
+    }
+}
+
+
+// Verifica se login, email ou cpf já estão em uso
 $sql_verifica = "SELECT * FROM Usuario WHERE login = ? OR email = ? OR cpf = ?";
 $stmt_verifica = $conn->prepare($sql_verifica);
 $stmt_verifica->bind_param("sss", $login, $email, $cpf);
@@ -50,10 +73,13 @@ if ($result->num_rows > 0) {
 // Criptografa a senha antes de salvar
 $senha_hash = password_hash($senha, PASSWORD_DEFAULT);
 
-// Insere todos os dados diretamente na tabela Usuario
+// Define o tipo do usuário como 'cliente'
+$tipo = 'cliente';
+
+// Insere os dados na tabela Usuario
 $sql = "INSERT INTO Usuario (
-    nome_completo, email, cpf, telefone, login, senha, tipo,
-    cep, estado, cidade, bairro, logradouro, numero, complemento
+    nome_completo, email, cpf, telefone, login, senha,
+    cep, estado, cidade, bairro, logradouro, numero, complemento, tipo
 ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
 $stmt = $conn->prepare($sql);
@@ -65,14 +91,14 @@ $stmt->bind_param(
     $telefone,
     $login,
     $senha_hash,
-    $tipo,
     $cep,
     $estado,
     $cidade,
     $bairro,
     $logradouro,
     $numero,
-    $complemento
+    $complemento,
+    $tipo
 );
 
 if ($stmt->execute()) {

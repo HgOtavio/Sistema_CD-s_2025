@@ -42,6 +42,6 @@ if (isset($_FILES['audio']) && $_FILES['audio']['error'] === 0) {
 }
 
 // 5. Redireciona ou exibe mensagem
-header("Location: ../musicas.php?sucesso=1");
+header("Location: editar_musicas.php?id_musica=$id_musica ");
 exit;
 ?>

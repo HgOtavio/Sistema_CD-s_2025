@@ -13,8 +13,8 @@
     --cinza-5: #888888;
     --cinza-6: #949494;
     --cinza-7: #abaaaa;
-    --branco: #ffffff;
-    --roxo: #7445cc;
+    --branco: rgb(255, 255, 255);
+    --roxo: rgb(116, 69, 204);
 }
 
 /* Estilo para o corpo da página */

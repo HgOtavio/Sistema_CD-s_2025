@@ -54,7 +54,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['artistas_selecionados'
         }
     }
 
-    echo "<div id='mensagem' class='sucesso'>Artista(s) excluído(s) com sucesso!</div>";
+echo "<div id='mensagem_sucesso'>Artista(s) excluído(s) com sucesso!</div>";
 }
 // Filtros
 $filtro_nome = $_GET['filtro_nome'] ?? '';
@@ -118,28 +118,52 @@ $result = $stmt->get_result();
 </head>
 <style>
 
-.checkbox-imagem-wrapper {
-    position: relative;
-    width: 50px;
-    height: 50px;
+/* Estilização da mensagem de sucesso */
+#mensagem_sucesso {
+    position: fixed; /* Fica fixo na tela mesmo se a página for rolada */
+    top: 50%; /* Centraliza verticalmente */
+    left: 50%; /* Centraliza horizontalmente */
+    transform: translate(-50%, -50%); /* Ajusta para o centro exato */
+    
+    background-color: #8e44ad; /* Roxo bonito */
+    color: white; /* Cor da fonte */
+    padding: 20px 40px; /* Espaçamento interno */
+    border-radius: 10px; /* Cantos arredondados */
+    box-shadow: 0 0 20px rgba(0,0,0,0.5); /* Sombra ao redor */
+    font-weight: bold; /* Texto em negrito */
+    z-index: 9999; /* Fica acima de todos os outros elementos */
+    transition: opacity 1s ease; /* Animação suave para o sumiço */
+    opacity: 1; /* Inicialmente visível */
 }
 
-.checkbox-artista {
-    width: 50%;
-    height: 50%;
-    opacity: 1;
-    cursor: pointer;
+/* Deixa a tabela com bordas arredondadas */
+#tabela {
+    border-collapse: separate; /* Permite o arredondamento */
+    border-spacing: 0; /* Remove espaçamento entre células */
+    border-radius: 15px; /* Define o arredondamento geral da tabela */
+    overflow: hidden; /* Garante que o arredondamento se aplique corretamente */
+    border: 1px solid #ddd; /* Mantém uma borda básica */
 }
 
-.imagem-selecionado {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    display: none;
-    object-fit: contain;
+/* Arredonda o topo da tabela (cabeçalho) */
+#itens_cabeca th:first-child {
+    border-top-left-radius: 15px;
 }
+
+#itens_cabeca th:last-child {
+    border-top-right-radius: 15px;
+}
+
+/* Arredonda a base da tabela (última linha do corpo) */
+#tabela tbody tr:last-child td:first-child {
+    border-bottom-left-radius: 15px;
+}
+
+#tabela tbody tr:last-child td:last-child {
+    border-bottom-right-radius: 15px;
+}
+
+
 
 
 </style>
@@ -159,12 +183,12 @@ $result = $stmt->get_result();
             <div id="login_carrinho"> <!-- Conta e Carrinho -->
                     <a href="../../adm.php"><img src="<?php echo $foto_exibir; ?>" alt="Perfil" id="Perfil"></a><!-- Imagem de perfil -->
 
-                <a href="#"><img src="../../../../../img/cabeçario/icone_carrinho.png" alt="Carrinho" id="Carrinho"></a><!-- Ícone de carrinho -->
+                <a href="../../butoes/carrinho.php"><img src="../../../../../img/cabeçario/icone_carrinho.png" alt="Carrinho" id="Carrinho"></a><!-- Ícone de carrinho -->
             </div>
         </div>
     </header>
 
-    <button class="button_voltar"><a href="../../perfil/adm.php" class="link_voltar">Voltar</a></button>
+    <button class="button_voltar"><a href="../../adm.php" class="link_voltar">Voltar</a></button>
 
     <h1 id="titulo">Gerenciar Artistas</h1>
 
@@ -251,6 +275,7 @@ $result = $stmt->get_result();
             </tr>
         </thead>
         <tbody>
+            
             <?php while ($row = $result->fetch_assoc()) : ?>
             <tr class="informações">
                 <th class="info"><?= htmlspecialchars($row['nomeArtista']) ?></th>
@@ -288,8 +313,10 @@ $result = $stmt->get_result();
                 <th class="info">
                     <a href="../editar/editar_artistas.php?id_artista=<?= $row['id_artista'] ?>" class="link_acao">Editar</a><br>
                     <div class="checkbox-imagem-wrapper">
-    <input type="checkbox" id="check<?= $row['id_artista'] ?>" name="artistas_selecionados[]" value="<?= $row['id_artista'] ?>" class="checkbox-artista">
-    <img src="../../../../../img/perfil/disco.png" alt="Selecionado" class="imagem-selecionado" id="img<?= $row['id_artista'] ?>">
+
+    <input type="checkbox" name="artistas_selecionados[]" value="<?= $row['id_artista']; ?>"  id="checkbox_<?= $row['id_artista']; ?>" class="input">
+    <label for="checkbox_<?= $row['id_artista']; ?>"></label>
+   
             </div>
 
 
@@ -301,31 +328,25 @@ $result = $stmt->get_result();
 </form>
  
     </section>
+ <script>
+// Aguarda 5 segundos (5000 milissegundos)
+setTimeout(function() {
+    // Seleciona o elemento da mensagem
+    var mensagem = document.getElementById('mensagem_sucesso');
+    
+    // Se existir a mensagem
+    if (mensagem) {
+        mensagem.style.opacity = '0'; // Faz o fade-out (desaparecer lentamente)
 
-    <script>
-document.addEventListener("DOMContentLoaded", function () {
-    const checkboxes = document.querySelectorAll(".checkbox-artista");
-
-    checkboxes.forEach(checkbox => {
-        const img = document.getElementById("img" + checkbox.value);
-
-        // Quando o checkbox muda
-        checkbox.addEventListener("change", function () {
-            if (this.checked) {
-                this.style.display = "none";
-                img.style.display = "block";
-            }
-        });
-
-        // Quando clica na imagem
-        img.addEventListener("click", function () {
-            checkbox.checked = false;
-            checkbox.style.display = "inline-block";
-            img.style.display = "none";
-        });
-    });
-});
+        // Aguarda 1 segundo para o fade-out antes de remover o elemento da tela
+        setTimeout(function() {
+            mensagem.remove();
+        }, 1000);
+    }
+}, 5000);
 </script>
+
+
 
 
 

@@ -126,13 +126,13 @@ if (!empty($usuarioLogado['foto_perfil'])):
 
                        
                     </div>
-             <a href="#"><img src="../../../../../img/cabeçario/icone_carrinho.png" alt="Carrinho" id="Carrinho"></a>
+             <a href="../../butoes/carrinho.php"><img src="../../../../../img/cabeçario/icone_carrinho.png" alt="Carrinho" id="Carrinho"></a>
         </div>
 
         </div>
     </header>
     
-    <button class="button_voltar"><a href="#" class="link_voltar">Voltar</a></button>
+    <button class="button_voltar"><a href="../../adm.php" class="link_voltar">Voltar</a></button>
 
     <h1 id="titulo">Gerenciar Usuarios</h1>
     <form method="get" action="">
@@ -232,6 +232,7 @@ if (!empty($usuarioLogado['foto_perfil'])):
 </form>
 
     <button class="button_voltar"><a href="../adicionar/add_user.php" class="link_voltar">Adicionar Usuarios</a></button>
+     <button onclick="window.open('relatorio_user.php', '_blank') " class="button_voltar link_voltar" >Relatório da Semana</button>
 
 
 
@@ -266,7 +267,7 @@ if (!empty($usuarioLogado['foto_perfil'])):
                         } elseif (!empty($foto) && file_exists($foto_cliente)) {
                             echo "<img src='$foto_cliente' width='50' height='50'>";
                         } else {
-                            echo "<img src='../php_cliente/uploads/default.png' width='50' height='50'>";
+                            echo "<img src../../../../../img/php_cliente/uploads/default.png' width='50' height='50'>";
                         }
                         ?>
                         </th>
@@ -274,13 +275,15 @@ if (!empty($usuarioLogado['foto_perfil'])):
                                 <th class="info"><?php echo $usuario['email']; ?></th>
                                 <th class="info"><?php echo $usuario['nome_completo']; ?></th>
                                 <th class="info"><?php echo $usuario['telefone']; ?></th>
-                                <th class="info"><?php echo $usuario['cep']; ?></th>
                                 <th class="info"><?php echo $usuario['cpf']; ?></th>
+                                <th class="info"><?php echo $usuario['cep']; ?></th>
+
                                 <th class="info">
                                     <div class="separar">
                                         <a href="../editar/editar_user.php?id=<?php echo $usuario['id_usuario']; ?>" class="link_acao">Editar</a>
                                         <a href="gerenciar_atividades.php?id=<?= $usuario['id_usuario'] ?>" class="link_acao">Atividades</a>
                                     </div> 
+                                    
                                     <input type="checkbox" name="excluir[]" value="<?= $usuario['id_usuario']; ?>" id="checkbox_<?= $usuario['id_usuario']; ?>" class="input">
                                 <label for="checkbox_<?= $usuario['id_usuario']; ?>"></label>
 

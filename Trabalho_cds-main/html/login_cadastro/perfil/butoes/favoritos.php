@@ -12,6 +12,14 @@ include "../../../login_cadastro/conexao.php";
 $id_usuario = $_SESSION['id_usuario'];
 $res = $conn->query("SELECT * FROM Usuario WHERE id_usuario = $id_usuario");
 $usuarioLogado = $res->fetch_assoc();
+// Consultas de gênero, artista e música
+$queryGenero = "SELECT DISTINCT genero FROM CD LIMIT 10";
+$queryArtista = "SELECT nomeArtista FROM Artista LIMIT 10";
+$queryMusica = "SELECT nomeMusica FROM Musica LIMIT 10";
+
+$generos = $conn->query($queryGenero)->fetch_all(MYSQLI_ASSOC);
+$artistas = $conn->query($queryArtista)->fetch_all(MYSQLI_ASSOC);
+$musicas = $conn->query($queryMusica)->fetch_all(MYSQLI_ASSOC);
 
 
 
@@ -162,10 +170,10 @@ if (!empty($usuarioLogado['foto_perfil'])):
 
             <ul id="menu">
 
-                <li class="p_menu"><a href="#" class="a_menu">Inicio</a></li>
-                <li class="p_menu"><a href="#" class="a_menu">Produtos</a></li>
+               <li class="p_menu"><a href="../../../pagina_inicial/index_logado.php" class="a_menu">Inicio</a></li>
+                <li class="p_menu"><a href="../../../produtos/todos_os_produtos.php?" class="a_menu">Produtos</a></li>
                 
-                 <!-- Menu suspenso de gêneros musicais -->
+                  <!-- Menu suspenso de gêneros musicais -->
                 <li class="p_menu" id="menu_genero">
 
                     <button onclick="aparecer_g('sumir_g')" class="b_menu">
@@ -176,24 +184,15 @@ if (!empty($usuarioLogado['foto_perfil'])):
                     <ul class="subclasse_menu" id="sumir_g">
                         
                         <ul class="sub_subclasse_menu">
-                            <li><a href="#" class="sub_a">Clássica</a></li>
-                            <li><a href="#" class="sub_a">Eletrônica</a></li>
-                            <li><a href="#" class="sub_a">Forro</a></li>
-                            <li><a href="#" class="sub_a">Hip Hop</a></li>
-                            <li><a href="#" class="sub_a">MPB</a></li>
-                        </ul>
-                        
-                        <ul class="sub_subclasse_menu">
-                            <li><a href="#" class="sub_a">Pagode</a></li>
-                            <li><a href="#" class="sub_a">Pop</a></li>
-                            <li><a href="#" class="sub_a">Reggae</a></li>
-                            <li><a href="#" class="sub_a">Rock</a></li>
-                            <li><a href="#" class="sub_a">Sertanejo</a></li>
+                        <?php foreach ($generos as $genero): ?>
+                                 <li><a href="../../../produtos/todos_os_produtos.php?genero=<?= htmlspecialchars($genero['genero']) ?>" class="sub_a"><?= htmlspecialchars($genero['genero']) ?></a></li>
+                        <?php endforeach; ?>
                         </ul>
                     </ul>
                 </li>
 
-                <!-- Menu suspenso para Artistas -->
+               
+               <!-- Menu suspenso para Artistas -->
                 <li class="p_menu" id="arredondar_b">
 
                     <button onclick="aparecer_a('sumir_a')" class="b_menu">
@@ -204,20 +203,12 @@ if (!empty($usuarioLogado['foto_perfil'])):
                     <ul class="subclasse_menu_a" id="sumir_a">
                         
                         <ul class="sub_subclasse_menu">
-                            <li><a href="#" class="sub_a">Ludwing Beethowen</a></li>
-                            <li><a href="#" class="sub_a">Marshmello</a></li>
-                            <li><a href="#" class="sub_a">Luiz Gonzaga</a></li>
-                            <li><a href="#" class="sub_a">Snoop Dogg</a></li>
-                            <li><a href="#" class="sub_a">Maria Bethânia</a></li>
+                        <?php foreach ($artistas as $artista): ?>
+                           <li><a href="../../../produtos/todos_os_produtos.php??busca_geral=<?= htmlspecialchars($artista['nomeArtista']) ?>"  class="sub_a"><?= htmlspecialchars($artista['nomeArtista']) ?></a></li>
+                        <?php endforeach; ?>
                         </ul>
                         
-                        <ul class="sub_subclasse_menu">
-                            <li><a href="#" class="sub_a">Péricles</a></li>
-                            <li><a href="#" class="sub_a">Michael Jackson</a></li>
-                            <li><a href="#" class="sub_a">Bob Marley</a></li>
-                            <li><a href="#" class="sub_a">Elvis Presley</a></li>
-                            <li><a href="#" class="sub_a">Luan Santana</a></li>
-                        </ul>
+                       
                     </ul>
                 </li>
             </ul>
@@ -396,12 +387,12 @@ if (!empty($usuarioLogado['foto_perfil'])):
                 <ul>
                     <li class="lista_rodape">
                         <a href="mailto:codedisc@gmail.com" class="link_rodape">
-                            <img src="../../../../../../img/rodape/contato/icone_email.png" alt="Ícone email" class="img_rodape_contatos"> Email
+                            <img src="../../../../img/rodape/contato/icone_email.png" alt="Ícone email" class="img_rodape_contatos"> Email
                         </a>
                     </li>
                     <li class="lista_rodape">
                         <a href="tel:+5585900000000" class="link_rodape">
-                            <img src="../../../../../../img/rodape/contato/icone_telefone.png" alt="Ícone telefone" class="img_rodape_contatos"> Telefone
+                            <img src="../../../../img/rodape/contato/icone_telefone.png" alt="Ícone telefone" class="img_rodape_contatos"> Telefone
                         </a>
                     </li>
                 </ul>
@@ -417,12 +408,12 @@ if (!empty($usuarioLogado['foto_perfil'])):
         <div>
             <h1 class="titulo">Formas de pagamento</h1>
             <!-- Ícones representando formas de pagamento -->
-            <img src="../../../../../../img/rodape/cartoes/icone_cartao1.png" alt="Cartão" class="img_cartao_rodape">
-            <img src="../../../../../../img/rodape/cartoes/icone_cartao2.png" alt="Cartão" class="img_cartao_rodape">
-            <img src="../../../../../../img/rodape/cartoes/icone_cartao1.png" alt="Cartão" class="img_cartao_rodape">
-            <img src="../../../../../../img/rodape/cartoes/icone_cartao2.png" alt="Cartão" class="img_cartao_rodape">
-            <img src="../../../../../../img/rodape/cartoes/icone_cartao1.png" alt="Cartão" class="img_cartao_rodape">
-            <img src="../../../../../../img/rodape/cartoes/icone_cartao2.png" alt="Cartão" class="img_cartao_rodape">
+            <img src="../../../../img/rodape/cartoes/icone_cartao1.png" alt="Cartão" class="img_cartao_rodape">
+            <img src="../../../../img/rodape/cartoes/icone_cartao2.png" alt="Cartão" class="img_cartao_rodape">
+            <img src="../../../../img/rodape/cartoes/icone_cartao1.png" alt="Cartão" class="img_cartao_rodape">
+            <img src="../../../../img/rodape/cartoes/icone_cartao2.png" alt="Cartão" class="img_cartao_rodape">
+            <img src="../../../../img/rodape/cartoes/icone_cartao1.png" alt="Cartão" class="img_cartao_rodape">
+            <img src="../../../../img/rodape/cartoes/icone_cartao2.png" alt="Cartão" class="img_cartao_rodape">
         </div>
 
         <!-- Seção de redes sociais -->

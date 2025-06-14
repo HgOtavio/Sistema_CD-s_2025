@@ -18,8 +18,7 @@
     
 </head>
 <body>
-    <!-- Cabeçalho da página (sem o usuário estar logado) -->
-    <header> 
+    <!-- Cabeçalho da página (sem o usuário estar logado) -->   <header> 
         <div id="parte_de_cima_cab">
 
             <!-- Logo da página -->
@@ -62,8 +61,8 @@
                           
                         <input type="text" placeholder="Usuario" class="input" name="login" required>
                         <input type="email" placeholder="E-mail" class="input"  name="email" required>
-                        <input type="text" placeholder="Senha" maxlength="20" class="input" name="senha" required>
-                        <input type="text" placeholder="Confirmar Senha" maxlength="20" class="input"  name="confirma_senha" required>
+                        <input type="password" placeholder="Senha" maxlength="20" class="input" name="senha" required>
+                        <input type="password" placeholder="Confirmar Senha" maxlength="20" class="input"  name="confirma_senha" required>
                     </div>
                     
                     <!-- Div para os dados pessoais -->
@@ -77,7 +76,7 @@
                             <input type="text" id="cpf" placeholder="CPF" maxlength="14" class="input" name="cpf" required>
                             <div>
                                 <label for="upload" class="input" id="add_perfil_img">Escolher foto de perfil</label>
-                                <input type="file" id="upload" hidden>
+                                <input type="file" id="upload "  name="foto_perfil" hidden>
                             </div>
                                 <!-- Div para os dados de endereço -->
                             </div>

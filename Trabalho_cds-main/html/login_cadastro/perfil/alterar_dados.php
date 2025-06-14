@@ -74,13 +74,13 @@ if (!empty($usuarioLogado['foto_perfil'])):
 <?php else:
     // Se não tiver foto, mesma lógica para o link com imagem padrão
     if ($usuarioLogado['tipo'] === 'admin') {
-        $linkPerfil = "../login_cadastro/perfil/admin.php";
+        $linkPerfil = "adm.php";
     } else {
-        $linkPerfil = "../login_cadastro/perfil/user.php";
+        $linkPerfil = "user.php";
     }
 ?>
     <a href="<?php echo $linkPerfil; ?>">
-        <img src="../../img/uploads/perfil_padrao.jpg" alt="Perfil padrão" id="Perfil">
+        <img src="../../../img/php_cliente//uploads/default.png" alt="Perfil padrão" id="Perfil">
     </a>
 <?php endif; ?>
 
@@ -126,7 +126,7 @@ if (!empty($usuarioLogado['foto_perfil'])):
 
     <!-- Exibir a foto atual -->
                             <div class="foto">
-                                <img src="<?= $foto_perfil ?>" alt="Foto de perfil" id="foto_perfil">
+                                <img src="../../img//<?= $foto_perfil ?>" alt="Foto de perfil" id="foto_perfil">
                                 <label for="upload" class="input" id="add_perfil_img">Escolher foto de perfil</label>
                                 <input type="file" id="upload" hidden name="foto_perfil">
                             </div>

@@ -88,6 +88,7 @@
     border-radius: 10px;
     background-color: var(--branco);
     box-shadow: 10px 10px 20px rgba(0, 0, 0, 0.3); /* Sombra suave */
+    margin-bottom: 50px;
 }
 
 .duas{

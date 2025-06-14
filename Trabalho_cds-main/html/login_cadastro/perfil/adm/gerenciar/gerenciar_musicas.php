@@ -15,25 +15,64 @@ $nomeMusicaFiltro = isset($_GET['nomeMusica']) ? $_GET['nomeMusica'] : '';
 $ordemTempo = isset($_GET['ordemTempo']) ? $_GET['ordemTempo'] : '';
 $cdFiltro = isset($_GET['cd']) ? $_GET['cd'] : '';
 
-// Consulta
-$sql_musica = "SELECT m.id_musica, m.nomeMusica, m.tempo, m.audio
+// Consulta com DISTINCT para evitar duplicados
+$sql_musica = "SELECT DISTINCT m.id_musica, m.nomeMusica, m.tempo, m.audio
                FROM Musica m
                LEFT JOIN CD_Musica cm ON m.id_musica = cm.id_musica
                LEFT JOIN CD c ON cm.id_cd = c.id_cd
                WHERE 1=1";
 
 if (!empty($nomeMusicaFiltro)) {
-    $sql_musica .= " AND m.nomeMusica LIKE '%$nomeMusicaFiltro%'";
+    // Use prepared statements para evitar SQL injection
+    $nomeMusicaFiltroParam = "%$nomeMusicaFiltro%";
+    $sql_musica .= " AND m.nomeMusica LIKE ?";
 }
 if (!empty($cdFiltro)) {
-    $sql_musica .= " AND c.titulo LIKE '%$cdFiltro%'";
+    $cdFiltroParam = "%$cdFiltro%";
+    $sql_musica .= " AND c.titulo LIKE ?";
 }
+
+// Ordenação
+if ($ordemTempo == 'maior') {
+    $sql_musica .= " ORDER BY m.tempo DESC";
+} elseif ($ordemTempo == 'menor') {
+    $sql_musica .= " ORDER BY m.tempo ASC";
+} else {
+    $sql_musica .= " ORDER BY m.id_musica ASC";
+}
+
+// Preparar e executar consulta com filtros (prepared statement)
+$stmt = $conn->prepare($sql_musica);
+
+// Montar os parâmetros dinamicamente
+$bindTypes = '';
+$params = [];
+
+if (!empty($nomeMusicaFiltro) && !empty($cdFiltro)) {
+    $bindTypes = 'ss';
+    $params = [&$nomeMusicaFiltroParam, &$cdFiltroParam];
+} elseif (!empty($nomeMusicaFiltro)) {
+    $bindTypes = 's';
+    $params = [&$nomeMusicaFiltroParam];
+} elseif (!empty($cdFiltro)) {
+    $bindTypes = 's';
+    $params = [&$cdFiltroParam];
+}
+
+// Bind dos parâmetros
+if (!empty($bindTypes)) {
+    $stmt->bind_param($bindTypes, ...$params);
+}
+
+$stmt->execute();
+$result_musica = $stmt->get_result();
+
 // Busca dados do usuário logado
 $sql_usuario_logado = "SELECT login, foto_perfil FROM Usuario WHERE id_usuario = ?";
-$stmt = $conn->prepare($sql_usuario_logado);
-$stmt->bind_param("i", $id_usuario);
-$stmt->execute();
-$result_usuario_logado = $stmt->get_result();
+$stmt_usuario = $conn->prepare($sql_usuario_logado);
+$stmt_usuario->bind_param("i", $id_usuario);
+$stmt_usuario->execute();
+$result_usuario_logado = $stmt_usuario->get_result();
 $usuario_logado = $result_usuario_logado->fetch_assoc();
 
 // Se não encontrar usuário, redireciona (por segurança)
@@ -53,19 +92,8 @@ if (!empty($foto_perfil_usuario) && file_exists($caminho_foto)) {
 } else {
     $foto_exibir = "../php_cliente/uploads/default.png"; // Foto padrão
 }
-
-
-
-if ($ordemTempo == 'maior') {
-    $sql_musica .= " ORDER BY m.tempo DESC";
-} elseif ($ordemTempo == 'menor') {
-    $sql_musica .= " ORDER BY m.tempo ASC";
-} else {
-    $sql_musica .= " ORDER BY m.id_musica ASC";
-}
-
-$result_musica = $conn->query($sql_musica);
 ?>
+
 
 <!DOCTYPE html>
 <html lang="pt-br">
@@ -93,12 +121,14 @@ $result_musica = $conn->query($sql_musica);
             <!-- Conta e Carrinho -->
             <div id="login_carrinho">
                 <a href="../../adm.php"><img src="<?php echo $foto_exibir; ?>" alt="Perfil" id="Perfil"></a>
-                <a href="#"><img src="../../../../../img/cabeçario/icone_carrinho.png" alt="Carrinho" id="Carrinho"></a>
+                <a href="../../butoes/carrinho.php"><img src="../../../../../img/cabeçario/icone_carrinho.png" alt="Carrinho" id="Carrinho"></a>
             </div>
         </div>
     </header>
     
-    <button class="button_voltar"><a href="#" class="link_voltar">Voltar</a></button>
+    <button class="button_voltar"><a href="../../adm.php" class="link_voltar">Voltar</a></button>
+    <button onclick="window.open('relatorio_musica.php', '_blank')" class="link_voltar button_voltar">Relatório da Semana</button>
+
 
     <h1 id="titulo">Gerenciar Músicas</h1>
     <form method="GET" action="">

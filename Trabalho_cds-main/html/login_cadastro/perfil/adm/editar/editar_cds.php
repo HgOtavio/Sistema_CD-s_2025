@@ -23,6 +23,23 @@ if (!$cd) {
     die("CD não encontrado.");
 }
 
+// Buscar todos os artistas
+$sql_todos_artistas = "SELECT id_artista, nomeArtista FROM Artista ORDER BY nomeArtista";
+$result_todos_artistas = $conn->query($sql_todos_artistas);
+$artistas = [];
+while ($row = $result_todos_artistas->fetch_assoc()) {
+    $artistas[] = $row;
+}
+
+// Buscar todas as músicas
+$sql_todas_musicas = "SELECT id_musica, nomeMusica FROM Musica ORDER BY nomeMusica";
+$result_todas_musicas = $conn->query($sql_todas_musicas);
+$musicas = [];
+while ($row = $result_todas_musicas->fetch_assoc()) {
+    $musicas[] = $row;
+}
+
+
 // Buscar artistas associados ao CD
 $sql_artistas = "SELECT a.id_artista, a.nomeArtista 
                  FROM Artista a 
@@ -69,6 +86,15 @@ while ($musica = $result_musicas->fetch_assoc()) {
     <script src="../../../../../js/mascaras/mascara_num.js" defer></script>
     <script src="../../../../../js/mascaras/mascara_preco.js" defer></script>
     <script src="../../../../../js/mascaras/mascara_ano.js" defer></script>
+    <!-- CSS do Select2 -->
+<link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+
+<!-- jQuery (necessário para Select2) -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+<!-- JS do Select2 -->
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+
     <script>
     $(document).ready(function() {
         // Inicializando o select2 para os selects de artistas e músicas
@@ -127,17 +153,27 @@ while ($musica = $result_musicas->fetch_assoc()) {
                             <input type="text" placeholder="Gênero" class="input" name="genero" value="<?= htmlspecialchars($cd['genero']) ?>" required>
                             <textarea class="input" name="descricao" required><?= htmlspecialchars($cd['descricao']) ?></textarea>
                             
-                            <!-- Artistas associados -->
-                            <!-- Artistas associados -->
-    <input type="text" id="artistaSearch" onkeyup="searchArtistas()" placeholder="Pesquise artistas" class="input">
-    <div id="artistaSuggestions" ></div>
-    <div id="selectedArtistas"></div> <!-- Exibição dos artistas selecionados -->
+                            
+<select id="artistaSelect" name="artistas[]" multiple="multiple" style="width: 100%;">
+  <?php
+    foreach ($artistas as $artista) {
+      $selected = in_array($artista['id_artista'], $artistas_associados) ? "selected" : "";
+      echo "<option value='{$artista['id_artista']}' $selected>{$artista['nomeArtista']}</option>";
+    }
+  ?>
+</select>
+
+<select id="musicaSelect" name="musicas[]" multiple="multiple" style="width: 100%;">
+  <?php
+    foreach ($musicas as $musica) {
+      $selected = in_array($musica['id_musica'], $musicas_associadas) ? "selected" : "";
+      echo "<option value='{$musica['id_musica']}' $selected>{$musica['nomeMusica']}</option>";
+    }
+  ?>
+</select>
 
 
-                             <!-- Músicas associadas -->
-    <input type="text" id="musicaSearch" onkeyup="searchMusicas()" placeholder="Pesquise músicas" class="input">
-    <div id="musicaSuggestions"></div>
-    <div id="selectedMusicas"></div> <!-- Exibição das músicas selecionadas -->
+
                         </div>
                     </div>
                     <button id="button">Alterar</button>
@@ -161,108 +197,20 @@ while ($musica = $result_musicas->fetch_assoc()) {
         <img src="../../../../../img/alterar_dados/img_cantos.png" alt="notas musicais" class="img_esquerda" id="sumir_d">
         <img src="../../../../../img/alterar_dados/img_cantos.png" alt="notas musicais" class="img_esquerda" id="sumir_d2">
     </div>
-    <script>
-    var artistasSelecionados = [];
-    var musicasSelecionadas = [];
-
-    // Função de pesquisa de artistas
-    function searchArtistas() {
-        var input = document.getElementById('artistaSearch');
-        var filter = input.value.toUpperCase();
-        var div = document.getElementById('artistaSuggestions');
-        div.innerHTML = ""; // Limpa as sugestões
-
-        // Filtra as sugestões
-        <?php foreach ($artistas as $artista): ?>
-            if ("<?= $artista['nomeArtista'] ?>".toUpperCase().indexOf(filter) > -1) {
-                var divItem = document.createElement("div");
-                divItem.textContent = "<?= $artista['nomeArtista'] ?>";
-                divItem.classList.add('suggestion-item');
-                divItem.onclick = function() { selectArtista(<?= $artista['id_artista'] ?>, '<?= $artista['nomeArtista'] ?>'); };
-                div.appendChild(divItem);
-            }
-        <?php endforeach; ?>
-    }
-
-    // Função de pesquisa de músicas
-    function searchMusicas() {
-        var input = document.getElementById('musicaSearch');
-        var filter = input.value.toUpperCase();
-        var div = document.getElementById('musicaSuggestions');
-        div.innerHTML = ""; // Limpa as sugestões
-
-        // Filtra as sugestões
-        <?php foreach ($musicas as $musica): ?>
-            if ("<?= $musica['nomeMusica'] ?>".toUpperCase().indexOf(filter) > -1) {
-                var divItem = document.createElement("div");
-                divItem.textContent = "<?= $musica['nomeMusica'] ?>";
-                divItem.classList.add('suggestion-item');
-                divItem.onclick = function() { selectMusica(<?= $musica['id_musica'] ?>, '<?= $musica['nomeMusica'] ?>'); };
-                div.appendChild(divItem);
-            }
-        <?php endforeach; ?>
-    }
-
-    // Função para selecionar artista
-    function selectArtista(id, nome) {
-        if (!artistasSelecionados.includes(id)) {
-            artistasSelecionados.push(id);
-            var div = document.createElement("div");
-            div.textContent = nome;
-            var removeBtn = document.createElement("button");
-            removeBtn.textContent = "Remover";
-            removeBtn.onclick = function() { removeArtista(id, div); };
-            div.appendChild(removeBtn);
-            document.getElementById('selectedArtistas').appendChild(div);
-            updateArtistasSearch();
-        }
-    }
-
-    // Função para selecionar música
-    function selectMusica(id, nome) {
-        if (!musicasSelecionadas.includes(id)) {
-            musicasSelecionadas.push(id);
-            var div = document.createElement("div");
-            div.textContent = nome;
-            var removeBtn = document.createElement("button");
-            removeBtn.textContent = "Remover";
-            removeBtn.onclick = function() { removeMusica(id, div); };
-            div.appendChild(removeBtn);
-            document.getElementById('selectedMusicas').appendChild(div);
-            updateMusicasSearch();
-        }
-    }
-
-    // Função para remover artista
-    function removeArtista(id, div) {
-        artistasSelecionados = artistasSelecionados.filter(function(item) {
-            return item !== id;
-        });
-        div.remove();
-    }
-
-    // Função para remover música
-    function removeMusica(id, div) {
-        musicasSelecionadas = musicasSelecionadas.filter(function(item) {
-            return item !== id;
-        });
-        div.remove();
-    }
-
-    // Atualiza o campo de busca de artistas
-    function updateArtistasSearch() {
-        var input = document.getElementById('artistaSearch');
-        input.value = '';  // Limpa o campo de pesquisa
-        document.getElementById('artistaSuggestions').innerHTML = ''; // Limpa sugestões
-    }
-
-    // Atualiza o campo de busca de músicas
-    function updateMusicasSearch() {
-        var input = document.getElementById('musicaSearch');
-        input.value = '';  // Limpa o campo de pesquisa
-        document.getElementById('musicaSuggestions').innerHTML = ''; // Limpa sugestões
-    }
+  
+<script>
+  $(document).ready(function() {
+    $('#artistaSelect').select2({
+      placeholder: 'Selecione os artistas',
+      allowClear: true
+    });
+    $('#musicaSelect').select2({
+      placeholder: 'Selecione as músicas',
+      allowClear: true
+    });
+  });
 </script>
+
 
 </body>
 </html>

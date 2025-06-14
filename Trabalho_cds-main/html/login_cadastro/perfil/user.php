@@ -2,7 +2,7 @@
 session_start();
 include "../../login_cadastro/conexao.php";
 
-// Verifica se o usuário está logado e é administrador
+// Verifica se o usuário está logado e é cliente
 if (!isset($_SESSION["id_usuario"]) || $_SESSION["tipo"] != "cliente") {
     header("Location: ../../login_cadastro/login.php");
     exit();
@@ -11,36 +11,44 @@ if (!isset($_SESSION["id_usuario"]) || $_SESSION["tipo"] != "cliente") {
 $id_usuario = $_SESSION['id_usuario'];
 
 // Consulta informações do usuário
-$sql = "SELECT foto_perfil, login, email, cep,nome_completo FROM Usuario WHERE id_usuario = ?";
-if ($stmt = $conn->prepare($sql)) {
-    $stmt->bind_param("i", $id_usuario);
-    $stmt->execute();
-    $result = $stmt->get_result();
-    $usuario = $result->fetch_assoc();
-} else {
-    echo "Erro na consulta ao banco de dados.";
+$sql = "SELECT foto_perfil, login, email, cep, nome_completo FROM Usuario WHERE id_usuario = ?";
+$stmt = $conn->prepare($sql);
+$stmt->bind_param("i", $id_usuario);
+$stmt->execute();
+$result = $stmt->get_result();
+$usuario = $result->fetch_assoc();
+
+if (!$usuario) {
+    echo "Erro ao buscar informações do usuário.";
     exit();
 }
 
-// Lógica para buscar em dois diretórios
-$foto = $usuario['foto_perfil'];
-$foto_cliente = "../../../img/php_cliente/uploads/" . basename($foto);
+// Consultas de gênero, artista e música
+$queryGenero = "SELECT DISTINCT genero FROM CD LIMIT 10";
+$queryArtista = "SELECT nomeArtista FROM Artista LIMIT 10";
+$queryMusica = "SELECT nomeMusica FROM Musica LIMIT 10";
 
-if (!empty($foto) && file_exists($foto_cliente)) {
-    $foto_perfil = $foto_cliente;
-} elseif (!empty($foto) && file_exists($foto_cliente)) {
-    $foto_perfil = $foto_cliente;
+$generos = $conn->query($queryGenero)->fetch_all(MYSQLI_ASSOC);
+$artistas = $conn->query($queryArtista)->fetch_all(MYSQLI_ASSOC);
+$musicas = $conn->query($queryMusica)->fetch_all(MYSQLI_ASSOC);
+
+// Foto de perfil
+$foto = $usuario['foto_perfil'];
+$caminho_foto = "../../../img/php_cliente/uploads/" . basename($foto);
+
+if (!empty($foto) && file_exists($caminho_foto)) {
+    $foto_perfil = $caminho_foto;
 } else {
-    $foto_perfil = "../php_cliente/uploads/default.png";
+    $foto_perfil = "../../../img/php_cliente/uploads/default.png";
 }
 
-// Pegando dados do usuário
-
+// Dados do usuário
 $nome_usuario = $usuario['nome_completo'];
 $login_usuario = $usuario['login'];
 $email_usuario = $usuario['email'];
 $cep_usuario = $usuario['cep'];
 ?>
+
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
@@ -81,7 +89,7 @@ $cep_usuario = $usuario['cep'];
 
             <div id="login_carrinho"> <!-- Login e Carrinho -->
 
-                <a href="#"><img src="../../../img/cabeçario/icone_carrinho.png" alt="Carrinho" id="Carrinho"></a><!-- Ícone de carrinho -->
+                <a href="butoes/carrinho.php"><img src="../../../img/cabeçario/icone_carrinho.png" alt="Carrinho" id="Carrinho"></a><!-- Ícone de carrinho -->
             </div>
         </div>
 
@@ -94,10 +102,10 @@ $cep_usuario = $usuario['cep'];
 
             <ul id="menu">
 
-                <li class="p_menu"><a href="#" class="a_menu">Inicio</a></li>
-                <li class="p_menu"><a href="#" class="a_menu">Produtos</a></li>
+                <li class="p_menu"><a href="../../pagina_inicial/index_logado.php" class="a_menu">Inicio</a></li>
+                <li class="p_menu"><a href="../../produtos/todos_os_produtos.php?" class="a_menu">Produtos</a></li>
                 
-                 <!-- Menu suspenso de gêneros musicais -->
+                  <!-- Menu suspenso de gêneros musicais -->
                 <li class="p_menu" id="menu_genero">
 
                     <button onclick="aparecer_g('sumir_g')" class="b_menu">
@@ -108,24 +116,14 @@ $cep_usuario = $usuario['cep'];
                     <ul class="subclasse_menu" id="sumir_g">
                         
                         <ul class="sub_subclasse_menu">
-                            <li><a href="#" class="sub_a">Clássica</a></li>
-                            <li><a href="#" class="sub_a">Eletrônica</a></li>
-                            <li><a href="#" class="sub_a">Forro</a></li>
-                            <li><a href="#" class="sub_a">Hip Hop</a></li>
-                            <li><a href="#" class="sub_a">MPB</a></li>
-                        </ul>
-                        
-                        <ul class="sub_subclasse_menu">
-                            <li><a href="#" class="sub_a">Pagode</a></li>
-                            <li><a href="#" class="sub_a">Pop</a></li>
-                            <li><a href="#" class="sub_a">Reggae</a></li>
-                            <li><a href="#" class="sub_a">Rock</a></li>
-                            <li><a href="#" class="sub_a">Sertanejo</a></li>
+                        <?php foreach ($generos as $genero): ?>
+                                 <li><a href="../../produtos/todos_os_produtos.php?genero=<?= htmlspecialchars($genero['genero']) ?>" class="sub_a"><?= htmlspecialchars($genero['genero']) ?></a></li>
+                        <?php endforeach; ?>
                         </ul>
                     </ul>
                 </li>
 
-                <!-- Menu suspenso para Artistas -->
+               <!-- Menu suspenso para Artistas -->
                 <li class="p_menu" id="arredondar_b">
 
                     <button onclick="aparecer_a('sumir_a')" class="b_menu">
@@ -136,20 +134,12 @@ $cep_usuario = $usuario['cep'];
                     <ul class="subclasse_menu_a" id="sumir_a">
                         
                         <ul class="sub_subclasse_menu">
-                            <li><a href="#" class="sub_a">Ludwing Beethowen</a></li>
-                            <li><a href="#" class="sub_a">Marshmello</a></li>
-                            <li><a href="#" class="sub_a">Luiz Gonzaga</a></li>
-                            <li><a href="#" class="sub_a">Snoop Dogg</a></li>
-                            <li><a href="#" class="sub_a">Maria Bethânia</a></li>
+                        <?php foreach ($artistas as $artista): ?>
+                           <li><a href="../../produtos/todos_os_produtos.php??busca_geral=<?= htmlspecialchars($artista['nomeArtista']) ?>"  class="sub_a"><?= htmlspecialchars($artista['nomeArtista']) ?></a></li>
+                        <?php endforeach; ?>
                         </ul>
                         
-                        <ul class="sub_subclasse_menu">
-                            <li><a href="#" class="sub_a">Péricles</a></li>
-                            <li><a href="#" class="sub_a">Michael Jackson</a></li>
-                            <li><a href="#" class="sub_a">Bob Marley</a></li>
-                            <li><a href="#" class="sub_a">Elvis Presley</a></li>
-                            <li><a href="#" class="sub_a">Luan Santana</a></li>
-                        </ul>
+                       
                     </ul>
                 </li>
             </ul>
@@ -177,7 +167,6 @@ $cep_usuario = $usuario['cep'];
             <div id="butoes">
                 <button class="butoes"><a href="butoes/carrinho.php" class="a_butoes">Carrinho</a></button>
                 <button class="butoes"><a href="butoes/favoritos.php" class="a_butoes">Favoritos</a></button>
-                <button class="butoes"><a href="butoes/sugestao.php" class="a_butoes">Sugestões</a></button>
                 <button class="butoes"><a href="butoes/historico.php" class="a_butoes">Histórico</a></button>
                 <button class="butoes"><a href="../../login_cadastro/logout.php" class="a_butoes">Sair</a></button>
             </div>

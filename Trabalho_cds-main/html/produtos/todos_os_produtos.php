@@ -40,6 +40,10 @@ $generos_result = $conn->query("SELECT DISTINCT genero FROM CD");
 // Buscar anos com destaque
 $anosResult = $conn->query("SELECT DISTINCT anoLancamento FROM CD WHERE destaque = 'Destaque' ORDER BY anoLancamento DESC");
 
+$id_usuario = $_SESSION['id_usuario'];
+$res = $conn->query("SELECT * FROM Usuario WHERE id_usuario = $id_usuario");
+$usuarioLogado = $res->fetch_assoc();
+
 $sql = "
     SELECT 
         CD.id_cd, 
@@ -156,7 +160,7 @@ $result = $stmt->get_result();
 
 // Exibe a mensagem de sucesso, caso exista
 if (isset($_SESSION['msg'])) {
-    echo "<div style='text-align: center; color: green; font-size: 18px; margin: 20px 0;'>" . $_SESSION['msg'] . "</div>";
+    echo "<div style='display:none;'>" . $_SESSION['msg'] . "</div>";
     unset($_SESSION['msg']); // Limpa a mensagem da sessão após exibição
 }
 
@@ -204,7 +208,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['favoritar'])) {
 // Processa a ação de adicionar ao carrinho (POST)
 if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['adicionar_carrinho'])) {
     $cd_id = $_POST['cd_id'];
-    $quantidade = 1; // A quantidade pode ser ajustada conforme necessário
+    $quantidade = 1; // Pode ajustar se quiser permitir escolher quantidade
 
     // Verifica se o carrinho já foi inicializado na sessão
     if (!isset($_SESSION['carrinho'])) {
@@ -213,13 +217,14 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['adicionar_carrinho']))
 
     // Adiciona o CD ao carrinho
     if (isset($_SESSION['carrinho'][$cd_id])) {
-        $_SESSION['carrinho'][$cd_id] += $quantidade; // Se o CD já está no carrinho, aumenta a quantidade
+        $_SESSION['carrinho'][$cd_id] += $quantidade;
     } else {
-        $_SESSION['carrinho'][$cd_id] = $quantidade; // Adiciona o CD com a quantidade inicial
+        $_SESSION['carrinho'][$cd_id] = $quantidade;
     }
 
+    // Mensagem de confirmação
     $_SESSION['msg'] = "CD adicionado ao carrinho!";
-    header("Location: " . $_SERVER['PHP_SELF']);
+    header("Location: " . $_SERVER['PHP_SELF'] . "?id_cd=" . $cd_id);
     exit();
 }
 
@@ -238,6 +243,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['adicionar_carrinho']))
     <link rel="stylesheet" href="../../css/todos_produtos/todos_produtos_responsividade.css">
     <link rel="stylesheet" href="../../css/cabeçalhos/cabeçalho_com_login.css">
     <link rel="stylesheet" href="../../css/rodape/rodape.css">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
     
 
     <script src="../../js/todos_produtos/filtro_part1.js" defer></script>
@@ -252,6 +259,10 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['adicionar_carrinho']))
     <script src="../../js/cabeçalho/menu.js" defer></script> <!-- Script do menu interativo -->
 </head>
 <body>
+    
+
+
+
 
     <!-- Cabeçalho da página (logado) -->
     <header> 
@@ -282,12 +293,31 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['adicionar_carrinho']))
             </div>
 
             <div id="login_carrinho"> <!-- Login e Carrinho -->
-                <?php if (!empty($usuarioLogado['foto_perfil'])): ?>
-            <img src=" ../../img/<?php echo htmlspecialchars($usuarioLogado['foto_perfil']); ?>"  id="Perfil" alt="Perfil">
-        <?php else: ?>
-            <img src="../../img/uploads/perfil_padrao.jpg" alt="Perfil padrão"  id="Perfil" >
-        <?php endif; ?><!-- Foto de perfil -->
-
+                <?php
+// Verifica se o usuário tem uma foto de perfil
+if (!empty($usuarioLogado['foto_perfil'])):
+    // Define a URL de destino com base no tipo de usuário
+    if ($usuarioLogado['tipo'] === 'admin') {
+        $linkPerfil = "../login_cadastro/perfil/adm.php";
+    } else {
+        $linkPerfil = "../login_cadastro/perfil/user.php";
+    }
+?>
+    <a href="<?php echo $linkPerfil; ?>">
+        <img src="../../img/php_cliente//<?php echo htmlspecialchars($usuarioLogado['foto_perfil']); ?>" id="Perfil" alt="Perfil">
+    </a>
+<?php else:
+    // Se não tiver foto, mesma lógica para o link com imagem padrão
+    if ($usuarioLogado['tipo'] === 'admin') {
+        $linkPerfil = "../login_cadastro/perfil/admin.php";
+    } else {
+        $linkPerfil = "../login_cadastro/perfil/user.php";
+    }
+?>
+    <a href="<?php echo $linkPerfil; ?>">
+        <img src="../../img/uploads/perfil_padrao.jpg" alt="Perfil padrão" id="Perfil">
+    </a>
+<?php endif; ?>
                 <a href="../login_cadastro/perfil/butoes/carrinho.php"><img src="../../img/cabeçario/icone_carrinho.png" alt="Carrinho" id="Carrinho"></a><!-- Ícone de carrinho -->
             </div>
         </div>
@@ -301,7 +331,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['adicionar_carrinho']))
 
             <ul id="menu">
 
-                <li class="p_menu"><a href="#" class="a_menu">Inicio</a></li>
+                <li class="p_menu"><a href="../pagina_inicial/index_logado.php" class="a_menu">Inicio</a></li>
                 <li class="p_menu"><a href="#" class="a_menu">Produtos</a></li>
                 
                  <!-- Menu suspenso de gêneros musicais -->

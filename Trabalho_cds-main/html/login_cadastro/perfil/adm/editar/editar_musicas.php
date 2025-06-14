@@ -62,7 +62,96 @@ while ($cd = $result_cds->fetch_assoc()) {
     <link rel="stylesheet" href="../../../../../css/adm/add_edit/add_edit_musicas.css">
     <link rel="stylesheet" href="../../../../../css/cabeçalhos/cabeçalho_com_login_sem_menu.css">
     <script src="../../../../../js/mascaras/mascara_temp.js" defer></script>
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+
+
 </head>
+<style>/* Fundo da caixa */
+/* Ajusta o X para ficar longe do texto */
+.select2-container--default .select2-selection--multiple .select2-selection__choice {
+    padding-right: 25px !important; /* dá espaço à direita pra caber o X */
+    position: relative; /* para o X ser posicionado em relação a essa caixa */
+}
+
+.select2-container--default .select2-selection--multiple .select2-selection__choice__remove {
+    position: absolute !important;
+    right: 5px; /* distancia do canto direito */
+    top: 50%;
+    transform: translateY(-50%);
+    color: #f3e8ff;
+    font-weight: bold;
+    cursor: pointer;
+    padding-left: 5px;
+    font-size: 14px;
+    z-index: 10;
+    transition: color 0.3s;
+}
+
+.select2-container--default .select2-selection--multiple .select2-selection__choice__remove:hover {
+    color: #9333ea;
+}
+
+/* Fundo da caixa */
+.select2-container--default .select2-selection--multiple {
+    background-color: #f3e8ff;
+    border: 2px solid #a855f7;
+    border-radius: 8px;
+    padding: 8px 10px;  /* mais padding pra espaçamento */
+    min-height: 40px;   /* altura mínima pra não ficar espremido */
+    display: flex;
+    flex-wrap: wrap;    /* permite as tags quebrarem linha */
+    gap: 6px;           /* espaço entre as tags */
+}
+
+/* Quando seleciona (tag) */
+.select2-container--default .select2-selection--multiple .select2-selection__choice {
+    background-color: #a855f7;
+    border: 1px solid #9333ea;
+    color: white;
+    border-radius: 5px;
+    padding: 4px 8px;  /* mais espaçamento interno */
+    font-size: 14px;
+    display: flex;
+    align-items: center;
+    gap: 5px;          /* espaço entre texto e X */
+    white-space: nowrap; /* não quebra o texto da tag */
+}
+
+/* Ícone de remover (X) */
+.select2-container--default .select2-selection--multiple .select2-selection__choice__remove {
+    color: #f3e8ff;
+    cursor: pointer;
+    font-weight: bold;
+    transition: color 0.3s;
+}
+
+/* Hover no X */
+.select2-container--default .select2-selection--multiple .select2-selection__choice__remove:hover {
+    color: #9333ea;
+}
+
+/* Caixinha de busca */
+.select2-container--default .select2-selection--multiple .select2-search--inline .select2-search__field {
+    color: #4b0082;
+    font-size: 14px;
+    min-width: 150px; /* largura mínima para digitar */
+}
+
+/* Dropdown dos itens */
+.select2-container--default .select2-results__option--highlighted[aria-selected] {
+    background-color: #a855f7;
+    color: white;
+}
+
+/* Itens normais */
+.select2-container--default .select2-results__option {
+    color: #4b0082;
+}
+
+</style>
+
 <body>
 
     <!-- Cabeçalho da página (com user logado) -->
@@ -108,15 +197,17 @@ while ($cd = $result_cds->fetch_assoc()) {
                                 <input type="file" class="input add_perfil_img" id="upload" hidden class="input">
                             </div> 
                             
-                            <select class="input" name="cdsSelecionados[]" multiple size="5" required>
-                                <?php foreach ($cds_disponiveis as $cd): 
-                                    $selected = in_array($cd['id_cd'], array_column($cds_associados, 'id_cd')) ? 'selected' : '';
-                                ?>
-                                    <option value="<?= $cd['id_cd']; ?>" <?= $selected; ?>>
-                                        <?= htmlspecialchars($cd['titulo']); ?>
-                                    </option>
-                                <?php endforeach; ?>
-                            </select>
+                          <label>Selecione os CDs relacionados:</label>
+<select id="select_cds" class="input" name="cdsSelecionados[]" multiple="multiple" required>
+    <?php foreach ($cds_disponiveis as $cd): 
+        $selected = in_array($cd['id_cd'], array_column($cds_associados, 'id_cd')) ? 'selected' : '';
+    ?>
+        <option value="<?= $cd['id_cd']; ?>" <?= $selected; ?>>
+            <?= htmlspecialchars($cd['titulo']); ?>
+        </option>
+    <?php endforeach; ?>
+</select>
+
                         </div>
 
                         <!-- Botão de alterar -->
@@ -143,8 +234,20 @@ while ($cd = $result_cds->fetch_assoc()) {
         <img src="../../../../../img/alterar_dados/img_cantos.png" alt="notas musicais" class="img_esquerda" id="sumir_d">
         <img src="../../../../../img/alterar_dados/img_cantos.png" alt="notas musicais" class="img_esquerda" id="sumir_d2">
     </div>
+     <script>
+    $(document).ready(function() {
+        $('#select_cds').select2({
+            placeholder: "Selecione os CDs",
+            allowClear: true,
+            width: '100%'
+        });
+    });
+</script>
 
     <?php $conn->close(); ?>
+
+   
+
 
 </body>
 </html>

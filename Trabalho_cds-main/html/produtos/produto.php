@@ -146,7 +146,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['adicionar_carrinho']))
     }
 
     $_SESSION['msg'] = "CD adicionado ao carrinho!";
-    header("Location: " . $_SERVER['PHP_SELF']);
+    header("Location: " . $_SERVER['PHP_SELF'] . "?id_cd=" . $cd_id);
+
     exit();
 }
 
@@ -278,7 +279,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['adicionar_carrinho']))
 
     <section>
         <div id="caminho">
-            <a href="#" id="home" class="link_caminho">
+            <a href="../../login_cadastro/pagina_inicial/index_logado.php" id="home" class="link_caminho">
                 <img src="../../img/todos_produtos/icone_home.png" alt="Home" id="img_home">
                 <p>Home</p>
             </a>
@@ -518,8 +519,8 @@ function decrementar(btn) {
                 <form action="salvar_avaliacao.php" method="POST">
     <input type="hidden" name="id_cd" value="<?= htmlspecialchars($id_cd) ?>">
     
-    <label>Nota:
-        <select name="nota" required>
+    <label id="text_avalicao_titulo">Nota:
+        <select name="nota" id="caixa_escolha" required>
             <option value="">Escolha</option>
             <option value="1">1 ★</option>
             <option value="2">2 ★</option>
@@ -533,7 +534,7 @@ function decrementar(btn) {
         <textarea name="comentario" rows="3" cols="40" id="input_text" ></textarea>
     </p>
     
-    <button type="submit">Enviar Avaliação</button>
+    <button type="submit" class="btn"  id="but_ava">Enviar Avaliação</button>
     </div><br><br>
 
 </form>
@@ -571,12 +572,12 @@ function decrementar(btn) {
   $media_avaliacoes = round($row_media['media_avaliacoes'], 1); // arredondando para 1 casa decimal
 
   // Exibe o total de avaliações e a média
-  echo "<p><strong>Total de Avaliações:</strong> " . $total_avaliacoes . " avaliações</p>";
-  echo "<p><strong>Média das Avaliações:</strong> " . $media_avaliacoes . " ★</p>";
+  echo "<p class='sub_ava_baixo'><strong class='ava_baixo'>Total de Avaliações:</strong> " . $total_avaliacoes . " avaliações</p>";
+  echo "<p class='sub_ava_baixo'><strong class='ava_baixo'>Média das Avaliações:</strong> " . $media_avaliacoes . " ★</p>";
 
   // Exibindo as estrelas correspondentes à média
   $estrelas_media = round($media_avaliacoes);
-  echo "<p><strong>Estrelas médias:</strong> ";
+  echo "<p class='sub_ava_baixo'><strong class='ava_baixo'>Estrelas médias:</strong> ";
   for ($i = 1; $i <= 5; $i++) {
       if ($i <= $estrelas_media) {
           echo "<img src='../../img/avaliar/estrela_amarela.png' alt='estrela cheia' class='estrela'>";
@@ -602,7 +603,7 @@ function decrementar(btn) {
   $result = $stmt->get_result();
 
   if ($result->num_rows === 0) {
-      echo "<p style='margin-left: 15px;'>Nenhuma avaliação encontrada para este CD.</p>";
+      echo "<p class='ava_baixo'>Nenhuma avaliação encontrada para este CD.</p>";
   } else {
       while ($row = $result->fetch_assoc()) {
           // Caminho da imagem de perfil
@@ -622,7 +623,7 @@ function decrementar(btn) {
               <!-- Foto de perfil do usuário -->
               <div>
               <?php if (!empty($usuarioLogado['foto_perfil'])): ?>
-            <img src=" ../../img/<?php echo htmlspecialchars($usuarioLogado['foto_perfil']); ?>"  id="Perfil" alt="Perfil">
+            <img src=" ../../img/php_cliente//<?php echo htmlspecialchars($usuarioLogado['foto_perfil']); ?>"  id="Perfil" alt="Perfil">
         <?php else: ?>
             <img src="../../img/uploads/perfil_padrao.jpg" alt="Perfil padrão"  id="Perfil" >
         <?php endif; ?><!-- Foto de perfil -->

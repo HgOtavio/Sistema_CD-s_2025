@@ -59,6 +59,6 @@ if (isset($_POST['cds']) && is_array($_POST['cds'])) {
     }
 }
 
-echo "<script>alert('Artista atualizado com sucesso!'); window.location.href='listar_artistas.php';</script>";
+echo '<script>alert("Artista atualizado com sucesso!"); window.location.href="editar_artistas.php?id_artista=' . $id_artista . '";</script>';
 $conn->close();
 ?>
