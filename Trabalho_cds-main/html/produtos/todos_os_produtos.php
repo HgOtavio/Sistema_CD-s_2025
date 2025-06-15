@@ -1,8 +1,6 @@
 <?php
 session_start();
-// Função para garantir que o parâmetro seja tratado como array
 $id_usuario = $_SESSION['id_usuario'];
-
 
 include "../login_cadastro/conexao.php";
 
@@ -32,15 +30,18 @@ $anosSelecionados = isset($_GET['anos']) ? $_GET['anos'] : [];
 $mostrarDestaques = isset($_GET['destaque']) ? in_array('Destaque', $_GET['destaque']) : false;
 $mostrarNaoDestaques = isset($_GET['destaque']) ? in_array('Não Destaque', $_GET['destaque']) : false;
 
+// PAGINAÇÃO INSERIDA AQUI
+$pagina = isset($_GET['pagina']) && is_numeric($_GET['pagina']) ? (int)$_GET['pagina'] : 1;
+$limite = 16;
+$offset = ($pagina - 1) * $limite;
+
 // Consulta para checkboxes
 $artistas_result = $conn->query("SELECT * FROM Artista");
 $musicas_result = $conn->query("SELECT * FROM Musica");
 $generos_result = $conn->query("SELECT DISTINCT genero FROM CD");
 
-// Buscar anos com destaque
 $anosResult = $conn->query("SELECT DISTINCT anoLancamento FROM CD WHERE destaque = 'Destaque' ORDER BY anoLancamento DESC");
 
-$id_usuario = $_SESSION['id_usuario'];
 $res = $conn->query("SELECT * FROM Usuario WHERE id_usuario = $id_usuario");
 $usuarioLogado = $res->fetch_assoc();
 
@@ -65,7 +66,6 @@ $sql = "
     AND (CD.disponibilidade >= $disponibilidade)
 ";
 
-// Filtros adicionais
 if (!empty($busca_geral)) {
     $sql .= " AND (
         Artista.nomeArtista LIKE '%$busca_geral%' OR 
@@ -107,10 +107,8 @@ if ($desconto == 'com') {
     $sql .= " AND (P.desconto = 0 OR P.desconto IS NULL)";
 }
 
-// Agrupamento para evitar duplicidade
 $sql .= " GROUP BY CD.id_cd";
 
-// Ordenação
 $ordem_sql = '';
 switch ($ordem_personalizada) {
     case 'avaliacao':
@@ -138,97 +136,34 @@ if (!empty($ordem_sql)) {
     $sql .= " ORDER BY $ordem_sql";
 }
 
-// Puxar os 10 primeiros dados da tabela Gênero, Artista, Música
-$queryGenero = "SELECT DISTINCT genero FROM CD LIMIT 10";
-$queryArtista = "SELECT nomeArtista FROM Artista LIMIT 10";
-$queryMusica = "SELECT nomeMusica FROM Musica LIMIT 10";
+$sql .= " LIMIT $limite OFFSET $offset";
 
-// Executando as consultas com a variável $conn
-$stmtGenero = $conn->query($queryGenero);
-$stmtArtista = $conn->query($queryArtista);
-$stmtMusica = $conn->query($queryMusica);
-
-// Recuperando os resultados das consultas
-$generos = $stmtGenero->fetch_all(MYSQLI_ASSOC);
-$artistas = $stmtArtista->fetch_all(MYSQLI_ASSOC);
-$musicas = $stmtMusica->fetch_all(MYSQLI_ASSOC);
-// Executa
+// Executa a consulta principal
 $stmt = $conn->prepare($sql);
 $stmt->execute();
 $result = $stmt->get_result();
 
+// Total de CDs para cálculo de páginas:
+$sql_total = "
+    SELECT COUNT(DISTINCT CD.id_cd) as total 
+    FROM CD 
+    LEFT JOIN CD_Artista ON CD.id_cd = CD_Artista.id_cd
+    LEFT JOIN Artista ON CD_Artista.id_artista = Artista.id_artista
+    LEFT JOIN Promocao P ON CD.id_cd = P.id_cd
+    LEFT JOIN CD_Musica ON CD.id_cd = CD_Musica.id_cd
+    LEFT JOIN Musica ON CD_Musica.id_musica = Musica.id_musica
+    WHERE CD.preco BETWEEN $preco_min AND $preco_max
+    AND (P.desconto >= 0 OR P.desconto IS NULL)
+    AND (CD.disponibilidade >= $disponibilidade)
+";
+$total_result = $conn->query($sql_total);
+$total_row = $total_result->fetch_assoc();
+$total_cds = $total_row['total'];
+$total_paginas = ceil($total_cds / $limite);
 
-// Exibe a mensagem de sucesso, caso exista
-if (isset($_SESSION['msg'])) {
-    echo "<div style='display:none;'>" . $_SESSION['msg'] . "</div>";
-    unset($_SESSION['msg']); // Limpa a mensagem da sessão após exibição
-}
-
-// Processa a ação de favoritar (POST)
-if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['favoritar'])) {
-    // Recebe o ID do CD e o ID do usuário (supondo que o ID do usuário está na sessão)
-    $cd_id = $_POST['cd_id'];
-    $user_id = $_SESSION['id_usuario'];
-
-    // Verificar se o CD já está favoritado
-    $sql_verificar = "SELECT 1 FROM Favoritos WHERE id_usuario = ? AND id_cd = ?";
-    $stmt = $conn->prepare($sql_verificar);
-    $stmt->bind_param("ii", $user_id, $cd_id);
-    $stmt->execute();
-    $stmt->store_result();
-
-    // Se o CD já estiver favoritado, vamos removê-lo
-    if ($stmt->num_rows > 0) {
-        // CD favoritado, vamos removê-lo
-        $sql_remover = "DELETE FROM Favoritos WHERE id_usuario = ? AND id_cd = ?";
-        $stmt_remover = $conn->prepare($sql_remover);
-        $stmt_remover->bind_param("ii", $user_id, $cd_id);
-        $stmt_remover->execute();
-        $stmt_remover->close();
-
-        // Mensagem de sucesso
-        $_SESSION['msg'] = "CD removido dos favoritos!";
-    } else {
-        // CD não favoritado, vamos adicionar
-        $sql_adicionar = "INSERT INTO Favoritos (id_usuario, id_cd) VALUES (?, ?)";
-        $stmt_adicionar = $conn->prepare($sql_adicionar);
-        $stmt_adicionar->bind_param("ii", $user_id, $cd_id);
-        $stmt_adicionar->execute();
-        $stmt_adicionar->close();
-
-        // Mensagem de sucesso
-        $_SESSION['msg'] = "CD adicionado aos favoritos!";
-    }
-    
-    // Redirecionar para a página atual após o processamento
-    header("Location: " . $_SERVER['PHP_SELF']);
-    exit();
-}
-
-// Processa a ação de adicionar ao carrinho (POST)
-if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['adicionar_carrinho'])) {
-    $cd_id = $_POST['cd_id'];
-    $quantidade = 1; // Pode ajustar se quiser permitir escolher quantidade
-
-    // Verifica se o carrinho já foi inicializado na sessão
-    if (!isset($_SESSION['carrinho'])) {
-        $_SESSION['carrinho'] = [];
-    }
-
-    // Adiciona o CD ao carrinho
-    if (isset($_SESSION['carrinho'][$cd_id])) {
-        $_SESSION['carrinho'][$cd_id] += $quantidade;
-    } else {
-        $_SESSION['carrinho'][$cd_id] = $quantidade;
-    }
-
-    // Mensagem de confirmação
-    $_SESSION['msg'] = "CD adicionado ao carrinho!";
-    header("Location: " . $_SERVER['PHP_SELF'] . "?id_cd=" . $cd_id);
-    exit();
-}
-
+// Fim da lógica de paginação
 ?>
+
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
@@ -257,6 +192,35 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['adicionar_carrinho']))
     <script src="../../js/todos_produtos/favoritos.js" defer></script>
     <script src="../../js/todos_produtos/produto/nome_cd.js" defer></script>
     <script src="../../js/cabeçalho/menu.js" defer></script> <!-- Script do menu interativo -->
+
+    <style>
+/* só um pequeno ajuste visual */
+.paginacao {
+    text-align: center;
+    margin: 20px 0;
+    transition: opacity 0.3s ease;
+}
+
+/* Quando esconder, aplicamos essa classe */
+.paginacao.esconder {
+    display: none !important;
+}
+
+.paginacao a {
+    padding: 8px 12px;
+    margin: 2px;
+    border: 1px solid #ccc;
+    text-decoration: none;
+    color: #333;
+}
+
+.paginacao a.ativa {
+    background-color: #333;
+    color: white;
+}
+
+</style>
+
 </head>
 <body>
     
@@ -489,119 +453,145 @@ if (!empty($usuarioLogado['foto_perfil'])):
             </form>
 
 
-            <div class="fileira_produtos">
+<div class="fileira_produtos">
 
-            <?php while ($cd = $result->fetch_assoc()) { ?>
+<?php while ($cd = $result->fetch_assoc()) { ?>
 
+    <div>
+        <div class="produto">
+            <img src="../../img/<?php echo $cd['capa']; ?>" alt="<?php echo $cd['titulo']; ?>" class="img_capa_cd">
+            <div>
                 <div>
-                    <div class="produto">
-                           <img src="../../img/<?php echo $cd['capa']; ?>" alt="<?php echo $cd['titulo']; ?>" class="img_capa_cd">
-                           <div>
-                               <div>
-                                   <h1 class="nome_cd"><?php echo $cd['titulo']; ?></h1>
-                                   <p class="descricao"><a href="#" class="artista"><?php echo substr($cd['descricao'], 0, 60); ?></a></p>
-                               </div>
-                               <form  method="POST"  action="">
-                <input type="hidden" name="cd_id" value="<?php echo $cd['id_cd']; ?>">
-                <button type="submit" name="adicionar_carrinho" class="carrinho">Adicionar ao Carrinho</button>
-            </form>                             
-              <div class="baixo_part">
-                                   <div>
-                                       <h1 class="valor">R$<?php echo number_format($cd['preco'], 2, ',', '.'); ?></h1>
-                                       <?php if ($cd['desconto'] > 0) { ?>
-                <p class="promo">R$ <?php echo number_format($cd['preco'] * (1 - $cd['desconto'] / 100), 2, ',', '.'); ?></p>
-            <?php } ?>
-                                   </div>
-                    <form method="post" action="favoritar.php" id="favoritar-form">
-    <input type="hidden" name="id_cd" value="<?= $cd['id_cd'] ?>">
-    <input type="hidden" name="id_usuario" value="<?= $_SESSION['id_usuario'] ?>">
-
-    <?php
-    // Verificar se o usuário está logado
-    if (isset($_SESSION['id_usuario'])) {
-        $id_usuario = $_SESSION['id_usuario'];
-    } else {
-        echo "Você precisa estar logado para favoritar CDs.";
-        exit;
-    }
-
-    // Verificar se o CD já está favoritado
-    $sql_verificar = "SELECT 1 FROM Favoritos WHERE id_usuario = ? AND id_cd = ?";
-    $stmt = $conn->prepare($sql_verificar);
-    $stmt->bind_param("ii", $id_usuario, $cd['id_cd']);
-    $stmt->execute();
-    $stmt->store_result();
-
-    if ($stmt->num_rows > 0) {
-        // CD já favoritado, mostrar imagem de favorito ativo
-        $img_favorito = '../../img/todos_produtos/icone_favoritos_selecionado.png'; 
-    } else {
-        // CD não favoritado, mostrar imagem de favorito inativo
-        $img_favorito = '../../img/todos_produtos/icone_favoritos.png'; 
-    }
-    $stmt->close();
-    ?>
-
-    <button type="button" class="btn-favorito" id="favorito-button">
-        <img src="<?= $img_favorito ?>" alt="Favoritar" class="img_favorito" id="favorito-img">
-    </button>
-</form>
-
-
-                         <script>
-    document.querySelectorAll('.btn-favorito').forEach((favoritoButton, index) => {
-        const form = favoritoButton.closest('form');
-        const favoritoImg = favoritoButton.querySelector('.img_favorito');
-
-        favoritoButton.addEventListener("click", function () {
-            const formData = new FormData(form);
-
-            fetch('../../../produtos/favoritar.php', {
-                method: 'POST',
-                body: formData
-            })
-            .then(response => response.json())
-            .then(data => {
-                // Atualiza a imagem do botão clicado
-                favoritoImg.src = data.favoritado
-                    ? '../../../../img/todos_produtos/icone_favoritos_selecionado.png'
-                    : '../../../../img/todos_produtos/icone_favoritos.png';
-
-                // Verifica se todos os favoritos estão selecionados
-                let todosFavoritados = true;
-                document.querySelectorAll('.img_favorito').forEach(img => {
-                    if (!img.src.includes('icone_favoritos_selecionado.png')) {
-                        todosFavoritados = false;
-                    }
-                });
-
-                // Se nem todos estão favoritados, recarrega a página
-                if (!todosFavoritados) {
-                    location.reload();
-                }
-            })
-            .catch(error => {
-                console.error('Erro ao favoritar:', error);
-            });
-        });
-    });
-</script>
-
-
-
-                     </div>
-           </div>
-                    </div>
-                    <a href="produto.php?id_cd=<?php echo $cd['id_cd']; ?>" class="link_produto2"> <div class="butao">Ver Mais</div></a>
+                    <h1 class="nome_cd"><?php echo $cd['titulo']; ?></h1>
+                    <p class="descricao"><a href="#" class="artista"><?php echo substr($cd['descricao'], 0, 60); ?></a></p>
                 </div>
-            <?php } ?>
 
+                <form method="POST" action="">
+                    <input type="hidden" name="cd_id" value="<?php echo $cd['id_cd']; ?>">
+                    <button type="submit" name="adicionar_carrinho" class="carrinho">Adicionar ao Carrinho</button>
+                </form>                             
 
+                <div class="baixo_part">
+                    <div>
+                        <h1 class="valor">R$<?php echo number_format($cd['preco'], 2, ',', '.'); ?></h1>
+                        <?php if ($cd['desconto'] > 0) { ?>
+                            <p class="promo">R$ <?php echo number_format($cd['preco'] * (1 - $cd['desconto'] / 100), 2, ',', '.'); ?></p>
+                        <?php } ?>
+                    </div>
 
-             
+                    <form method="post" action="favoritar.php" id="favoritar-form">
+                        <input type="hidden" name="id_cd" value="<?= $cd['id_cd'] ?>">
+                        <input type="hidden" name="id_usuario" value="<?= $_SESSION['id_usuario'] ?>">
+
+                        <?php
+                        if (isset($_SESSION['id_usuario'])) {
+                            $id_usuario = $_SESSION['id_usuario'];
+                        } else {
+                            echo "Você precisa estar logado para favoritar CDs.";
+                            exit;
+                        }
+
+                        $sql_verificar = "SELECT 1 FROM Favoritos WHERE id_usuario = ? AND id_cd = ?";
+                        $stmt = $conn->prepare($sql_verificar);
+                        $stmt->bind_param("ii", $id_usuario, $cd['id_cd']);
+                        $stmt->execute();
+                        $stmt->store_result();
+
+                        if ($stmt->num_rows > 0) {
+                            $img_favorito = '../../img/todos_produtos/icone_favoritos_selecionado.png'; 
+                        } else {
+                            $img_favorito = '../../img/todos_produtos/icone_favoritos.png'; 
+                        }
+                        $stmt->close();
+                        ?>
+
+                        <button type="button" class="btn-favorito" id="favorito-button">
+                            <img src="<?= $img_favorito ?>" alt="Favoritar" class="img_favorito" id="favorito-img">
+                        </button>
+                    </form>
+
+                    <script>
+                        document.querySelectorAll('.btn-favorito').forEach((favoritoButton, index) => {
+                            const form = favoritoButton.closest('form');
+                            const favoritoImg = favoritoButton.querySelector('.img_favorito');
+
+                            favoritoButton.addEventListener("click", function () {
+                                const formData = new FormData(form);
+                                fetch('../../../produtos/favoritar.php', {
+                                    method: 'POST',
+                                    body: formData
+                                })
+                                .then(response => response.json())
+                                .then(data => {
+                                    favoritoImg.src = data.favoritado
+                                        ? '../../../../img/todos_produtos/icone_favoritos_selecionado.png'
+                                        : '../../../../img/todos_produtos/icone_favoritos.png';
+
+                                    let todosFavoritados = true;
+                                    document.querySelectorAll('.img_favorito').forEach(img => {
+                                        if (!img.src.includes('icone_favoritos_selecionado.png')) {
+                                            todosFavoritados = false;
+                                        }
+                                    });
+
+                                    if (!todosFavoritados) {
+                                        location.reload();
+                                    }
+                                })
+                                .catch(error => {
+                                    console.error('Erro ao favoritar:', error);
+                                });
+                            });
+                        });
+                    </script>
+
+                </div>
             </div>
-        
         </div>
+        <a href="produto.php?id_cd=<?php echo $cd['id_cd']; ?>" class="link_produto2">
+            <div class="butao">Ver Mais</div>
+        </a>
+    </div>
+
+<?php } ?>
+
+</div>
+<!-- PAGINAÇÃO -->
+<?php if ($total_cds > 16) { ?>
+    <div class="paginacao" id="paginacao" data-total-cds="<?php echo $total_cds; ?>">
+        <?php if ($pagina > 1) { ?>
+            <a href="?pagina=<?php echo ($pagina - 1); ?>">&laquo; Anterior</a>
+        <?php } ?>
+
+        <?php for ($i = 1; $i <= $total_paginas; $i++) { ?>
+            <a href="?pagina=<?php echo $i; ?>" class="<?php echo ($i == $pagina) ? 'ativa' : ''; ?>">
+                <?php echo $i; ?>
+            </a>
+        <?php } ?>
+
+        <?php if ($pagina < $total_paginas) { ?>
+            <a href="?pagina=<?php echo ($pagina + 1); ?>">Próxima &raquo;</a>
+        <?php } ?>
+    </div>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const paginacao = document.getElementById('paginacao');
+            if (paginacao) {
+                const totalCDs = parseInt(paginacao.getAttribute('data-total-cds'), 10);
+                if (totalCDs < 17) {
+                    paginacao.style.display = 'none'; // esconde via JS
+                } else {
+                    paginacao.style.display = 'block';
+                }
+            }
+        });
+    </script>
+<?php } ?>
+
+
+
+
     </section>
 
 <footer>

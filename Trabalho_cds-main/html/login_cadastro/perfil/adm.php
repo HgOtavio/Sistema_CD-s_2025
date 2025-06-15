@@ -165,6 +165,9 @@ if (!empty($foto) && file_exists($foto_cliente)) {
                 <button class="butoes"><a href="adm/gerenciar/gerenciar_cds.php" class="a_butoes">CDs</a></button>
                 <button class="butoes"><a href="adm/gerenciar/gerenciar_artistas.php" class="a_butoes">Artistas</a></button>
                 <button class="butoes"><a href="adm/gerenciar/gerenciar_musicas.php" class="a_butoes">Músicas</a></button>
+                 <button class="butoes"><a href="butoes/carrinho.php" class="a_butoes">Carrinho</a></button>
+                <button class="butoes"><a href="butoes/favoritos.php" class="a_butoes">Favoritos</a></button>
+                <button class="butoes"><a href="butoes/historico.php" class="a_butoes">Histórico</a></button>
                 <button class="butoes"><a href="../../login_cadastro/logout.php" class="a_butoes">Sair</a></button>
             </div>
             <div id="cortar">

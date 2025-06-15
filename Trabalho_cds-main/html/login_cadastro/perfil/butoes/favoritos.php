@@ -1,4 +1,3 @@
-
 <?php
 session_start();
 if (!isset($_SESSION["id_usuario"]) || $_SESSION["tipo"] != "cliente") {
@@ -8,10 +7,10 @@ if (!isset($_SESSION["id_usuario"]) || $_SESSION["tipo"] != "cliente") {
 
 include "../../../login_cadastro/conexao.php";
 
-
 $id_usuario = $_SESSION['id_usuario'];
 $res = $conn->query("SELECT * FROM Usuario WHERE id_usuario = $id_usuario");
 $usuarioLogado = $res->fetch_assoc();
+
 // Consultas de gênero, artista e música
 $queryGenero = "SELECT DISTINCT genero FROM CD LIMIT 10";
 $queryArtista = "SELECT nomeArtista FROM Artista LIMIT 10";
@@ -21,9 +20,7 @@ $generos = $conn->query($queryGenero)->fetch_all(MYSQLI_ASSOC);
 $artistas = $conn->query($queryArtista)->fetch_all(MYSQLI_ASSOC);
 $musicas = $conn->query($queryMusica)->fetch_all(MYSQLI_ASSOC);
 
-
-
-// Query para pegar os CDs favoritos do usuário e o desconto da promoção, se houver
+// Query para pegar os CDs favoritos do usuário e o desconto da promoção, se houver (JOINs desnecessários removidos)
 $sql = "
     SELECT 
         CD.id_cd, 
@@ -36,11 +33,7 @@ $sql = "
         CD.genero
     FROM Favoritos
     INNER JOIN CD ON Favoritos.id_cd = CD.id_cd
-    LEFT JOIN CD_Artista ON CD.id_cd = CD_Artista.id_cd
-    LEFT JOIN Artista ON CD_Artista.id_artista = Artista.id_artista
     LEFT JOIN Promocao P ON CD.id_cd = P.id_cd
-    LEFT JOIN CD_Musica ON CD.id_cd = CD_Musica.id_cd
-    LEFT JOIN Musica ON CD_Musica.id_musica = Musica.id_musica
     WHERE Favoritos.id_usuario = ?
 ";
 
@@ -87,6 +80,7 @@ $result = $stmt->get_result();
 
 // Aqui você pode usar $result para exibir os CDs favoritos
 ?>
+
 
 
 <!DOCTYPE html>
@@ -228,113 +222,144 @@ if (!empty($usuarioLogado['foto_perfil'])):
         </div>
     </section>
     
-    <h1 id="titulo">Favoritos</h1>
+  <h1 id="titulo">Favoritos</h1>
 
-    <div id="main">
-        
-            <p id="quantidade"><?php echo $result->num_rows; ?> Produtos</p>
-        
-      <?php if ($result->num_rows === 0): ?>
+<div id="main">
+
+    <!-- Exibe a quantidade total de produtos favoritos encontrados -->
+    <p id="quantidade"><?php echo $result->num_rows; ?> Produtos</p>
+
+<?php if ($result->num_rows === 0): ?>
+    <!-- Caso não tenha nenhum favorito -->
     <p id="nada">Não há favoritos</p>
 <?php else: ?>
+    <!-- Container que segura todos os produtos, para organizar um ao lado do outro -->
+    <div class="fileira_produtos">
     <?php while ($cd = $result->fetch_assoc()) { ?>
-        <div class="fileira_produtos">
+        <!-- Início de cada produto -->
+        <div class="produto">
+            <!-- Exibe a imagem da capa do CD -->
+            <img src="../../../../img/<?php echo $cd['capa']; ?>" alt="<?php echo $cd['titulo']; ?>" class="img_capa_cd">
+
             <div>
-                <div class="produto">
-                    <img src="../../../../img/<?php echo $cd['capa']; ?>" alt="<?php echo $cd['titulo']; ?>" class="img_capa_cd">
-                    <div>
-                        <div>
-                            <h1 class="nome_cd"><?php echo $cd['titulo']; ?></h1>
-                            <p class="descricao"><a href="" class="artista"><?php echo substr($cd['descricao'], 0, 60); ?></a></p>
-                        </div>
-                        <form method="POST" action="">
-                            <input type="hidden" name="cd_id" value="<?php echo $cd['id_cd']; ?>">
-                            <button type="submit" name="adicionar_carrinho" class="carrinho">Adicionar ao Carrinho</button>
-                        </form>              
-                        <div class="baixo_part">
-                            <div>
-                                <h1 class="valor">R$<?php echo number_format($cd['preco'], 2, ',', '.'); ?></h1>
-                                <?php if ($cd['desconto'] > 0) { ?>
-                                    <p class="promo">R$ <?php echo number_format($cd['preco'] * (1 - $cd['desconto'] / 100), 2, ',', '.'); ?></p>
-                                <?php } ?>
-                            </div>
-                            <form method="post" action="../../../produtos/favoritar.php" id="favoritar-form">
-                                <input type="hidden" name="id_cd" value="<?= $cd['id_cd'] ?>">
-                                <input type="hidden" name="id_usuario" value="<?= $_SESSION['id_usuario'] ?>">
+                <div>
+                    <!-- Exibe o título do CD -->
+                    <h1 class="nome_cd"><?php echo $cd['titulo']; ?></h1>
 
-                                <?php
-                                if (isset($_SESSION['id_usuario'])) {
-                                    $id_usuario = $_SESSION['id_usuario'];
-                                } else {
-                                    echo "Você precisa estar logado para favoritar CDs.";
-                                    exit;
-                                }
-
-                                $sql_verificar = "SELECT 1 FROM Favoritos WHERE id_usuario = ? AND id_cd = ?";
-                                $stmt = $conn->prepare($sql_verificar);
-                                $stmt->bind_param("ii", $id_usuario, $cd['id_cd']);
-                                $stmt->execute();
-                                $stmt->store_result();
-
-                                if ($stmt->num_rows > 0) {
-                                    $img_favorito = '../../../../img/todos_produtos/icone_favoritos_selecionado.png'; 
-                                } else {
-                                    $img_favorito = '../../../../img/todos_produtos/icone_favoritos.png'; 
-                                }
-                                $stmt->close();
-                                ?>
-
-                                <button type="button" class="btn-favorito" id="favorito-button">
-                                    <img src="<?= $img_favorito ?>" alt="Favoritar" class="img_favorito" id="favorito-img">
-                                </button>
-                            </form>
-
-                         <script>
-    document.querySelectorAll('.btn-favorito').forEach((favoritoButton, index) => {
-        const form = favoritoButton.closest('form');
-        const favoritoImg = favoritoButton.querySelector('.img_favorito');
-
-        favoritoButton.addEventListener("click", function () {
-            const formData = new FormData(form);
-
-            fetch('../../../produtos/favoritar.php', {
-                method: 'POST',
-                body: formData
-            })
-            .then(response => response.json())
-            .then(data => {
-                // Atualiza a imagem do botão clicado
-                favoritoImg.src = data.favoritado
-                    ? '../../../../img/todos_produtos/icone_favoritos_selecionado.png'
-                    : '../../../../img/todos_produtos/icone_favoritos.png';
-
-                // Verifica se todos os favoritos estão selecionados
-                let todosFavoritados = true;
-                document.querySelectorAll('.img_favorito').forEach(img => {
-                    if (!img.src.includes('icone_favoritos_selecionado.png')) {
-                        todosFavoritados = false;
-                    }
-                });
-
-                // Se nem todos estão favoritados, recarrega a página
-                if (!todosFavoritados) {
-                    location.reload();
-                }
-            })
-            .catch(error => {
-                console.error('Erro ao favoritar:', error);
-            });
-        });
-    });
-</script>
-
-                        </div>
-                    </div>
+                    <!-- Exibe um pedaço da descrição (máx 60 caracteres) -->
+                    <p class="descricao">
+                        <a href="" class="artista">
+                            <?php echo substr($cd['descricao'], 0, 60); ?>
+                        </a>
+                    </p>
                 </div>
-                <a href="../../../produtos/produto.php?id_cd=<?php echo $cd['id_cd']; ?>"  class="link_produto2"> <div class="butao">Ver Mais</div></a>
-            </div>
-        </div>
+
+                <!-- Formulário para adicionar o item no carrinho -->
+                <form method="POST" action="">
+                    <input type="hidden" name="cd_id" value="<?php echo $cd['id_cd']; ?>">
+                    <button type="submit" name="adicionar_carrinho" class="carrinho">Adicionar ao Carrinho</button>
+                </form>              
+
+                <div class="baixo_part">
+                    <div>
+                        <!-- Exibe o preço original -->
+                        <h1 class="valor">R$<?php echo number_format($cd['preco'], 2, ',', '.'); ?></h1>
+
+                        <!-- Exibe o preço com desconto (se houver) -->
+                        <?php if ($cd['desconto'] > 0) { ?>
+                            <p class="promo">
+                                R$ <?php echo number_format($cd['preco'] * (1 - $cd['desconto'] / 100), 2, ',', '.'); ?>
+                            </p>
+                        <?php } ?>
+                    </div>
+
+                    <!-- Formulário de favoritos -->
+                    <form method="post" action="../../../produtos/favoritar.php" id="favoritar-form">
+                        <input type="hidden" name="id_cd" value="<?= $cd['id_cd'] ?>">
+                        <input type="hidden" name="id_usuario" value="<?= $_SESSION['id_usuario'] ?>">
+
+                        <?php
+                        // Verifica se o usuário está logado
+                        if (isset($_SESSION['id_usuario'])) {
+                            $id_usuario = $_SESSION['id_usuario'];
+                        } else {
+                            echo "Você precisa estar logado para favoritar CDs.";
+                            exit;
+                        }
+
+                        // Verifica se o produto já está favoritado
+                        $sql_verificar = "SELECT 1 FROM Favoritos WHERE id_usuario = ? AND id_cd = ?";
+                        $stmt = $conn->prepare($sql_verificar);
+                        $stmt->bind_param("ii", $id_usuario, $cd['id_cd']);
+                        $stmt->execute();
+                        $stmt->store_result();
+
+                        // Define a imagem correta conforme o status de favorito
+                        if ($stmt->num_rows > 0) {
+                            $img_favorito = '../../../../img/todos_produtos/icone_favoritos_selecionado.png'; 
+                        } else {
+                            $img_favorito = '../../../../img/todos_produtos/icone_favoritos.png'; 
+                        }
+                        $stmt->close();
+                        ?>
+
+                        <!-- Botão de favoritar -->
+                        <button type="button" class="btn-favorito" id="favorito-button">
+                            <img src="<?= $img_favorito ?>" alt="Favoritar" class="img_favorito" id="favorito-img">
+                        </button>
+                    </form>
+
+                    <!-- Código JS para enviar a requisição de favoritar/desfavoritar via AJAX -->
+                    <script>
+                        document.querySelectorAll('.btn-favorito').forEach((favoritoButton, index) => {
+                            const form = favoritoButton.closest('form');
+                            const favoritoImg = favoritoButton.querySelector('.img_favorito');
+
+                            favoritoButton.addEventListener("click", function () {
+                                const formData = new FormData(form);
+
+                                fetch('../../../produtos/favoritar.php', {
+                                    method: 'POST',
+                                    body: formData
+                                })
+                                .then(response => response.json())
+                                .then(data => {
+                                    // Atualiza a imagem conforme o retorno da requisição
+                                    favoritoImg.src = data.favoritado
+                                        ? '../../../../img/todos_produtos/icone_favoritos_selecionado.png'
+                                        : '../../../../img/todos_produtos/icone_favoritos.png';
+
+                                    // Verifica se todos ainda estão favoritados
+                                    let todosFavoritados = true;
+                                    document.querySelectorAll('.img_favorito').forEach(img => {
+                                        if (!img.src.includes('icone_favoritos_selecionado.png')) {
+                                            todosFavoritados = false;
+                                        }
+                                    });
+
+                                    // Se algum deixou de ser favoritado, recarrega a página
+                                    if (!todosFavoritados) {
+                                        location.reload();
+                                    }
+                                })
+                                .catch(error => {
+                                    console.error('Erro ao favoritar:', error);
+                                });
+                            });
+                        });
+                    </script>
+
+                </div> <!-- fim baixo_part -->
+            </div> <!-- fim bloco principal -->
+        </div> <!-- fim produto -->
+
+        <!-- Botão Ver Mais -->
+        <a href="../../../produtos/produto.php?id_cd=<?php echo $cd['id_cd']; ?>" class="link_produto2">
+            <div class="butao">Ver Mais</div>
+        </a>
+
     <?php } ?>
+    </div> <!-- fim fileira_produtos -->
 <?php endif; ?>
 
 </main>

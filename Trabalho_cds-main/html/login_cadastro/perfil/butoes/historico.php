@@ -8,12 +8,11 @@ if (!isset($_SESSION['id_usuario'])) {
     exit;
 }
 
-date_default_timezone_set('America/Sao_Paulo'); // Define o fuso horário para o Brasil
-$dataAtual = date('d/m/Y'); // Formato brasileiro: dia/mês/ano
 $id_usuario = $_SESSION['id_usuario'];
 $res = $conn->query("SELECT * FROM Usuario WHERE id_usuario = $id_usuario");
 $usuarioLogado = $res->fetch_assoc();
-// Consultas de gênero, artista e música
+
+// Consultas de gênero, artista e música (se precisar)
 $queryGenero = "SELECT DISTINCT genero FROM CD LIMIT 10";
 $queryArtista = "SELECT nomeArtista FROM Artista LIMIT 10";
 $queryMusica = "SELECT nomeMusica FROM Musica LIMIT 10";
@@ -22,8 +21,7 @@ $generos = $conn->query($queryGenero)->fetch_all(MYSQLI_ASSOC);
 $artistas = $conn->query($queryArtista)->fetch_all(MYSQLI_ASSOC);
 $musicas = $conn->query($queryMusica)->fetch_all(MYSQLI_ASSOC);
 
-
-
+// Query para pegar as compras recentes do usuário
 $sql = "SELECT c.id_compra, c.id_cd, c.quantidade, c.forma_pagamento, c.tipo_pagamento, c.tipo_envio, 
                c.enderecoEntrega, c.valorTotal, c.cep_entrega, c.estimativa_entrega, c.taxa_entrega, 
                cd.titulo AS cd_titulo, cd.capa
@@ -32,11 +30,17 @@ $sql = "SELECT c.id_compra, c.id_cd, c.quantidade, c.forma_pagamento, c.tipo_pag
         WHERE c.id_usuario = ? AND c.data_compra >= DATE_SUB(NOW(), INTERVAL 13 DAY)
         ORDER BY c.data_compra DESC";
 
+        
+        
+
+
 $stmt = $conn->prepare($sql);
 $stmt->bind_param("i", $id_usuario);
 $stmt->execute();
 $result = $stmt->get_result();
+
 ?>
+
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
@@ -116,7 +120,7 @@ if (!empty($usuarioLogado['foto_perfil'])):
             <ul id="menu">
 
                  <li class="p_menu"><a href="../../../pagina_inicial/index_logado.php" class="a_menu">Inicio</a></li>
-                <li class="p_menu"><a href="../../../produtos/todos_os_produtos.php?" class="a_menu">Produtos</a></li>
+                <li class="p_menu"><a href="../../../produtos/todos_os_produtos.php" class="a_menu">Produtos</a></li>
                 
                   <!-- Menu suspenso de gêneros musicais -->
                 <li class="p_menu" id="menu_genero">
@@ -161,10 +165,20 @@ if (!empty($usuarioLogado['foto_perfil'])):
     </header>
     <section id="section">
     <h1 id="titulo">Historico de compras</h1>
-    <button class="button" id="voltar"><a href="#" class="link">Voltar</a></button>
+    <button class="button" id="voltar"><a href="../user.php" class="link">Voltar</a></button>
     <?php
 if ($result->num_rows > 0) {
     while ($row = $result->fetch_assoc()) {
+
+        // ATENÇÃO: AQUI JÁ FAZEMOS A CONVERSÃO ANTES DE IMPRIMIR
+        if ($row['tipo_envio'] == 'aéreo') {
+            $tipoEnvioExibir = 'Retirada';
+        } elseif ($row['tipo_envio'] == 'maritimo') {
+            $tipoEnvioExibir = 'Correios';
+        } else {
+            $tipoEnvioExibir = $row['tipo_envio'];
+        }
+
         echo "<div id='produtos'>";
         echo "<div class='produto'> ";
 
@@ -176,15 +190,33 @@ if ($result->num_rows > 0) {
         echo "<div class='duas part1'>";
         echo "<p class='sub_titulo'>Quantidade: <span class='info_sub'>{$row['quantidade']}</span></p>";
         echo "<p class='sub_titulo'>Forma de pagamento: <span class='info_sub'>{$row['forma_pagamento']}</span></p>";
-        echo "<p class='sub_titulo'>Tipo de envio: <span class='info_sub'>{$row['tipo_envio']}</span></p>";
+            
+
+        echo "<p class='sub_titulo'>Tipo de envio: <span class='info_sub'>{$tipoEnvioExibir}</span></p>";
         echo "</div>";
 
         echo "<div class='duas'>";
         echo "<p class='sub_titulo'>Endereço: <span class='info_sub'>{$row['enderecoEntrega']}</span></p>";
         echo "<p class='sub_titulo'>Total: <span class='info_sub'>R$ " . number_format($row['valorTotal'], 2, ',', '.') . "</span></p>";
         echo "<p class='sub_titulo'>Taxa de entrega: <span class='info_sub'>R$ " . number_format($row['taxa_entrega'], 2, ',', '.') . "</span></p>";
-        echo "<p class='sub_titulo'>Previsão de entrega: <span class='info_sub'>" . date('d/m/Y', strtotime($row['estimativa_entrega'])) . "</span></p>";
-        echo "</div>";
+        
+if (!empty($row['estimativa_entrega'])) {
+        // Converter dd/mm/yyyy para DateTime
+        $dataEntrega = DateTime::createFromFormat('d/m/Y', $row['estimativa_entrega']);
+        $dataHoje = new DateTime();
+
+        if ($dataEntrega && $dataHoje >= $dataEntrega) {
+            echo "<p class='sub_titulo'>Status do pedido: <span class='info_sub'>Pedido entregue</span></p>";
+        } else {
+            echo "<p class='sub_titulo'>Previsão de entrega: <span class='info_sub'>" . htmlspecialchars($row['estimativa_entrega']) . "</span></p>";
+        }
+    } else {
+        echo "<p class='sub_titulo'>Previsão de entrega: <span class='info_sub'>Data não disponível</span></p>";
+    }
+
+    echo "</div><hr>";
+
+
 
         echo "</div>"; // Fecha produto
         echo "</div>"; // Fecha produtos
@@ -198,7 +230,7 @@ $stmt->close();
 
     </section>
 
-    <div id="div_but_prod" ><button class="button" id="but_prod"><a href="#" class="link" id="link_prod">Tela de Produtos</a></button></div>
+    <div id="div_but_prod" ><button class="button" id="but_prod"><a href="../../../produtos/todos_os_produtos.php" class="link" id="link_prod">Tela de Produtos</a></button></div>
 
      <!-- Seção de imagens à direita -->
      <div id="imgs_direita">
