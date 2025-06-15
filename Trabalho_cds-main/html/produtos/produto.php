@@ -373,7 +373,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['adicionar_carrinho']))
 
             <div class="input-wrapper">
                 <button type="button" onclick="decrementar(this)">-</button>
-                <input type="number" name="quantidade" class="quantidade-input" value="1" min="1" max="<?= $cd['disponibilidade'] ?>" required>
+                <input type="number" name="quantidade" class="quantidade-input" value="0" min="1" max="<?= $cd['disponibilidade'] ?>" required>
                 <button type="button" onclick="incrementar(this)">+</button>
             </div>
 
