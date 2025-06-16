@@ -227,22 +227,11 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['adicionar_carrinho']))
 
                 <!-- Submenu de Gêneros -->
                 <ul class="subclasse_menu" id="sumir_g">
-                    
-                    <ul class="sub_subclasse_menu">
-                        <li><a href="#" class="sub_a">Clássica</a></li>
-                        <li><a href="#" class="sub_a">Eletrônica</a></li>
-                        <li><a href="#" class="sub_a">Forro</a></li>
-                        <li><a href="#" class="sub_a">Hip Hop</a></li>
-                        <li><a href="#" class="sub_a">MPB</a></li>
-                    </ul>
-                    
-                    <ul class="sub_subclasse_menu">
-                        <li><a href="#" class="sub_a">Pagode</a></li>
-                        <li><a href="#" class="sub_a">Pop</a></li>
-                        <li><a href="#" class="sub_a">Reggae</a></li>
-                        <li><a href="#" class="sub_a">Rock</a></li>
-                        <li><a href="#" class="sub_a">Sertanejo</a></li>
-                    </ul>
+                   <ul class="sub_subclasse_menu">
+                        <?php foreach ($generos as $genero): ?>
+                                 <li><a href="../produtos/todos_os_produtos.php?genero=<?= htmlspecialchars($genero['genero']) ?>" class="sub_a"><?= htmlspecialchars($genero['genero']) ?></a></li>
+                        <?php endforeach; ?>
+                        </ul>
                 </ul>
             </li>
 
@@ -256,21 +245,11 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['adicionar_carrinho']))
                 <!-- Submenu de Artistas -->
                 <ul class="subclasse_menu_a" id="sumir_a">
                     
-                    <ul class="sub_subclasse_menu">
-                        <li><a href="#" class="sub_a">Ludwing Beethowen</a></li>
-                        <li><a href="#" class="sub_a">Marshmello</a></li>
-                        <li><a href="#" class="sub_a">Luiz Gonzaga</a></li>
-                        <li><a href="#" class="sub_a">Snoop Dogg</a></li>
-                        <li><a href="#" class="sub_a">Maria Bethânia</a></li>
-                    </ul>
-                    
-                    <ul class="sub_subclasse_menu">
-                        <li><a href="#" class="sub_a">Péricles</a></li>
-                        <li><a href="#" class="sub_a">Michael Jackson</a></li>
-                        <li><a href="#" class="sub_a">Bob Marley</a></li>
-                        <li><a href="#" class="sub_a">Elvis Presley</a></li>
-                        <li><a href="#" class="sub_a">Luan Santana</a></li>
-                    </ul>
+                   <ul class="sub_subclasse_menu">
+                        <?php foreach ($artistas as $artista): ?>
+                           <li><a href="../produtos/todos_os_produtos.php?busca_geral=<?= htmlspecialchars($artista['nomeArtista']) ?>"  class="sub_a"><?= htmlspecialchars($artista['nomeArtista']) ?></a></li>
+                        <?php endforeach; ?>
+                        </ul>
                 </ul>
             </li>
         </ul>

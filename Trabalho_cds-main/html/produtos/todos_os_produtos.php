@@ -271,7 +271,7 @@ if (!empty($usuarioLogado['foto_perfil'])):
         <img src="../../img/php_cliente//<?php echo htmlspecialchars($usuarioLogado['foto_perfil']); ?>" id="Perfil" alt="Perfil">
     </a>
 <?php else:
-    // Se não tiver foto, mesma lógica para o link com imagem padrão
+    // Se não tiver fto, mesma lógica para o link com imagem padrão
     if ($usuarioLogado['tipo'] === 'admin') {
         $linkPerfil = "../login_cadastro/perfil/admin.php";
     } else {
